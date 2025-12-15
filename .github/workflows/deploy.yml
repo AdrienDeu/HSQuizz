@@ -1,4 +1,4 @@
-name: Deploy Angular App
+name: Deploy App (Frontend + Backend)
 
 on:
   push:
@@ -22,28 +22,34 @@ jobs:
         port: 22
         script: |
           set -e
-          echo "🚀 Début du déploiement sur MAIN..."
+          echo "🚀 DÉBUT DU DÉPLOIEMENT..."
 
-          # 1. Aller dans le dossier
+          # --- 1. MISE A JOUR DU CODE (Frontend ET Backend) ---
           cd /var/www/HSQuizz
-          
-          # 2. FORCER la mise à jour (La méthode radicale et propre)
-          # On s'assure d'être sur la branche main
+          echo "📥 Récupération du code depuis GitHub..."
           git checkout main
-          # On récupère tout
           git fetch --all
-          # On écrase les modifs locales pour être identique à GitHub (évite les conflits)
+          # Attention : Ceci écrase toute modification faite à la main sur le serveur !
           git reset --hard origin/main
-          
-          # 3. Entrer dans le sous-dossier Angular
-          cd frontend
 
-          # 4. Install & Build
-          echo "📦 Installation des dépendances..."
+          # --- 2. FRONTEND (Angular) ---
+          echo "🅰️  Mise à jour du Frontend..."
+          cd frontend
+          echo "📦 Installation des dépendances Frontend..."
           npm ci
-          
-          echo "🏗️ Build de l'application..."
+          echo "🏗️  Build de l'application Angular..."
           npm run build -- --configuration production
+
+          # --- 3. BACKEND (Node.js) ---
+          echo "🔙 Mise à jour du Backend..."
+          # On remonte d'un cran (..) et on va dans backend
+          cd ../backend
           
-          # 5. On termine
-          echo "✅ Déploiement terminé ! Nginx va servir les nouveaux fichiers."
+          echo "📦 Installation des dépendances Backend..."
+          npm install --production
+
+          echo "🔄 Redémarrage du serveur Node.js..."
+          # On redémarre le processus PM2 qu'on a créé ensemble
+          pm2 restart hs-backend
+
+          echo "✅ DÉPLOIEMENT TERMINÉ AVEC SUCCÈS ! 🎉"

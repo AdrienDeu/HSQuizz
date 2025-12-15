@@ -1,0 +1,120 @@
+.footer {
+  background: linear-gradient(180deg, #2d1f14 0%, #1a1208 100%);
+  border-top: 3px solid #8b7355;
+  padding: 1.5rem 1rem;
+  margin-top: auto;
+  
+  @media (min-width: 768px) {
+    padding: 1.5rem 2rem;
+  }
+  
+  @media (min-width: 1200px) {
+    padding: 2rem 3rem;
+  }
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    gap: 2rem;
+  }
+}
+
+.footer-author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  @media (min-width: 768px) {
+    flex: 1;
+  }
+  
+  .author-label {
+    font-size: 0.85rem;
+    color: #a89070;
+  }
+  
+  .author-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #f4e4bc;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    
+    @media (min-width: 768px) {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  .social-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .link-text {
+    @media (max-width: 400px) {
+      display: none;
+    }
+  }
+  
+  &.linkedin {
+    background: #0077b5;
+    color: white;
+    border: 2px solid #0088cc;
+    
+    &:hover {
+      background: #0088cc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 119, 181, 0.4);
+    }
+  }
+  
+  &.github {
+    background: #333;
+    color: white;
+    border: 2px solid #555;
+    
+    &:hover {
+      background: #444;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  color: #6b5a4a;
+  margin-top: 0.5rem;
+  
+  @media (min-width: 768px) {
+    flex: 1;
+    text-align: right;
+    margin-top: 0;
+  }
+}

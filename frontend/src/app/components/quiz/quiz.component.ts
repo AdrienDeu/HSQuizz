@@ -37,7 +37,8 @@ export class QuizComponent implements OnInit {
     { value: 'cost', label: HIDDEN_ATTRIBUTE_LABELS['cost'] },
     { value: 'attack', label: HIDDEN_ATTRIBUTE_LABELS['attack'] },
     { value: 'health', label: HIDDEN_ATTRIBUTE_LABELS['health'] },
-    { value: 'rarity', label: HIDDEN_ATTRIBUTE_LABELS['rarity'] }
+    { value: 'rarity', label: HIDDEN_ATTRIBUTE_LABELS['rarity'] },
+    { value: 'set', label: HIDDEN_ATTRIBUTE_LABELS['set'] }
   ];
   
   // Stats

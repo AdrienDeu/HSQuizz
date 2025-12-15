@@ -1,0 +1,112 @@
+<div class="leaderboard-container">
+  <!-- Header -->
+  <div class="leaderboard-header">
+    <h1>🏆 Leaderboard</h1>
+    <p class="subtitle">Top 200 des meilleurs joueurs Hearthstone</p>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="region-select">Région</label>
+      <select 
+        id="region-select" 
+        [(ngModel)]="selectedRegion" 
+        (change)="onRegionChange()"
+        class="filter-select"
+      >
+        <option *ngFor="let region of regions" [value]="region">
+          {{ regionLabels[region] }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="gamemode-select">Mode de jeu</label>
+      <select 
+        id="gamemode-select" 
+        [(ngModel)]="selectedGameMode" 
+        (change)="onGameModeChange()"
+        class="filter-select"
+      >
+        <option *ngFor="let mode of gameModes" [value]="mode">
+          {{ gameModeLabels[mode] }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Chargement du leaderboard...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error-message">
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadLeaderboard()">
+      Réessayer
+    </button>
+  </div>
+
+  <!-- Leaderboard Table -->
+  <div *ngIf="!loading && !error && leaderboardEntries.length > 0" class="leaderboard-content">
+    <div class="table-container">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th class="rank-col">Rang</th>
+            <th class="player-col">Joueur</th>
+            <th *ngIf="selectedGameMode === 'battlegrounds' || selectedGameMode === 'battlegroundsduo'" class="rating-col">Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            *ngFor="let entry of leaderboardEntries" 
+            [class]="getMedalClass(entry.rank)"
+          >
+            <td class="rank-cell">
+              <span class="medal" *ngIf="entry.rank <= 3">{{ getMedalEmoji(entry.rank) }}</span>
+              <span class="rank-number">{{ entry.rank }}</span>
+            </td>
+            <td class="player-cell">{{ entry.accountid }}</td>
+            <td *ngIf="selectedGameMode === 'battlegrounds' || selectedGameMode === 'battlegroundsduo'" class="rating-cell">
+              {{ entry.rating || '-' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination Bottom -->
+  <div *ngIf="!loading && !error && allEntries.length > 0" class="pagination-section">
+    <div class="pagination-controls">
+      <button 
+        class="pagination-btn" 
+        (click)="previousPage()" 
+        [disabled]="currentPage === 1"
+      >
+        ◀ Précédent
+      </button>
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of [].constructor(totalPages); let i = index"
+          class="page-btn" 
+          [class.active]="currentPage === i + 1"
+          (click)="goToPage(i + 1)"
+        >
+          {{ i + 1 }}
+        </button>
+      </div>
+      <button 
+        class="pagination-btn" 
+        (click)="nextPage()" 
+        [disabled]="currentPage === totalPages"
+      >
+        Suivant ▶
+      </button>
+    </div>
+  </div>
+</div>

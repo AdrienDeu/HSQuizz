@@ -1,0 +1,10 @@
+{
+  "/api/blizzard": {
+    "target": "https://hearthstone.blizzard.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/blizzard": "/en-us/api/community"
+    }
+  }
+}

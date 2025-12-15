@@ -6,7 +6,11 @@
     </a>
     
     <div class="navbar-actions">
-      <a [href]="mailtoLink" class="suggestions-btn" title="Envoyer une suggestion">
+      <a routerLink="/leaderboard" class="nav-btn leaderboard-btn" title="Voir le leaderboard">
+        <span class="btn-icon">🏆</span>
+        <span class="btn-text">Leaderboard</span>
+      </a>
+      <a [href]="mailtoLink" class="nav-btn suggestions-btn" title="Envoyer une suggestion">
         <span class="btn-icon">💡</span>
         <span class="btn-text">Suggestions</span>
       </a>

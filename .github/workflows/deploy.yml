@@ -1,0 +1,49 @@
+name: Deploy Angular App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: 22
+        script: |
+          set -e
+          echo "🚀 Début du déploiement sur MAIN..."
+
+          # 1. Aller dans le dossier
+          cd /var/www/HSQuizz
+          
+          # 2. FORCER la mise à jour (La méthode radicale et propre)
+          # On s'assure d'être sur la branche main
+          git checkout main
+          # On récupère tout
+          git fetch --all
+          # On écrase les modifs locales pour être identique à GitHub (évite les conflits)
+          git reset --hard origin/main
+          
+          # 3. Entrer dans le sous-dossier Angular
+          cd frontend
+
+          # 4. Install & Build
+          echo "📦 Installation des dépendances..."
+          npm ci
+          
+          echo "🏗️ Build de l'application..."
+          npm run build -- --configuration production
+          
+          # 5. On termine
+          echo "✅ Déploiement terminé ! Nginx va servir les nouveaux fichiers."

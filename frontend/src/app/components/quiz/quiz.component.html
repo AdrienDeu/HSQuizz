@@ -1,0 +1,105 @@
+<div class="quiz-container">
+  <!-- Header -->
+  <header class="quiz-header">
+    <h1>🎴 HSQuizz</h1>
+    <p class="subtitle">Devinez le nom de la carte Hearthstone !</p>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-label">Score</span>
+      <span class="stat-value">{{ correctAnswers }}/{{ totalAnswered }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Réussite</span>
+      <span class="stat-value">{{ successRate }}%</span>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Chargement des cartes...</p>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (error) {
+    <div class="error-message">
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadCards()">Réessayer</button>
+    </div>
+  }
+
+  <!-- Quiz content -->
+  @if (!loading && !error && currentQuestion) {
+    <div class="quiz-content">
+      <!-- Card display -->
+      <app-card-display
+        [card]="currentQuestion.card"
+        [hiddenAttribute]="currentQuestion.hiddenAttribute"
+        [revealed]="currentQuestion.revealed || currentQuestion.correct === true">
+      </app-card-display>
+
+      <!-- Answer section -->
+      <div class="answer-section">
+        @if (!currentQuestion.answered) {
+          <!-- Input form -->
+          <div class="input-group">
+            <input
+              type="text"
+              class="answer-input"
+              [(ngModel)]="userAnswer"
+              (keydown)="onKeyDown($event)"
+              placeholder="Entrez le nom de la carte..."
+              autofocus>
+            <button 
+              class="btn btn-primary"
+              (click)="submitAnswer()"
+              [disabled]="!userAnswer.trim()">
+              Valider
+            </button>
+          </div>
+          <button class="btn btn-secondary btn-reveal" (click)="revealAnswer()">
+            Je ne sais pas 😅
+          </button>
+        } @else {
+          <!-- Feedback -->
+          <div class="feedback" [class.correct]="currentQuestion.correct" [class.incorrect]="!currentQuestion.correct">
+            @if (currentQuestion.correct) {
+              <div class="feedback-icon">✅</div>
+              <h2>Correct !</h2>
+              <p class="correct-answer">{{ currentQuestion.card.name }}</p>
+            } @else {
+              <div class="feedback-icon">❌</div>
+              <h2>{{ currentQuestion.revealed ? 'Réponse révélée' : 'Incorrect' }}</h2>
+              @if (currentQuestion.userAnswer) {
+                <p class="user-answer">Votre réponse : {{ currentQuestion.userAnswer }}</p>
+              }
+              <p class="correct-answer">Réponse : <strong>{{ currentQuestion.card.name }}</strong></p>
+            }
+          </div>
+
+          <!-- Actions -->
+          <div class="action-buttons">
+            @if (!currentQuestion.correct && !currentQuestion.revealed) {
+              <button class="btn btn-secondary" (click)="retry()">
+                Réessayer
+              </button>
+            }
+            <button class="btn btn-primary" (click)="nextCard()">
+              Carte suivante →
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Footer -->
+  <footer class="quiz-footer">
+    <p>{{ cards.length }} cartes disponibles</p>
+  </footer>
+</div>

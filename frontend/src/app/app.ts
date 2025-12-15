@@ -1,12 +1,11 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { QuizComponent } from './components/quiz/quiz.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  standalone: true,
+  imports: [QuizComponent],
+  template: '<app-quiz></app-quiz>',
+  styles: []
 })
-export class App {
-  protected readonly title = signal('hsquizz-frontend');
-}
+export class App {}

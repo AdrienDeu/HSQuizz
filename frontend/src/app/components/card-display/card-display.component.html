@@ -1,0 +1,86 @@
+<div class="card-container" [class]="rarityClass">
+  <!-- En-tête avec nom -->
+  <div class="card-header">
+    <span class="card-name" [class.hidden]="isHidden('name')">
+      {{ getDisplayValue('name', card.name) }}
+    </span>
+    @if (card.cost !== undefined) {
+      <span class="card-cost mana-crystal">
+        {{ getDisplayValue('cost', card.cost) }}
+      </span>
+    }
+  </div>
+
+  <!-- Corps de la carte -->
+  <div class="card-body">
+    <!-- Info ligne 1: Type et Classe -->
+    <div class="card-info-row">
+      <div class="info-item">
+        <span class="label">Type</span>
+        <span class="value">{{ translatedType }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Classe</span>
+        <span class="value" [class.hidden]="isHidden('cardClass')">
+          {{ isHidden('cardClass') ? '???' : translatedClass }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Info ligne 2: Rareté et Race -->
+    <div class="card-info-row">
+      <div class="info-item">
+        <span class="label">Rareté</span>
+        <span class="value rarity-badge" [class]="rarityClass" [class.hidden]="isHidden('rarity')">
+          {{ isHidden('rarity') ? '???' : translatedRarity }}
+        </span>
+      </div>
+      @if (translatedRace) {
+        <div class="info-item">
+          <span class="label">Race</span>
+          <span class="value">{{ translatedRace }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Stats pour serviteurs/armes -->
+    @if (isMinion || isWeapon) {
+      <div class="card-stats">
+        <div class="stat attack">
+          <span class="stat-icon">⚔️</span>
+          <span class="stat-value" [class.hidden]="isHidden('attack')">
+            {{ getDisplayValue('attack', card.attack) }}
+          </span>
+        </div>
+        @if (isMinion) {
+          <div class="stat health">
+            <span class="stat-icon">❤️</span>
+            <span class="stat-value" [class.hidden]="isHidden('health')">
+              {{ getDisplayValue('health', card.health) }}
+            </span>
+          </div>
+        }
+        @if (isWeapon) {
+          <div class="stat durability">
+            <span class="stat-icon">🛡️</span>
+            <span class="stat-value">{{ card.durability ?? '-' }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Texte de la carte -->
+    @if (cleanText) {
+      <div class="card-text">
+        <span class="label">Effet</span>
+        <p class="effect-text">{{ cleanText }}</p>
+      </div>
+    }
+
+    <!-- Extension -->
+    <div class="card-set">
+      <span class="label">Extension</span>
+      <span class="value">{{ card.set }}</span>
+    </div>
+  </div>
+</div>

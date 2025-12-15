@@ -28,7 +28,7 @@ export interface Card {
 /**
  * Type des attributs masquables dans le quiz
  */
-export type HiddenAttribute = 'name' | 'cardClass' | 'cost' | 'attack' | 'health' | 'rarity';
+export type HiddenAttribute = 'name' | 'cardClass' | 'cost' | 'attack' | 'health' | 'rarity' | 'set';
 
 /**
  * Labels pour les attributs devinables
@@ -39,7 +39,8 @@ export const HIDDEN_ATTRIBUTE_LABELS: Record<HiddenAttribute, string> = {
   cost: 'Coût en mana',
   attack: 'Attaque',
   health: 'Points de vie',
-  rarity: 'Rareté'
+  rarity: 'Rareté',
+  set: 'Extension'
 };
 
 /**

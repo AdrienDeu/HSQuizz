@@ -142,6 +142,13 @@ export class CardService {
   }
 
   /**
+   * Traduit l'extension en français
+   */
+  static translateSet(set: string): string {
+    return SET_TRANSLATIONS[set] || set;
+  }
+
+  /**
    * Traduit la race en français
    */
   static translateRace(race: string): string {

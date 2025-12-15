@@ -76,6 +76,8 @@ export class QuizService {
         return 'Entrez les points de vie';
       case 'rarity':
         return 'Entrez la rareté (Commune, Rare, Épique, Légendaire)';
+      case 'set':
+        return 'Entrez l\'extension (ex: Les Titans, Forgés dans les Tarides...)';
       default:
         return 'Entrez votre réponse...';
     }
@@ -104,6 +106,14 @@ export class QuizService {
       }
     }
 
+    // Pour les extensions, accepter le code original ET la traduction
+    if (question.hiddenAttribute === 'set') {
+      const setCode = question.card.set;
+      if (normalizedUserAnswer === this.normalizeString(setCode)) {
+        return true;
+      }
+    }
+
     return normalizedUserAnswer === normalizedCorrectValue;
   }
 
@@ -124,6 +134,8 @@ export class QuizService {
         return card.health?.toString() ?? '0';
       case 'rarity':
         return CardService.translateRarity(card.rarity ?? '');
+      case 'set':
+        return CardService.translateSet(card.set);
       default:
         return '';
     }

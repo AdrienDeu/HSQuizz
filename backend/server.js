@@ -90,4 +90,41 @@ app.get('/api/blizzard/leaderboardsData', async (req, res) => {
     }
 });
 
+require('dotenv').config();
+const CLIENT_ID = process.env.BNET_CLIENT_ID;
+const CLIENT_SECRET = process.env.BNET_CLIENT_SECRET;
+let tokenCache = { value: null, expires: 0 };
+
+async function getAccessToken() {
+  const now = Date.now();
+  if (tokenCache.value && now < tokenCache.expires) return tokenCache.value;
+  const params = new URLSearchParams();
+  params.append('grant_type', 'client_credentials');
+  const resp = await axios.post('https://oauth.battle.net/token', params, {
+    auth: { username: CLIENT_ID, password: CLIENT_SECRET }
+  });
+  tokenCache = {
+    value: resp.data.access_token,
+    expires: now + (resp.data.expires_in - 60) * 1000
+  };
+  return tokenCache.value;
+}
+
+app.get('/api/blizzard/cards', async (req, res) => {
+  try {
+    const token = await getAccessToken();
+    const response = await axios.get('https://eu.api.blizzard.com/hearthstone/cards?locale=fr_FR', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error('❌ ERREUR API CARTES:', error.message);
+    if (error.response) {
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      res.status(500).json({ error: 'Erreur interne serveur' });
+    }
+  }
+});
+
 app.listen(PORT, () => console.log(`🚀 Serveur PRET sur le port ${PORT}`));

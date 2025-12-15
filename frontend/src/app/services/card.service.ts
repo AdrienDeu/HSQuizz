@@ -7,7 +7,8 @@ import { Card, HiddenAttribute, SET_TRANSLATIONS } from '../models/card.model';
   providedIn: 'root'
 })
 export class CardService {
-  private readonly CARDS_URL = 'hearthstone_cards.json';
+  // Utilise un endpoint backend proxyé qui gère l'authentification Battle.net (comme le leaderboard)
+  private readonly CARDS_URL = '/api/blizzard/hearthstone/cards';
   private cards$: Observable<Card[]> | null = null;
 
   constructor(private http: HttpClient) {}
@@ -18,8 +19,12 @@ export class CardService {
    */
   getCollectibleCards(): Observable<Card[]> {
     if (!this.cards$) {
-      this.cards$ = this.http.get<Card[]>(this.CARDS_URL).pipe(
-        map(cards => this.filterCollectibleCards(cards)),
+      this.cards$ = this.http.get<any>(this.CARDS_URL).pipe(
+        map(response => {
+          // L'API Battle.net retourne {cards: Card[], ...}
+          const cards = response.cards || response;
+          return this.filterCollectibleCards(cards);
+        }),
         shareReplay(1)
       );
     }

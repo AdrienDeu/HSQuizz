@@ -17,12 +17,12 @@
     <div class="card-info-row">
       <div class="info-item">
         <span class="label">Type</span>
-        <span class="value">{{ translatedType }}</span>
+        <span class="value">{{ originalType }}</span>
       </div>
       <div class="info-item">
         <span class="label">Classe</span>
         <span class="value" [class.hidden]="isHidden('cardClass')">
-          {{ isHidden('cardClass') ? '???' : translatedClass }}
+          {{ isHidden('cardClass') ? '???' : originalClass }}
         </span>
       </div>
     </div>
@@ -32,13 +32,13 @@
       <div class="info-item">
         <span class="label">Rareté</span>
         <span class="value rarity-badge" [class]="rarityClass" [class.hidden]="isHidden('rarity')">
-          {{ isHidden('rarity') ? '???' : translatedRarity }}
+          {{ isHidden('rarity') ? '???' : originalRarity }}
         </span>
       </div>
-      @if (translatedRace) {
+      @if (originalRace) {
         <div class="info-item">
           <span class="label">Race</span>
-          <span class="value">{{ translatedRace }}</span>
+          <span class="value">{{ originalRace }}</span>
         </div>
       }
     </div>
@@ -80,7 +80,7 @@
     <!-- Extension -->
     <div class="card-set">
       <span class="label">Extension</span>
-      <span class="value">{{ translatedSet }}</span>
+      <span class="value">{{ originalSet }}</span>
     </div>
   </div>
 </div>

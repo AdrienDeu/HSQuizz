@@ -33,24 +33,24 @@ export class CardDisplayComponent {
     return attribute === this.hiddenAttribute && !this.revealed;
   }
 
-  get translatedType(): string {
-    return CardService.translateType(this.card.type);
+  get originalType(): string {
+    return this.card.type;
   }
 
-  get translatedClass(): string {
-    return CardService.translateClass(this.card.cardClass);
+  get originalClass(): string {
+    return this.card.cardClass;
   }
 
-  get translatedRarity(): string {
-    return this.card.rarity ? CardService.translateRarity(this.card.rarity) : '-';
+  get originalRarity(): string {
+    return this.card.rarity ?? '-';
   }
 
-  get translatedRace(): string {
-    return this.card.race ? CardService.translateRace(this.card.race) : '';
+  get originalRace(): string {
+    return this.card.race ?? '';
   }
 
-  get translatedSet(): string {
-    return SET_TRANSLATIONS[this.card.set] || this.card.set;
+  get originalSet(): string {
+    return this.card.set;
   }
 
   get cleanText(): string {

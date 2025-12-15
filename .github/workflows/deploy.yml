@@ -22,14 +22,21 @@ jobs:
         port: 22
         script: |
           set -e
+          
+          # --- CORRECTIF GIT (AJOUTÉ ICI) ---
+          # On autorise Git à utiliser ce dossier même s'il appartient à www-data
+          git config --global --add safe.directory /var/www/HSQuizz
+
           echo "🚀 DÉBUT DU DÉPLOIEMENT..."
 
-          # --- 1. MISE A JOUR DU CODE (Frontend ET Backend) ---
+          # --- 1. MISE A JOUR DU CODE ---
           cd /var/www/HSQuizz
           echo "📥 Récupération du code depuis GitHub..."
           git checkout main
           git fetch --all
-          # Attention : Ceci écrase toute modification faite à la main sur le serveur !
+          
+          # ⚠️ ATTENTION : Cela va écraser votre server.js du serveur !
+          # Assurez-vous d'avoir mis le bon server.js sur votre GitHub avant !
           git reset --hard origin/main
 
           # --- 2. FRONTEND (Angular) ---
@@ -42,14 +49,12 @@ jobs:
 
           # --- 3. BACKEND (Node.js) ---
           echo "🔙 Mise à jour du Backend..."
-          # On remonte d'un cran (..) et on va dans backend
           cd ../backend
           
           echo "📦 Installation des dépendances Backend..."
           npm install --production
 
           echo "🔄 Redémarrage du serveur Node.js..."
-          # On redémarre le processus PM2 qu'on a créé ensemble
           pm2 restart hs-backend
 
           echo "✅ DÉPLOIEMENT TERMINÉ AVEC SUCCÈS ! 🎉"

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Card, HiddenAttribute, QuizQuestion } from '../models/card.model';
+import { Card, HiddenAttribute, QuizQuestion, HIDDEN_ATTRIBUTE_LABELS } from '../models/card.model';
+import { CardService } from './card.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,13 @@ export class QuizService {
   }
 
   /**
+   * Réinitialise l'historique de carte précédente
+   */
+  resetPreviousCard(): void {
+    this.previousCardId = null;
+  }
+
+  /**
    * Crée une nouvelle question de quiz
    */
   createQuestion(card: Card, hiddenAttribute: HiddenAttribute = 'name'): QuizQuestion {
@@ -45,6 +53,35 @@ export class QuizService {
   }
 
   /**
+   * Retourne le label d'un attribut à deviner
+   */
+  getAttributeLabel(attribute: HiddenAttribute): string {
+    return HIDDEN_ATTRIBUTE_LABELS[attribute];
+  }
+
+  /**
+   * Retourne le placeholder pour le champ de réponse selon l'attribut
+   */
+  getAnswerPlaceholder(attribute: HiddenAttribute): string {
+    switch (attribute) {
+      case 'name':
+        return 'Entrez le nom de la carte...';
+      case 'cardClass':
+        return 'Entrez la classe (Mage, Guerrier, Neutre...)';
+      case 'cost':
+        return 'Entrez le coût en mana (0-10+)';
+      case 'attack':
+        return 'Entrez l\'attaque';
+      case 'health':
+        return 'Entrez les points de vie';
+      case 'rarity':
+        return 'Entrez la rareté (Commune, Rare, Épique, Légendaire)';
+      default:
+        return 'Entrez votre réponse...';
+    }
+  }
+
+  /**
    * Vérifie si la réponse de l'utilisateur est correcte
    */
   checkAnswer(question: QuizQuestion, userAnswer: string): boolean {
@@ -52,18 +89,33 @@ export class QuizService {
     const normalizedUserAnswer = this.normalizeString(userAnswer);
     const normalizedCorrectValue = this.normalizeString(correctValue);
 
+    // Pour les classes et raretés, accepter aussi les traductions
+    if (question.hiddenAttribute === 'cardClass') {
+      const translatedClass = CardService.translateClass(question.card.cardClass);
+      if (normalizedUserAnswer === this.normalizeString(translatedClass)) {
+        return true;
+      }
+    }
+
+    if (question.hiddenAttribute === 'rarity' && question.card.rarity) {
+      const translatedRarity = CardService.translateRarity(question.card.rarity);
+      if (normalizedUserAnswer === this.normalizeString(translatedRarity)) {
+        return true;
+      }
+    }
+
     return normalizedUserAnswer === normalizedCorrectValue;
   }
 
   /**
-   * Récupère la valeur d'un attribut de la carte
+   * Récupère la valeur d'un attribut de la carte (traduite si nécessaire)
    */
   getAttributeValue(card: Card, attribute: HiddenAttribute): string {
     switch (attribute) {
       case 'name':
         return card.name;
       case 'cardClass':
-        return card.cardClass;
+        return CardService.translateClass(card.cardClass);
       case 'cost':
         return card.cost?.toString() ?? '0';
       case 'attack':
@@ -71,7 +123,7 @@ export class QuizService {
       case 'health':
         return card.health?.toString() ?? '0';
       case 'rarity':
-        return card.rarity ?? '';
+        return CardService.translateRarity(card.rarity ?? '');
       default:
         return '';
     }

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Card, HiddenAttribute } from '../../models/card.model';
+import { Card, HiddenAttribute, SET_TRANSLATIONS } from '../../models/card.model';
 import { CardService } from '../../services/card.service';
 
 @Component({
@@ -47,6 +47,10 @@ export class CardDisplayComponent {
 
   get translatedRace(): string {
     return this.card.race ? CardService.translateRace(this.card.race) : '';
+  }
+
+  get translatedSet(): string {
+    return SET_TRANSLATIONS[this.card.set] || this.card.set;
   }
 
   get cleanText(): string {

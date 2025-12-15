@@ -12,6 +12,14 @@
   text-align: center;
   margin-bottom: 1rem;
   
+  .header-logo {
+    max-width: 280px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+  }
+  
   h1 {
     font-size: 2.5rem;
     margin: 0;
@@ -23,35 +31,6 @@
     color: #a89070;
     margin: 0.5rem 0 0 0;
     font-size: 1.1rem;
-  }
-}
-
-// Stats bar
-.stats-bar {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  
-  .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    
-    .stat-label {
-      font-size: 0.75rem;
-      color: #a89070;
-      text-transform: uppercase;
-    }
-    
-    .stat-value {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #f4e4bc;
-    }
   }
 }
 
@@ -241,6 +220,199 @@
   flex-wrap: wrap;
 }
 
+// Settings Panel
+.settings-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-section {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 1.25rem;
+  
+  h3 {
+    margin: 0 0 1rem 0;
+    color: #f4e4bc;
+    font-size: 1.1rem;
+  }
+}
+
+// Attribute options
+.attribute-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.attribute-btn {
+  padding: 0.6rem 1rem;
+  border: 2px solid #8b7355;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #a89070;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  
+  &:hover {
+    border-color: #ff9900;
+    color: #f4e4bc;
+  }
+  
+  &.selected {
+    background: linear-gradient(145deg, #ff9900, #cc7700);
+    border-color: #ff9900;
+    color: white;
+  }
+}
+
+// Sets selector
+.sets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.sets-count {
+  color: #a89070;
+  font-size: 0.85rem;
+}
+
+.sets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #8b7355;
+    border-radius: 3px;
+  }
+}
+
+.set-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  
+  input[type="checkbox"] {
+    accent-color: #ff9900;
+    width: 16px;
+    height: 16px;
+  }
+  
+  .set-name {
+    color: #f4e4bc;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// Start section
+.start-section {
+  text-align: center;
+}
+
+.preview-count {
+  color: #ff9900;
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+}
+
+.error-inline {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin: 0 0 1rem 0;
+}
+
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+}
+
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.btn-settings {
+  margin-left: auto;
+}
+
+// Mode info badges
+.mode-info {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.mode-badge {
+  background: rgba(255, 153, 0, 0.2);
+  border: 1px solid #ff9900;
+  color: #ff9900;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+// Stats bar updates
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: #a89070;
+      text-transform: uppercase;
+    }
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #f4e4bc;
+    }
+  }
+}
+
 // Footer
 .quiz-footer {
   text-align: center;
@@ -270,5 +442,19 @@
   
   .stats-bar {
     gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .sets-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .attribute-options {
+    justify-content: center;
+  }
+  
+  .mode-info {
+    flex-direction: column;
+    align-items: center;
   }
 }

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CardDisplayComponent } from '../card-display/card-display.component';
 import { CardService } from '../../services/card.service';
 import { QuizService } from '../../services/quiz.service';
-import { Card, QuizQuestion } from '../../models/card.model';
+import { Card, QuizQuestion, HiddenAttribute, QuizSettings, HIDDEN_ATTRIBUTE_LABELS, SET_TRANSLATIONS } from '../../models/card.model';
 
 @Component({
   selector: 'app-quiz',
@@ -14,11 +14,31 @@ import { Card, QuizQuestion } from '../../models/card.model';
   styleUrl: './quiz.component.scss'
 })
 export class QuizComponent implements OnInit {
-  cards: Card[] = [];
+  // Données des cartes
+  allCards: Card[] = [];
+  filteredCards: Card[] = [];
   currentQuestion: QuizQuestion | null = null;
   userAnswer: string = '';
   loading: boolean = true;
   error: string | null = null;
+  
+  // Configuration du quiz
+  quizStarted: boolean = false;
+  availableSets: { code: string; name: string }[] = [];
+  settings: QuizSettings = {
+    selectedSets: [],
+    hiddenAttribute: 'name'
+  };
+  
+  // Options pour les attributs
+  attributeOptions: { value: HiddenAttribute; label: string }[] = [
+    { value: 'name', label: HIDDEN_ATTRIBUTE_LABELS['name'] },
+    { value: 'cardClass', label: HIDDEN_ATTRIBUTE_LABELS['cardClass'] },
+    { value: 'cost', label: HIDDEN_ATTRIBUTE_LABELS['cost'] },
+    { value: 'attack', label: HIDDEN_ATTRIBUTE_LABELS['attack'] },
+    { value: 'health', label: HIDDEN_ATTRIBUTE_LABELS['health'] },
+    { value: 'rarity', label: HIDDEN_ATTRIBUTE_LABELS['rarity'] }
+  ];
   
   // Stats
   totalAnswered: number = 0;
@@ -42,9 +62,9 @@ export class QuizComponent implements OnInit {
     
     this.cardService.getCollectibleCards().subscribe({
       next: (cards) => {
-        this.cards = cards;
+        this.allCards = cards;
         this.loading = false;
-        this.nextCard();
+        this.loadAvailableSets();
       },
       error: (err) => {
         this.error = 'Erreur lors du chargement des cartes. Veuillez rafraîchir la page.';
@@ -55,13 +75,95 @@ export class QuizComponent implements OnInit {
   }
 
   /**
+   * Charge la liste des extensions disponibles
+   */
+  loadAvailableSets(): void {
+    this.cardService.getAvailableSets().subscribe({
+      next: (sets) => {
+        this.availableSets = sets;
+      }
+    });
+  }
+
+  /**
+   * Démarre le quiz avec les paramètres actuels
+   */
+  startQuiz(): void {
+    this.applyFilters();
+    
+    if (this.filteredCards.length === 0) {
+      this.error = 'Aucune carte ne correspond aux filtres sélectionnés.';
+      return;
+    }
+    
+    this.quizStarted = true;
+    this.resetStats();
+    this.quizService.resetPreviousCard();
+    this.nextCard();
+  }
+
+  /**
+   * Applique les filtres de configuration
+   */
+  applyFilters(): void {
+    let cards = this.allCards;
+    
+    // Filtre par extension
+    cards = this.cardService.filterCardsBySets(cards, this.settings.selectedSets);
+    
+    // Filtre par attribut (pour s'assurer que l'attribut existe)
+    cards = this.cardService.filterCardsByAttribute(cards, this.settings.hiddenAttribute);
+    
+    this.filteredCards = cards;
+  }
+
+  /**
+   * Retourne à la configuration
+   */
+  backToSettings(): void {
+    this.quizStarted = false;
+    this.currentQuestion = null;
+    this.error = null;
+  }
+
+  /**
+   * Toggle la sélection d'une extension
+   */
+  toggleSet(setCode: string): void {
+    const index = this.settings.selectedSets.indexOf(setCode);
+    if (index === -1) {
+      this.settings.selectedSets.push(setCode);
+    } else {
+      this.settings.selectedSets.splice(index, 1);
+    }
+  }
+
+  /**
+   * Vérifie si une extension est sélectionnée
+   */
+  isSetSelected(setCode: string): boolean {
+    return this.settings.selectedSets.includes(setCode);
+  }
+
+  /**
+   * Sélectionne ou désélectionne toutes les extensions
+   */
+  toggleAllSets(): void {
+    if (this.settings.selectedSets.length === this.availableSets.length) {
+      this.settings.selectedSets = [];
+    } else {
+      this.settings.selectedSets = this.availableSets.map(s => s.code);
+    }
+  }
+
+  /**
    * Passe à la carte suivante
    */
   nextCard(): void {
-    if (this.cards.length === 0) return;
+    if (this.filteredCards.length === 0) return;
     
-    const card = this.quizService.selectRandomCard(this.cards);
-    this.currentQuestion = this.quizService.createQuestion(card, 'name');
+    const card = this.quizService.selectRandomCard(this.filteredCards);
+    this.currentQuestion = this.quizService.createQuestion(card, this.settings.hiddenAttribute);
     this.userAnswer = '';
   }
 
@@ -107,11 +209,69 @@ export class QuizComponent implements OnInit {
   }
 
   /**
+   * Réinitialise les statistiques
+   */
+  resetStats(): void {
+    this.totalAnswered = 0;
+    this.correctAnswers = 0;
+  }
+
+  /**
    * Calcule le pourcentage de réussite
    */
   get successRate(): number {
     if (this.totalAnswered === 0) return 0;
     return Math.round((this.correctAnswers / this.totalAnswered) * 100);
+  }
+
+  /**
+   * Retourne le nombre de cartes après filtrage (preview)
+   */
+  get previewCardCount(): number {
+    let cards = this.allCards;
+    cards = this.cardService.filterCardsBySets(cards, this.settings.selectedSets);
+    cards = this.cardService.filterCardsByAttribute(cards, this.settings.hiddenAttribute);
+    return cards.length;
+  }
+
+  /**
+   * Retourne le label de l'attribut actuel
+   */
+  get currentAttributeLabel(): string {
+    return this.quizService.getAttributeLabel(this.settings.hiddenAttribute);
+  }
+
+  /**
+   * Retourne le placeholder pour le champ de réponse
+   */
+  get answerPlaceholder(): string {
+    return this.quizService.getAnswerPlaceholder(this.settings.hiddenAttribute);
+  }
+
+  /**
+   * Retourne les noms des extensions sélectionnées
+   */
+  get selectedSetsDisplay(): string {
+    if (this.settings.selectedSets.length === 0) {
+      return 'Toutes les extensions';
+    }
+    if (this.settings.selectedSets.length <= 2) {
+      return this.settings.selectedSets
+        .map(code => SET_TRANSLATIONS[code] || code)
+        .join(', ');
+    }
+    return `${this.settings.selectedSets.length} extensions`;
+  }
+
+  /**
+   * Retourne la réponse correcte pour la question actuelle
+   */
+  get correctAnswer(): string {
+    if (!this.currentQuestion) return '';
+    return this.quizService.getAttributeValue(
+      this.currentQuestion.card,
+      this.currentQuestion.hiddenAttribute
+    );
   }
 
   /**

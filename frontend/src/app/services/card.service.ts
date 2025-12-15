@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, shareReplay } from 'rxjs';
-import { Card } from '../models/card.model';
+import { Card, HiddenAttribute, SET_TRANSLATIONS } from '../models/card.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +24,59 @@ export class CardService {
       );
     }
     return this.cards$;
+  }
+
+  /**
+   * Récupère la liste des extensions disponibles dans les cartes
+   * Retourne un tableau trié par nom traduit
+   */
+  getAvailableSets(): Observable<{ code: string; name: string }[]> {
+    return this.getCollectibleCards().pipe(
+      map(cards => {
+        const sets = new Set<string>();
+        cards.forEach(card => {
+          if (card.set) {
+            sets.add(card.set);
+          }
+        });
+        return Array.from(sets)
+          .map(code => ({
+            code,
+            name: SET_TRANSLATIONS[code] || code
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+      })
+    );
+  }
+
+  /**
+   * Filtre les cartes par extension(s)
+   * Si selectedSets est vide, retourne toutes les cartes
+   */
+  filterCardsBySets(cards: Card[], selectedSets: string[]): Card[] {
+    if (!selectedSets || selectedSets.length === 0) {
+      return cards;
+    }
+    return cards.filter(card => selectedSets.includes(card.set));
+  }
+
+  /**
+   * Filtre les cartes selon l'attribut à deviner
+   * Certains attributs nécessitent que la carte ait une valeur définie
+   */
+  filterCardsByAttribute(cards: Card[], attribute: HiddenAttribute): Card[] {
+    switch (attribute) {
+      case 'attack':
+        return cards.filter(card => card.attack !== undefined);
+      case 'health':
+        return cards.filter(card => card.health !== undefined);
+      case 'rarity':
+        return cards.filter(card => card.rarity !== undefined);
+      case 'cost':
+        return cards.filter(card => card.cost !== undefined);
+      default:
+        return cards;
+    }
   }
 
   /**

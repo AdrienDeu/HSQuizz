@@ -1,21 +1,13 @@
 <div class="quiz-container">
   <!-- Header -->
   <header class="quiz-header">
-    <h1>🎴 HSQuizz</h1>
-    <p class="subtitle">Devinez le nom de la carte Hearthstone !</p>
+    <img src="logo.webp" alt="HSQuizz Logo" class="header-logo">
+    @if (!quizStarted) {
+      <p class="subtitle">Configurez votre quiz Hearthstone !</p>
+    } @else {
+      <p class="subtitle">Devinez : {{ currentAttributeLabel }}</p>
+    }
   </header>
-
-  <!-- Stats -->
-  <div class="stats-bar">
-    <div class="stat">
-      <span class="stat-label">Score</span>
-      <span class="stat-value">{{ correctAnswers }}/{{ totalAnswered }}</span>
-    </div>
-    <div class="stat">
-      <span class="stat-label">Réussite</span>
-      <span class="stat-value">{{ successRate }}%</span>
-    </div>
-  </div>
 
   <!-- Loading state -->
   @if (loading) {
@@ -26,15 +18,95 @@
   }
 
   <!-- Error state -->
-  @if (error) {
+  @if (error && !quizStarted) {
     <div class="error-message">
       <p>{{ error }}</p>
       <button class="btn btn-primary" (click)="loadCards()">Réessayer</button>
     </div>
   }
 
+  <!-- Settings Panel -->
+  @if (!loading && !quizStarted) {
+    <div class="settings-panel">
+      <!-- Attribute selector -->
+      <div class="settings-section">
+        <h3>🎯 Que voulez-vous deviner ?</h3>
+        <div class="attribute-options">
+          @for (option of attributeOptions; track option.value) {
+            <button 
+              class="attribute-btn"
+              [class.selected]="settings.hiddenAttribute === option.value"
+              (click)="settings.hiddenAttribute = option.value">
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Set selector -->
+      <div class="settings-section">
+        <h3>📦 Extensions</h3>
+        <div class="sets-header">
+          <button class="btn btn-small" (click)="toggleAllSets()">
+            {{ settings.selectedSets.length === availableSets.length ? 'Tout désélectionner' : 'Tout sélectionner' }}
+          </button>
+          <span class="sets-count">
+            {{ settings.selectedSets.length === 0 ? 'Toutes' : settings.selectedSets.length + ' sélectionnée(s)' }}
+          </span>
+        </div>
+        <div class="sets-grid">
+          @for (set of availableSets; track set.code) {
+            <label class="set-checkbox">
+              <input 
+                type="checkbox" 
+                [checked]="isSetSelected(set.code)"
+                (change)="toggleSet(set.code)">
+              <span class="set-name">{{ set.name }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Preview and Start -->
+      <div class="settings-section start-section">
+        <p class="preview-count">{{ previewCardCount }} cartes disponibles</p>
+        @if (error) {
+          <p class="error-inline">{{ error }}</p>
+        }
+        <button 
+          class="btn btn-primary btn-large"
+          (click)="startQuiz()"
+          [disabled]="previewCardCount === 0">
+          🚀 Démarrer le quiz
+        </button>
+      </div>
+    </div>
+  }
+
   <!-- Quiz content -->
-  @if (!loading && !error && currentQuestion) {
+  @if (!loading && quizStarted && currentQuestion) {
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">Score</span>
+        <span class="stat-value">{{ correctAnswers }}/{{ totalAnswered }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Réussite</span>
+        <span class="stat-value">{{ successRate }}%</span>
+      </div>
+      <button class="btn btn-small btn-settings" (click)="backToSettings()">
+        ⚙️ Paramètres
+      </button>
+    </div>
+
+    <!-- Current mode info -->
+    <div class="mode-info">
+      <span class="mode-badge">{{ currentAttributeLabel }}</span>
+      <span class="mode-badge">{{ selectedSetsDisplay }}</span>
+      <span class="mode-badge">{{ filteredCards.length }} cartes</span>
+    </div>
+
     <div class="quiz-content">
       <!-- Card display -->
       <app-card-display
@@ -53,7 +125,7 @@
               class="answer-input"
               [(ngModel)]="userAnswer"
               (keydown)="onKeyDown($event)"
-              placeholder="Entrez le nom de la carte..."
+              [placeholder]="answerPlaceholder"
               autofocus>
             <button 
               class="btn btn-primary"
@@ -71,14 +143,14 @@
             @if (currentQuestion.correct) {
               <div class="feedback-icon">✅</div>
               <h2>Correct !</h2>
-              <p class="correct-answer">{{ currentQuestion.card.name }}</p>
+              <p class="correct-answer">{{ correctAnswer }}</p>
             } @else {
               <div class="feedback-icon">❌</div>
               <h2>{{ currentQuestion.revealed ? 'Réponse révélée' : 'Incorrect' }}</h2>
               @if (currentQuestion.userAnswer) {
                 <p class="user-answer">Votre réponse : {{ currentQuestion.userAnswer }}</p>
               }
-              <p class="correct-answer">Réponse : <strong>{{ currentQuestion.card.name }}</strong></p>
+              <p class="correct-answer">Réponse : <strong>{{ correctAnswer }}</strong></p>
             }
           </div>
 
@@ -100,6 +172,10 @@
 
   <!-- Footer -->
   <footer class="quiz-footer">
-    <p>{{ cards.length }} cartes disponibles</p>
+    @if (quizStarted) {
+      <p>{{ filteredCards.length }} cartes dans cette sélection</p>
+    } @else {
+      <p>{{ allCards.length }} cartes au total</p>
+    }
   </footer>
 </div>

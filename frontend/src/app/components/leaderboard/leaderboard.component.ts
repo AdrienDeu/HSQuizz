@@ -58,20 +58,38 @@ export class LeaderboardComponent implements OnInit {
     this.currentPage = page;
     this.leaderboardService.getLeaderboardPage(this.selectedRegion, this.selectedGameMode, page).subscribe({
       next: (entries) => {
-        this.leaderboardEntries = entries;
-        // Si on reçoit moins que itemsPerPage, c'est la dernière page
-        if (entries.length < this.itemsPerPage) {
-          this.totalEntries = (page - 1) * this.itemsPerPage + entries.length;
-          this.totalPages = page;
-        } else {
-          // On ne connaît pas le total exact, on suppose qu'il y a potentiellement une page suivante
-          this.totalEntries = page * this.itemsPerPage;
-          this.totalPages = page + 1; // On affiche un bouton pour la page suivante
+        // Si on reçoit 0 entrées et qu'on n'est pas sur la page 1
+        if (entries.length === 0 && page > 1) {
+          // Page vide : on a atteint la fin, on reste sur la page précédente
+          this.totalPages = page - 1;
+          this.currentPage = page - 1;
+          // Ne pas vider les entrées, garder celles de la page précédente affichées
+          // et juste désactiver le bouton suivant
+          this.loading = false;
+          return;
         }
-        this.loading = false;
+
+        // Mettre à jour les entrées seulement si on a des données ou si c'est la page 1
+        this.leaderboardEntries = entries;
+
+        // Si on reçoit 0 entrées sur la page 1
         if (entries.length === 0) {
           this.error = 'Aucune donnée disponible pour cette sélection.';
+          this.totalPages = 1;
+          this.totalEntries = 0;
         }
+        // Si on reçoit moins que itemsPerPage, c'est la dernière page
+        else if (entries.length < this.itemsPerPage) {
+          this.totalEntries = (page - 1) * this.itemsPerPage + entries.length;
+          this.totalPages = page;
+        }
+        // Page complète : on suppose qu'il y a potentiellement une page suivante
+        else {
+          this.totalEntries = page * this.itemsPerPage;
+          this.totalPages = page + 1;
+        }
+
+        this.loading = false;
       },
       error: (err) => {
         this.error = 'Erreur lors du chargement du leaderboard. Veuillez réessayer.';

@@ -3,7 +3,11 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "WebSearch",
+      "WebFetch(domain:hearthsim.info)",
+      "WebFetch(domain:api.hearthstonejson.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

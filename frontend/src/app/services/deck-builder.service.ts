@@ -16,13 +16,29 @@ import { Card } from '../models/card.model';
 import { CardService } from './card.service';
 
 /**
+ * Extensions valides en mode Standard (Core + dernières extensions)
+ */
+const STANDARD_SETS = [
+  'CORE',                      // Cartes de base
+  'WHIZBANGS_WORKSHOP',        // L'Atelier du Génistordu
+  'WILD_WEST',                 // Rixe en Terres Ingrates
+  'TITANS',                    // Les Titans
+  'EMERALD_DREAM',             // Le Rêve d'Émeraude
+  'PATH_OF_ARTHAS',            // La Voie d'Arthas
+  'RETURN_OF_THE_LICH_KING',   // Le Retour du Roi-Liche
+  'REVENDRETH',                // Meurtre au Château Nathria
+  'ISLAND_VACATION',           // Vacances Insulaires
+  'BATTLE_OF_THE_BANDS',       // La Bataille des Groupes
+];
+
+/**
  * Service principal pour la gestion du Deck Builder
  *
  * Gère:
  * - État réactif du deck actuel (BehaviorSubject)
  * - Ajout/suppression de cartes avec validation
  * - Calcul des statistiques en temps réel
- * - Filtrage de la collection de cartes
+ * - Filtrage de la collection de cartes (incluant le format Standard/Wild)
  * - Recherche par nom
  */
 @Injectable({
@@ -58,20 +74,23 @@ export class DeckBuilderService {
 
   /**
    * Charge les cartes disponibles avec les filtres actuels
+   * Réagit aux changements de filtres ET de format du deck
    */
   private loadAvailableCards(): void {
     this.loadingSubject.next(true);
 
     combineLatest([
       this.cardService.getCollectibleCards(false),
-      this.filters$
+      this.filters$,
+      this.deck$
     ]).pipe(
       debounceTime(200)
     ).subscribe({
-      next: ([allCards, filters]) => {
+      next: ([allCards, filters, deck]) => {
         const filtered = this.applyFiltersToCards(allCards, filters);
         this.availableCardsSubject.next(filtered);
         this.loadingSubject.next(false);
+        console.log(`📚 ${filtered.length} cartes chargées (Format: ${deck.format})`);
       },
       error: (err) => {
         console.error('Erreur lors du chargement des cartes:', err);
@@ -448,6 +467,15 @@ export class DeckBuilderService {
    */
   private applyFiltersToCards(cards: Card[], filters: DeckFilters): Card[] {
     let filtered = cards;
+
+    // Filtre par format (Standard vs Wild)
+    const currentDeck = this.deckSubject.value;
+    if (currentDeck.format === 'standard') {
+      filtered = filtered.filter(card => STANDARD_SETS.includes(card.set));
+      console.log(`🎯 Mode Standard: ${filtered.length} cartes disponibles`);
+    } else {
+      console.log(`🌟 Mode Wild: ${filtered.length} cartes disponibles`);
+    }
 
     // Filtre par classe
     if (filters.heroClass.length > 0) {

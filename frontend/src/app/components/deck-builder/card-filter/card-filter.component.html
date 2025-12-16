@@ -42,7 +42,7 @@
 
   <!-- Mana Cost Filter -->
   <div class="filter-section">
-    <h4 class="filter-label">Co\u00fbt de mana</h4>
+    <h4 class="filter-label">Coût en mana</h4>
     <div class="filter-grid mana-grid">
       <button
         *ngFor="let cost of manaCosts"
@@ -56,7 +56,7 @@
 
   <!-- Rarity Filter -->
   <div class="filter-section">
-    <h4 class="filter-label">Raret\u00e9</h4>
+    <h4 class="filter-label">Rareté</h4>
     <div class="filter-list">
       <label
         *ngFor="let rarity of rarities"
@@ -94,7 +94,7 @@
   <!-- Mechanics Filter (Collapsible) -->
   <div class="filter-section mechanics-section">
     <h4 class="filter-label clickable" (click)="showMechanics = !showMechanics">
-      <span>M\u00e9caniques</span>
+      <span>Mécaniques</span>
       <span class="toggle-icon">{{ showMechanics ? '\u25bc' : '\u25b6' }}</span>
     </h4>
     <div class="filter-list mechanics-list" *ngIf="showMechanics">

@@ -112,6 +112,7 @@ export interface StorageSchema {
 
 /**
  * DBF IDs des héros par classe
+ * Note: Certaines classes ont plusieurs IDs (héros alternatifs, skins)
  */
 export const HERO_DBF_IDS: Record<string, number> = {
   'DRUID': 274,
@@ -124,13 +125,16 @@ export const HERO_DBF_IDS: Record<string, number> = {
   'WARLOCK': 893,
   'WARRIOR': 7,
   'DEMONHUNTER': 56550,
-  'DEATHKNIGHT': 78065
+  'DEATHKNIGHT': 78065,
+  'NEUTRAL': 1  // Utilisé pour certains decks spéciaux
 };
 
 /**
  * Mapping inverse: DBF ID vers classe
+ * Inclut les héros alternatifs et skins
  */
 export const DBF_ID_TO_CLASS: Record<number, string> = {
+  1: 'NEUTRAL',     // Héro neutre/placeholder
   274: 'DRUID',
   31: 'HUNTER',
   637: 'MAGE',
@@ -141,7 +145,8 @@ export const DBF_ID_TO_CLASS: Record<number, string> = {
   893: 'WARLOCK',
   7: 'WARRIOR',
   56550: 'DEMONHUNTER',
-  78065: 'DEATHKNIGHT'
+  78065: 'DEATHKNIGHT',
+  121643: 'ROGUE'   // Héro Rogue alternatif (Maestra)
 };
 
 /**

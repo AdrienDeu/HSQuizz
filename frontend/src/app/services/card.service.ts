@@ -108,13 +108,55 @@ export class CardService {
   }
 
   /**
+   * Récupère des cartes par leurs DBF IDs
+   * Utilisé pour l'import de decks depuis un code
+   * Cherche dans toutes les cartes (incluant non-collectibles) pour maximiser les résultats
+   */
+  getCardsByDbfIds(dbfIds: number[]): Observable<Card[]> {
+    return this.getCollectibleCards(true).pipe(
+      map(allCards => {
+        console.log(`🔍 Recherche dans ${allCards.length} cartes disponibles`);
+
+        const cardMap = new Map<number, Card>();
+        allCards.forEach(card => {
+          if (card.dbfId) {
+            cardMap.set(card.dbfId, card);
+          }
+        });
+
+        console.log(`📊 Index créé avec ${cardMap.size} cartes uniques`);
+
+        const foundCards: Card[] = [];
+        const missingIds: number[] = [];
+
+        dbfIds.forEach(dbfId => {
+          const card = cardMap.get(dbfId);
+          if (card) {
+            foundCards.push(card);
+          } else {
+            missingIds.push(dbfId);
+          }
+        });
+
+        console.log(`✅ Trouvées: ${foundCards.length}, ❌ Manquantes: ${missingIds.length}`);
+
+        if (missingIds.length > 0) {
+          console.warn(`⚠️ Cartes non trouvées pour DBF IDs:`, missingIds);
+        }
+
+        return foundCards;
+      })
+    );
+  }
+
+  /**
    * Filtre les cartes pour ne garder que celles qui sont collectibles
    * et qui ont un nom (requis pour le quiz)
    */
   private filterCollectibleCards(cards: Card[]): Card[] {
-    return cards.filter(card => 
-      card.collectible === true && 
-      card.name && 
+    return cards.filter(card =>
+      card.collectible === true &&
+      card.name &&
       card.name.trim().length > 0
     );
   }

@@ -92,12 +92,18 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       this.deckName = deck.name;
       this.selectedClass = deck.heroClass;
       this.selectedFormat = deck.format;
+      console.log(`📡 Deck mis à jour via subscription - Classe: ${deck.heroClass}, Format: ${deck.format}`);
     });
 
     // S'abonner aux statistiques
     this.deckStats$.pipe(takeUntil(this.destroy$)).subscribe(stats => {
       this.currentStats = stats;
     });
+
+    // S'assurer que la classe par défaut est MAGE
+    if (this.selectedClass !== 'MAGE') {
+      this.deckBuilderService.updateDeckMetadata({ heroClass: 'MAGE' });
+    }
 
     // Appliquer le filtre initial pour la classe Mage
     this.deckBuilderService.updateFilters({
@@ -283,20 +289,136 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       return;
     }
 
+    console.log('📥 Tentative d\'import du code:', this.importCode);
+
+    // Extraire le nom du deck si disponible
+    const extractedName = this.extractDeckName(this.importCode);
+
+    // Extraire le code deck du texte (peut contenir des commentaires et autres infos)
+    const deckCode = this.extractDeckCode(this.importCode);
+    if (!deckCode) {
+      this.showError('Aucun code de deck valide trouvé dans le texte');
+      return;
+    }
+
+    console.log('✂️ Code deck extrait:', deckCode);
+    if (extractedName) {
+      console.log('📝 Nom du deck extrait:', extractedName);
+    }
+
     try {
-      const decoded = this.deckCodeService.decodeDeck(this.importCode);
+      const decoded = this.deckCodeService.decodeDeck(deckCode);
       if (!decoded) {
-        this.showError('Code de deck invalide');
+        this.showError('Code de deck invalide - Impossible de décoder');
         return;
       }
 
-      // TODO: Récupérer les cartes complètes depuis CardService
-      // Pour l'instant, afficher un message
-      this.showSuccess('Import réussi ! (Fonctionnalité complète à venir)');
-      this.showImportModal = false;
+      console.log('✅ Deck décodé avec succès:', decoded);
+      console.log(`   Classe: ${decoded.heroClass}`);
+      console.log(`   Format: ${decoded.format}`);
+      console.log(`   Single copy: ${decoded.singleCopyDbfIds.length} cartes`);
+      console.log(`   Double copy: ${decoded.doubleCopyDbfIds.length} cartes`);
+      console.log(`   N-copy: ${decoded.nCopyCards.length} cartes`);
 
-      console.log('Deck décodé:', decoded);
+      // Collecter tous les DBF IDs avec leurs quantités
+      const allDbfIds: number[] = [];
+      const cardQuantities = new Map<number, number>();
+
+      // Cartes single copy
+      decoded.singleCopyDbfIds.forEach(dbfId => {
+        allDbfIds.push(dbfId);
+        cardQuantities.set(dbfId, 1);
+      });
+
+      // Cartes double copy
+      decoded.doubleCopyDbfIds.forEach(dbfId => {
+        allDbfIds.push(dbfId);
+        cardQuantities.set(dbfId, 2);
+      });
+
+      // Cartes N-copy
+      decoded.nCopyCards.forEach(({ dbfId, count }) => {
+        allDbfIds.push(dbfId);
+        cardQuantities.set(dbfId, count);
+      });
+
+      console.log(`🔍 Recherche de ${allDbfIds.length} cartes...`, allDbfIds);
+
+      // Récupérer les cartes complètes depuis CardService
+      this.cardService.getCardsByDbfIds(allDbfIds).subscribe({
+        next: (cards) => {
+          console.log(`✅ Cartes trouvées: ${cards.length}/${allDbfIds.length}`);
+
+          if (cards.length === 0) {
+            this.showError(`Aucune carte trouvée dans la base de données pour ce deck. DBF IDs: ${allDbfIds.join(', ')}`);
+            return;
+          }
+
+          if (cards.length < allDbfIds.length) {
+            const foundIds = new Set(cards.map(c => c.dbfId));
+            const missingIds = allDbfIds.filter(id => !foundIds.has(id));
+            console.warn(`⚠️ Cartes manquantes (${missingIds.length}):`, missingIds);
+          }
+
+          // Construire le deck avec les cartes et leurs quantités
+          const deckCards: any[] = cards.map(card => ({
+            card,
+            quantity: cardQuantities.get(card.dbfId) || 1
+          }));
+
+          // Utiliser le nom extrait ou générer un nom par défaut
+          const deckName = extractedName || `Deck importé - ${this.getClassName(decoded.heroClass)}`;
+
+          // Créer le nouveau deck
+          const importedDeck: Deck = {
+            id: this.generateUUID(),
+            name: deckName,
+            heroClass: decoded.heroClass,
+            format: decoded.format,
+            cards: deckCards,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+
+          // Charger le deck importé
+          this.deckBuilderService.loadDeck(importedDeck);
+
+          console.log(`🔄 Deck chargé - Classe: ${importedDeck.heroClass}, Format: ${importedDeck.format}`);
+          console.log(`🔄 Variables composant après loadDeck - selectedClass: ${this.selectedClass}, selectedFormat: ${this.selectedFormat}`);
+
+          // La subscription dans ngOnInit va mettre à jour automatiquement selectedClass et selectedFormat
+          // Pas besoin de les mettre à jour manuellement ici
+
+          // Appliquer les filtres pour la classe importée
+          this.deckBuilderService.updateFilters({
+            heroClass: [importedDeck.heroClass, 'NEUTRAL'],
+            manaCosts: [],
+            rarities: [],
+            types: [],
+            mechanics: [],
+            searchQuery: '',
+            sets: []
+          });
+
+          const totalCards = deckCards.reduce((sum, dc) => sum + dc.quantity, 0);
+          const missingCount = allDbfIds.length - cards.length;
+
+          if (missingCount > 0) {
+            this.showSuccess(`Deck "${deckName}" importé avec ${totalCards} cartes (${missingCount} cartes manquantes)`);
+          } else {
+            this.showSuccess(`Deck "${deckName}" importé avec succès ! (${totalCards}/30 cartes)`);
+          }
+
+          this.showImportModal = false;
+        },
+        error: (err) => {
+          console.error('❌ Erreur lors de la récupération des cartes:', err);
+          this.showError('Erreur lors de la récupération des cartes: ' + err.message);
+        }
+      });
+
     } catch (error: any) {
+      console.error('❌ Erreur lors de l\'import:', error);
       this.showError('Erreur lors de l\'import : ' + error.message);
     }
   }
@@ -328,6 +450,57 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
   }
 
   // ============ UTILITAIRES ============
+
+  /**
+   * Extrait le nom du deck d'un texte (format export Hearthstone)
+   * Le nom est sur la première ligne après "###"
+   */
+  private extractDeckName(text: string): string | null {
+    const lines = text.split('\n');
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      // Format Hearthstone: ### NomDuDeck
+      if (trimmedLine.startsWith('###')) {
+        const name = trimmedLine.substring(3).trim();
+        if (name.length > 0) {
+          console.log(`📝 Nom du deck trouvé: "${name}"`);
+          return name;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Extrait le code deck d'un texte (peut contenir l'export complet Hearthstone)
+   */
+  private extractDeckCode(text: string): string | null {
+    // Supprimer les espaces/retours à la ligne au début et à la fin
+    text = text.trim();
+
+    // Si c'est déjà juste un code (commence par AAE), le retourner
+    if (/^AAE[A-Za-z0-9+/=]+$/.test(text)) {
+      return text;
+    }
+
+    // Sinon, chercher le code dans le texte (ligne qui commence par AAE)
+    const lines = text.split('\n');
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      // Le code deck Hearthstone commence toujours par "AAE"
+      if (/^AAE[A-Za-z0-9+/=]+$/.test(trimmedLine)) {
+        return trimmedLine;
+      }
+    }
+
+    // Si pas trouvé, essayer de trouver une séquence AAE... n'importe où
+    const match = text.match(/AAE[A-Za-z0-9+/=]+/);
+    if (match) {
+      return match[0];
+    }
+
+    return null;
+  }
 
   /**
    * Récupère le nom traduit d'une classe

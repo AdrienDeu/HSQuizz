@@ -6,14 +6,16 @@ import { VarintUtil } from '../utils/varint.util';
 /**
  * Service pour encoder/décoder les deck codes Hearthstone
  *
- * Format du deck code (version 1):
- * 1. Header byte (version + format)
- * 2. Nombre de héros (varint)
- * 3. Hero DBF IDs (varint chacun)
- * 4. Cartes single copy: count + DBF IDs triés
- * 5. Cartes double copy: count + DBF IDs triés
- * 6. Cartes N-copy: count + pairs (DBF ID, count)
- * 7. Base64 encode
+ * Format du deck code (version 1) - Format officiel Hearthstone:
+ * 1. Reserved byte (0x00)
+ * 2. Version byte (1)
+ * 3. Format (varint: 1=wild, 2=standard)
+ * 4. Nombre de héros (varint)
+ * 5. Hero DBF IDs (varint chacun)
+ * 6. Cartes single copy: count + DBF IDs triés
+ * 7. Cartes double copy: count + DBF IDs triés
+ * 8. Cartes N-copy: count + pairs (DBF ID, count)
+ * 9. Base64 encode
  */
 @Injectable({
   providedIn: 'root'
@@ -34,23 +36,24 @@ export class DeckCodeService {
   encodeDeck(deck: Deck): string {
     const bytes: number[] = [];
 
-    // 1. Header byte: (reserved 0) + (version) + (format)
-    const format = deck.format === 'standard' ? this.FORMAT_STANDARD : this.FORMAT_WILD;
-    const header = 0; // Reserved
-    const versionByte = (header << 6) | (this.VERSION << 0);
-    bytes.push(versionByte);
+    // 1. Reserved byte (0x00)
+    bytes.push(0);
 
-    // 2. Format
+    // 2. Version byte (1)
+    bytes.push(this.VERSION);
+
+    // 3. Format
+    const format = deck.format === 'standard' ? this.FORMAT_STANDARD : this.FORMAT_WILD;
     bytes.push(...VarintUtil.encode(format));
 
-    // 3. Nombre de héros (toujours 1 pour le constructed)
+    // 4. Nombre de héros (toujours 1 pour le constructed)
     bytes.push(...VarintUtil.encode(1));
 
-    // 4. Hero DBF ID
+    // 5. Hero DBF ID
     const heroDbfId = this.getHeroDbfId(deck.heroClass);
     bytes.push(...VarintUtil.encode(heroDbfId));
 
-    // 5. Organiser les cartes par quantité
+    // 6. Organiser les cartes par quantité
     const singleCopy: number[] = [];
     const doubleCopy: number[] = [];
     const nCopy: Array<{ dbfId: number; count: number }> = [];
@@ -71,26 +74,26 @@ export class DeckCodeService {
     doubleCopy.sort((a, b) => a - b);
     nCopy.sort((a, b) => a.dbfId - b.dbfId);
 
-    // 6. Cartes single copy
+    // 7. Cartes single copy
     bytes.push(...VarintUtil.encode(singleCopy.length));
     singleCopy.forEach(dbfId => {
       bytes.push(...VarintUtil.encode(dbfId));
     });
 
-    // 7. Cartes double copy
+    // 8. Cartes double copy
     bytes.push(...VarintUtil.encode(doubleCopy.length));
     doubleCopy.forEach(dbfId => {
       bytes.push(...VarintUtil.encode(dbfId));
     });
 
-    // 8. Cartes N-copy (pour modes spéciaux)
+    // 9. Cartes N-copy (pour modes spéciaux)
     bytes.push(...VarintUtil.encode(nCopy.length));
     nCopy.forEach(({ dbfId, count }) => {
       bytes.push(...VarintUtil.encode(dbfId));
       bytes.push(...VarintUtil.encode(count));
     });
 
-    // 9. Encoder en base64
+    // 10. Encoder en base64
     return this.base64Encode(new Uint8Array(bytes));
   }
 
@@ -114,15 +117,22 @@ export class DeckCodeService {
       // 1. Décoder de base64
       const bytes = Array.from(this.base64Decode(deckCode));
       let offset = 0;
+      console.log(`🔍 Décodage: ${bytes.length} bytes total`);
 
-      // 2. Lire header
-      if (bytes.length < 1) {
+      // 2. Lire header (format officiel Hearthstone)
+      if (bytes.length < 2) {
         throw new Error('Deck code trop court');
       }
-      const versionByte = bytes[offset++];
-      const version = versionByte & 0x1F;
 
-      if (version !== this.VERSION) {
+      // Byte 1: Reserved (0x00)
+      const reservedByte = bytes[offset++];
+      console.log(`   Reserved byte: ${reservedByte}`);
+
+      // Byte 2: Version (1)
+      const version = bytes[offset++];
+      console.log(`   Version: ${version}`);
+
+      if (version !== this.VERSION && version !== 0) {
         console.warn(`Version non supportée: ${version}`);
       }
 
@@ -130,19 +140,35 @@ export class DeckCodeService {
       const formatResult = VarintUtil.decode(bytes, offset);
       offset += formatResult.bytesRead;
       const format = formatResult.value === this.FORMAT_STANDARD ? 'standard' : 'wild';
+      console.log(`   Format: ${formatResult.value} (${format}), offset: ${offset}`);
 
       // 4. Lire nombre de héros
       const numHeroesResult = VarintUtil.decode(bytes, offset);
       offset += numHeroesResult.bytesRead;
+      console.log(`   Nombre de héros: ${numHeroesResult.value}, offset: ${offset}`);
 
-      // 5. Lire hero DBF ID
-      const heroDbfIdResult = VarintUtil.decode(bytes, offset);
-      offset += heroDbfIdResult.bytesRead;
-      const heroClass = this.getClassFromHeroDbfId(heroDbfIdResult.value);
+      // 5. Lire TOUS les hero DBF IDs (important!)
+      // Pour les decks avec Maestra (multi-héros), on préfère le héros non-NEUTRAL
+      let heroClass = 'NEUTRAL'; // Défaut
+      for (let i = 0; i < numHeroesResult.value; i++) {
+        const heroDbfIdResult = VarintUtil.decode(bytes, offset);
+        offset += heroDbfIdResult.bytesRead;
+        const currentHeroClass = this.getClassFromHeroDbfId(heroDbfIdResult.value);
+
+        // Préférer un héros avec une vraie classe plutôt que NEUTRAL
+        if (currentHeroClass !== 'NEUTRAL') {
+          heroClass = currentHeroClass;
+        } else if (i === 0) {
+          // Si c'est le premier héros, on l'utilise par défaut
+          heroClass = currentHeroClass;
+        }
+        console.log(`   Hero ${i + 1} DBF ID: ${heroDbfIdResult.value} (${currentHeroClass}), offset: ${offset}`);
+      }
 
       // 6. Lire cartes single copy
       const singleCountResult = VarintUtil.decode(bytes, offset);
       offset += singleCountResult.bytesRead;
+      console.log(`   Single copy count: ${singleCountResult.value}, offset: ${offset}`);
       const singleCopyDbfIds: number[] = [];
 
       for (let i = 0; i < singleCountResult.value; i++) {
@@ -150,6 +176,7 @@ export class DeckCodeService {
         offset += dbfIdResult.bytesRead;
         singleCopyDbfIds.push(dbfIdResult.value);
       }
+      console.log(`   Single copy cards: ${singleCopyDbfIds.length} cartes lues, offset: ${offset}`);
 
       // 7. Lire cartes double copy
       const doubleCountResult = VarintUtil.decode(bytes, offset);

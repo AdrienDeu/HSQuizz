@@ -122,7 +122,7 @@ export class LeaderboardComponent implements OnInit {
    * Va à une page spécifique
    */
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 1) {
       this.loadLeaderboardPage(page);
     }
   }

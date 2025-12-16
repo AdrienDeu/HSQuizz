@@ -114,23 +114,7 @@
         </button>
       </div>
 
-      <!-- Navigation directe -->
-      <div class="page-jump">
-        <label for="page-input">Aller à la page :</label>
-        <input
-          id="page-input"
-          type="number"
-          #pageInput
-          (keyup.enter)="goToPage(pageInput.valueAsNumber)"
-          [disabled]="loading"
-          min="1"
-          [max]="totalPages"
-          class="page-input"
-        />
-        <button class="btn btn-secondary" (click)="goToPage(pageInput.valueAsNumber)" [disabled]="loading">
-          Aller
-        </button>
-      </div>
+
     </div>
   </div>
 </div>

@@ -245,6 +245,11 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+
+  &.reloading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
 }
 
 .settings-section {
@@ -333,17 +338,17 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
-  
+
   &:hover {
     background: rgba(0, 0, 0, 0.4);
   }
-  
+
   input[type="checkbox"] {
     accent-color: #ff9900;
     width: 16px;
     height: 16px;
   }
-  
+
   .set-name {
     color: #f4e4bc;
     font-size: 0.85rem;
@@ -351,6 +356,115 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+// Custom styled checkbox for filters
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid #8b7355;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: #ff9900;
+  }
+
+  // Hide default checkbox
+  input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+
+    // Custom checkbox styles
+    & + .custom-checkbox {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid #8b7355;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+
+      // Checkmark
+      &::after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 7px;
+        top: 3px;
+        width: 6px;
+        height: 12px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
+      }
+    }
+
+    // When checked
+    &:checked + .custom-checkbox {
+      background: linear-gradient(145deg, #ff9900, #cc7700);
+      border-color: #ff9900;
+
+      &::after {
+        display: block;
+      }
+    }
+  }
+
+  // Label text
+  .filter-label {
+    color: #f4e4bc;
+    font-size: 0.95rem;
+    flex: 1;
+
+    .filter-label-main {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .filter-label-sub {
+      font-size: 0.8rem;
+      color: #a89070;
+      display: block;
+    }
+  }
+
+  // Loading state
+  &.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// Loading spinner inline
+.loading-spinner-inline {
+  display: inline-block;
+  margin-left: 0.5rem;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+// Loading text
+.loading-text {
+  color: #ff9900;
+  font-style: italic;
 }
 
 // Start section

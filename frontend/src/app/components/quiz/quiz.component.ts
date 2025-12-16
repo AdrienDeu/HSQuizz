@@ -20,6 +20,7 @@ export class QuizComponent implements OnInit {
   currentQuestion: QuizQuestion | null = null;
   userAnswer: string = '';
   loading: boolean = true;
+  reloadingCards: boolean = false;
   error: string | null = null;
   
   // Configuration du quiz
@@ -29,6 +30,7 @@ export class QuizComponent implements OnInit {
     selectedSets: [],
     hiddenAttribute: 'name'
   };
+  includeNonCollectible: boolean = false;
   
   // Options pour les attributs
   attributeOptions: { value: HiddenAttribute; label: string }[] = [
@@ -51,25 +53,34 @@ export class QuizComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadCards();
+    this.loadCards(true);
   }
 
   /**
    * Charge les cartes depuis le service
    */
-  loadCards(): void {
-    this.loading = true;
+  loadCards(isInitialLoad: boolean = false): void {
+    // Si c'est un rechargement (pas le chargement initial), on utilise reloadingCards
+    if (!isInitialLoad && this.allCards.length > 0) {
+      this.reloadingCards = true;
+    } else {
+      this.loading = true;
+    }
     this.error = null;
-    
-    this.cardService.getCollectibleCards().subscribe({
+
+    this.cardService.getCollectibleCards(this.includeNonCollectible).subscribe({
       next: (cards) => {
         this.allCards = cards;
         this.loading = false;
-        this.loadAvailableSets();
+        this.reloadingCards = false;
+        if (isInitialLoad) {
+          this.loadAvailableSets();
+        }
       },
       error: (err) => {
         this.error = 'Erreur lors du chargement des cartes. Veuillez rafraîchir la page.';
         this.loading = false;
+        this.reloadingCards = false;
         console.error('Error loading cards:', err);
       }
     });

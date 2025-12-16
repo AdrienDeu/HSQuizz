@@ -1,10 +1,12 @@
 {
   "/api/blizzard": {
-    "target": "https://hearthstone.blizzard.com",
-    "secure": true,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/api/blizzard": "/en-us/api/community"
-    }
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/hearthstone": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true
   }
 }

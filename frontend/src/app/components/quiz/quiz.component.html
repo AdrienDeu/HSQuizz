@@ -26,8 +26,8 @@
   }
 
   <!-- Settings Panel -->
-  @if (!loading && !quizStarted) {
-    <div class="settings-panel">
+  @if ((!loading || reloadingCards) && !quizStarted) {
+    <div class="settings-panel" [class.reloading]="reloadingCards">
       <!-- Attribute selector -->
       <div class="settings-section">
         <h3>🎯 Que voulez-vous deviner ?</h3>
@@ -57,8 +57,8 @@
         <div class="sets-grid">
           @for (set of availableSets; track set.code) {
             <label class="set-checkbox">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 [checked]="isSetSelected(set.code)"
                 (change)="toggleSet(set.code)">
               <span class="set-name">{{ set.name }}</span>
@@ -67,9 +67,37 @@
         </div>
       </div>
 
+      <!-- Collectible filter -->
+      <div class="settings-section">
+        <h3>🃏 Filtres de cartes</h3>
+        <label class="filter-checkbox" [class.loading]="reloadingCards">
+          <input
+            type="checkbox"
+            [(ngModel)]="includeNonCollectible"
+            (change)="loadCards()"
+            [disabled]="reloadingCards">
+          <span class="custom-checkbox"></span>
+          <div class="filter-label">
+            <span class="filter-label-main">
+              Inclure les éléments non-collectibles
+              @if (reloadingCards) {
+                <span class="loading-spinner-inline">⏳</span>
+              }
+            </span>
+            <span class="filter-label-sub">Ajoute ~26 000 éléments supplémentaires (jetons, héros, etc.)</span>
+          </div>
+        </label>
+      </div>
+
       <!-- Preview and Start -->
       <div class="settings-section start-section">
-        <p class="preview-count">{{ previewCardCount }} cartes disponibles</p>
+        <p class="preview-count">
+          @if (reloadingCards) {
+            <span class="loading-text">Chargement des cartes...</span>
+          } @else {
+            {{ previewCardCount }} cartes disponibles
+          }
+        </p>
         @if (error) {
           <p class="error-inline">{{ error }}</p>
         }

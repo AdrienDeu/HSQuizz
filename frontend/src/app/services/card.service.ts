@@ -1,25 +1,53 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, shareReplay } from 'rxjs';
+import { Observable, map, shareReplay, catchError, tap } from 'rxjs';
 import { Card, HiddenAttribute, SET_TRANSLATIONS } from '../models/card.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CardService {
-  private readonly CARDS_URL = 'hearthstone_cards.json';
+  // API via backend (proxy pour éviter CORS)
+  private readonly API_URL = '/api/hearthstone/cards';
+  // Fichier JSON local en backup
+  private readonly BACKUP_URL = 'hearthstone_cards.json';
   private cards$: Observable<Card[]> | null = null;
+  private lastIncludeNonCollectible: boolean = false;
 
   constructor(private http: HttpClient) {}
 
   /**
-   * Charge toutes les cartes collectibles depuis le fichier JSON
+   * Charge toutes les cartes depuis l'API via le backend
+   * Le backend fait un proxy vers HearthstoneJSON et filtre les cartes collectibles
+   * Utilise le fichier JSON local en fallback si l'API échoue
    * Utilise shareReplay pour mettre en cache le résultat
    */
-  getCollectibleCards(): Observable<Card[]> {
+  getCollectibleCards(includeNonCollectible: boolean = false): Observable<Card[]> {
+    // Si le paramètre change par rapport au dernier appel, on invalide le cache
+    if (this.cards$ && this.lastIncludeNonCollectible !== includeNonCollectible) {
+      console.log(`🔄 Changement de filtre détecté (${this.lastIncludeNonCollectible} -> ${includeNonCollectible}), invalidation du cache...`);
+      this.cards$ = null;
+    }
+
+    // Sauvegarder l'état actuel
+    this.lastIncludeNonCollectible = includeNonCollectible;
+
     if (!this.cards$) {
-      this.cards$ = this.http.get<Card[]>(this.CARDS_URL).pipe(
-        map(cards => this.filterCollectibleCards(cards)),
+      const url = includeNonCollectible
+        ? `${this.API_URL}?includeNonCollectible=true`
+        : this.API_URL;
+
+      console.log(`📡 Requête API: ${url}`);
+
+      this.cards$ = this.http.get<Card[]>(url).pipe(
+        tap((cards) => console.log(`✅ ${cards.length} cartes chargées depuis l'API`)),
+        catchError(error => {
+          console.warn('⚠️ Erreur API, utilisation du fichier backup:', error.message);
+          return this.http.get<Card[]>(this.BACKUP_URL).pipe(
+            tap(() => console.log('✅ Cartes chargées depuis le fichier backup')),
+            map(cards => includeNonCollectible ? cards : this.filterCollectibleCards(cards))
+          );
+        }),
         shareReplay(1)
       );
     }

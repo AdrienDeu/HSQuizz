@@ -1,0 +1,256 @@
+<div class="deck-builder-container">
+  <!-- Header -->
+  <header class="deck-builder-header">
+    <div class="header-top">
+      <h1>🎴 Deck Builder</h1>
+      <div class="header-info">
+        <span class="storage-info">{{ getStorageInfo() }}</span>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Nom du deck -->
+      <div class="control-group">
+        <label for="deckName">Nom du deck</label>
+        <input
+          id="deckName"
+          type="text"
+          [(ngModel)]="deckName"
+          (blur)="onDeckNameChange()"
+          (keyup.enter)="onDeckNameChange()"
+          class="deck-name-input"
+          placeholder="Nom du deck"
+        />
+      </div>
+
+      <!-- Sélection de classe -->
+      <div class="control-group">
+        <label for="classSelect">Classe</label>
+        <select
+          id="classSelect"
+          [(ngModel)]="selectedClass"
+          (change)="onClassChange()"
+          class="class-select"
+        >
+          @for (cls of classes; track cls.code) {
+            <option [value]="cls.code">{{ cls.icon }} {{ cls.name }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Sélection du format -->
+      <div class="control-group">
+        <label for="formatSelect">Format</label>
+        <select
+          id="formatSelect"
+          [(ngModel)]="selectedFormat"
+          (change)="onFormatChange()"
+          class="format-select"
+        >
+          <option value="standard">🎯 Standard</option>
+          <option value="wild">🌟 Libre</option>
+        </select>
+      </div>
+
+      <!-- Actions -->
+      <div class="control-group actions">
+        <button class="btn btn-secondary" (click)="newDeck()" title="Nouveau deck">
+          🆕 Nouveau
+        </button>
+        <button
+          class="btn btn-primary"
+          (click)="saveDeck()"
+          title="Sauvegarder le deck (même incomplet)"
+        >
+          💾 Sauvegarder
+        </button>
+        <button class="btn btn-secondary" (click)="openExportModal()" title="Exporter le code">
+          📤 Exporter
+        </button>
+        <button class="btn btn-secondary" (click)="openImportModal()" title="Importer un deck">
+          📥 Importer
+        </button>
+        <button class="btn btn-secondary" (click)="openDeckManager()" title="Gérer mes decks">
+          📚 Mes Decks
+        </button>
+        <button class="btn btn-danger" (click)="clearDeck()" title="Vider le deck">
+          🗑️ Vider
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    @if (successMessage) {
+      <div class="message message-success">✅ {{ successMessage }}</div>
+    }
+    @if (errorMessage) {
+      <div class="message message-error">❌ {{ errorMessage }}</div>
+    }
+  </header>
+
+  <!-- Statistiques du deck (affichage compact en haut) -->
+  @if (currentStats) {
+    <div class="deck-stats-compact">
+      <div class="stat-item">
+        <span class="stat-label">Cartes:</span>
+        <span class="stat-value" [class.complete]="currentStats.totalCards === 30">
+          {{ currentStats.totalCards }}/30
+        </span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Coût moyen:</span>
+        <span class="stat-value">{{ currentStats.averageManaCost }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Serviteurs:</span>
+        <span class="stat-value">{{ currentStats.typeDistribution.minions }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Sorts:</span>
+        <span class="stat-value">{{ currentStats.typeDistribution.spells }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Armes:</span>
+        <span class="stat-value">{{ currentStats.typeDistribution.weapons }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- Contenu principal (3 colonnes) -->
+  <div class="deck-builder-layout">
+    <!-- Colonne gauche: Filtres -->
+    <aside class="filters-sidebar">
+      <div class="sidebar-header">
+        <h2>🔍 Filtres</h2>
+      </div>
+      <div class="sidebar-content">
+        <app-card-filter></app-card-filter>
+      </div>
+    </aside>
+
+    <!-- Colonne centrale: Collection de cartes -->
+    <main class="card-collection-main">
+      <div class="section-header">
+        <h2>📚 Collection de Cartes</h2>
+        @if (loading$ | async) {
+          <span class="loading-indicator">Chargement...</span>
+        }
+      </div>
+      <div class="card-collection-content">
+        @if (availableCards$ | async; as cards) {
+          <app-card-collection
+            [cards]="cards"
+            [loading]="(loading$ | async) || false"
+          ></app-card-collection>
+        }
+      </div>
+    </main>
+
+    <!-- Colonne droite: Deck actuel + Statistiques -->
+    <aside class="deck-sidebar">
+      <!-- Deck List -->
+      <div class="deck-list-section">
+        <div class="section-header">
+          <h2>🃏 Deck ({{ currentStats?.totalCards || 0 }}/30)</h2>
+        </div>
+        <div class="deck-list-content">
+          @if (currentDeck && currentDeck.cards.length > 0) {
+            <div class="deck-cards">
+              @for (deckCard of currentDeck.cards; track deckCard.card.id) {
+                <div class="deck-card-item">
+                  <span class="card-quantity">{{ deckCard.quantity }}x</span>
+                  <span class="card-cost">{{ deckCard.card.cost ?? 0 }}</span>
+                  <span class="card-name">{{ deckCard.card.name }}</span>
+                  <button
+                    class="btn-remove"
+                    (click)="deckBuilderService.removeCardFromDeck(deckCard.card.id)"
+                    title="Retirer"
+                  >
+                    ×
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              <p>Aucune carte dans le deck</p>
+              <p class="empty-hint">Cliquez sur une carte pour l'ajouter</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Stats détaillées -->
+      <div class="deck-stats-section">
+        <div class="section-header">
+          <h2>📊 Statistiques</h2>
+        </div>
+        <div class="deck-stats-content">
+          @if (currentStats) {
+            <app-deck-stats [stats]="currentStats"></app-deck-stats>
+          } @else {
+            <p class="placeholder-text">Aucune statistique</p>
+          }
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Modal Export -->
+  @if (showExportModal) {
+    <div class="modal-overlay" (click)="closeModals()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>📤 Exporter le Deck</h2>
+          <button class="btn-close" (click)="closeModals()">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Code du deck Hearthstone :</p>
+          <textarea
+            readonly
+            class="code-textarea"
+            [value]="exportedCode"
+            rows="4"
+          ></textarea>
+          <button class="btn btn-primary btn-full" (click)="copyDeckCode()">
+            📋 Copier le code
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Import -->
+  @if (showImportModal) {
+    <div class="modal-overlay" (click)="closeModals()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>📥 Importer un Deck</h2>
+          <button class="btn-close" (click)="closeModals()">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Collez le code du deck Hearthstone :</p>
+          <textarea
+            [(ngModel)]="importCode"
+            class="code-textarea"
+            placeholder="AAECAa0GBMABnAL7AqwI..."
+            rows="4"
+          ></textarea>
+          <button
+            class="btn btn-primary btn-full"
+            (click)="importDeck()"
+            [disabled]="!importCode.trim()"
+          >
+            ✅ Importer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Deck Manager -->
+  @if (showDeckManager) {
+    <app-deck-manager (closeManager)="closeDeckManager()"></app-deck-manager>
+  }
+</div>
+

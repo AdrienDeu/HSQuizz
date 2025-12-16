@@ -1,0 +1,112 @@
+<div class="card-filter">
+  <!-- Header with Clear Button -->
+  <div class="filter-header">
+    <h3>Filtres</h3>
+    <button
+      class="clear-btn"
+      (click)="clearAllFilters()"
+      [disabled]="activeFiltersCount === 0">
+      Effacer
+      <span class="filter-badge" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="filter-section search-section">
+    <label>
+      <span class="filter-label">Recherche</span>
+      <input
+        type="text"
+        class="search-input"
+        [value]="filters.searchQuery"
+        (input)="onSearchInput($event)"
+        placeholder="Nom de carte...">
+    </label>
+  </div>
+
+  <!-- Class Filter -->
+  <div class="filter-section">
+    <h4 class="filter-label">Classe</h4>
+    <div class="filter-grid class-grid">
+      <button
+        *ngFor="let cls of classes"
+        class="filter-btn class-btn"
+        [class.active]="isClassSelected(cls.code)"
+        (click)="toggleClass(cls.code)"
+        [title]="cls.name">
+        <span class="icon">{{ cls.icon }}</span>
+        <span class="name">{{ cls.name }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mana Cost Filter -->
+  <div class="filter-section">
+    <h4 class="filter-label">Co\u00fbt de mana</h4>
+    <div class="filter-grid mana-grid">
+      <button
+        *ngFor="let cost of manaCosts"
+        class="filter-btn mana-btn"
+        [class.active]="isManaCostSelected(cost)"
+        (click)="toggleManaCost(cost)">
+        {{ getManaCostLabel(cost) }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Rarity Filter -->
+  <div class="filter-section">
+    <h4 class="filter-label">Raret\u00e9</h4>
+    <div class="filter-list">
+      <label
+        *ngFor="let rarity of rarities"
+        class="filter-checkbox">
+        <input
+          type="checkbox"
+          [checked]="isRaritySelected(rarity.code)"
+          (change)="toggleRarity(rarity.code)">
+        <span class="checkbox-label" [attr.data-rarity]="rarity.code.toLowerCase()">
+          {{ rarity.name }}
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Type Filter -->
+  <div class="filter-section">
+    <h4 class="filter-label">Type de carte</h4>
+    <div class="filter-list">
+      <label
+        *ngFor="let type of types"
+        class="filter-checkbox">
+        <input
+          type="checkbox"
+          [checked]="isTypeSelected(type.code)"
+          (change)="toggleType(type.code)">
+        <span class="checkbox-label">
+          <span class="icon">{{ type.icon }}</span>
+          {{ type.name }}
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Mechanics Filter (Collapsible) -->
+  <div class="filter-section mechanics-section">
+    <h4 class="filter-label clickable" (click)="showMechanics = !showMechanics">
+      <span>M\u00e9caniques</span>
+      <span class="toggle-icon">{{ showMechanics ? '\u25bc' : '\u25b6' }}</span>
+    </h4>
+    <div class="filter-list mechanics-list" *ngIf="showMechanics">
+      <label
+        *ngFor="let mechanic of mechanics"
+        class="filter-checkbox">
+        <input
+          type="checkbox"
+          [checked]="isMechanicSelected(mechanic.code)"
+          (change)="toggleMechanic(mechanic.code)">
+        <span class="checkbox-label">{{ mechanic.name }}</span>
+      </label>
+    </div>
+  </div>
+</div>

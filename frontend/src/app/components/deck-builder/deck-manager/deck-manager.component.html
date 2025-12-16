@@ -1,0 +1,168 @@
+<div class="deck-manager-overlay" (click)="close()">
+  <div class="deck-manager-modal" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="manager-header">
+      <h2>📚 Mes Decks</h2>
+      <button class="btn-close" (click)="close()" title="Fermer">×</button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="manager-toolbar">
+      <!-- Search -->
+      <div class="search-box">
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+          placeholder="Rechercher un deck...">
+      </div>
+
+      <!-- Sort Controls -->
+      <div class="sort-controls">
+        <button
+          class="sort-btn"
+          [class.active]="sortBy === 'date'"
+          (click)="changeSortBy('date')"
+          title="Trier par date">
+          📅 Date
+          <span class="sort-arrow" *ngIf="sortBy === 'date'">
+            {{ sortOrder === 'asc' ? '↑' : '↓' }}
+          </span>
+        </button>
+        <button
+          class="sort-btn"
+          [class.active]="sortBy === 'name'"
+          (click)="changeSortBy('name')"
+          title="Trier par nom">
+          🔤 Nom
+          <span class="sort-arrow" *ngIf="sortBy === 'name'">
+            {{ sortOrder === 'asc' ? '↑' : '↓' }}
+          </span>
+        </button>
+        <button
+          class="sort-btn"
+          [class.active]="sortBy === 'class'"
+          (click)="changeSortBy('class')"
+          title="Trier par classe">
+          🎭 Classe
+          <span class="sort-arrow" *ngIf="sortBy === 'class'">
+            {{ sortOrder === 'asc' ? '↑' : '↓' }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Storage Info -->
+      <div class="storage-info">
+        {{ getStorageInfo() }}
+      </div>
+    </div>
+
+    <!-- Deck List -->
+    <div class="manager-content">
+      @if (filteredDecks.length === 0 && savedDecks.length === 0) {
+        <!-- Empty State -->
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          <h3>Aucun deck sauvegardé</h3>
+          <p>Créez votre premier deck pour commencer !</p>
+          <button class="btn btn-primary" (click)="createNewDeck()">
+            ➕ Nouveau Deck
+          </button>
+        </div>
+      } @else if (filteredDecks.length === 0) {
+        <!-- No Results -->
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>Aucun résultat</h3>
+          <p>Essayez une autre recherche</p>
+        </div>
+      } @else {
+        <!-- Deck Cards -->
+        <div class="deck-list">
+          @for (deck of filteredDecks; track deck.id) {
+            <div
+              class="deck-card"
+              [class.selected]="selectedDeckId === deck.id"
+              (click)="selectDeck(deck.id)">
+              <!-- Deck Header -->
+              <div class="deck-card-header">
+                <div class="deck-class">
+                  <span class="class-icon">{{ getClassIcon(deck.heroClass) }}</span>
+                  <span class="class-name">{{ getClassName(deck.heroClass) }}</span>
+                </div>
+                <div class="deck-format">{{ deck.format === 'standard' ? '🎯 Standard' : '🌟 Libre' }}</div>
+              </div>
+
+              <!-- Deck Name -->
+              <div class="deck-card-body">
+                @if (editingDeckId === deck.id) {
+                  <!-- Edit Mode -->
+                  <div class="edit-name-box" (click)="$event.stopPropagation()">
+                    <input
+                      type="text"
+                      class="edit-name-input"
+                      [(ngModel)]="editingDeckName"
+                      (keyup.enter)="saveDeckName(deck)"
+                      (keyup.escape)="cancelEditDeckName()"
+                      autofocus>
+                    <div class="edit-name-actions">
+                      <button class="btn-edit-action btn-save" (click)="saveDeckName(deck)" title="Sauvegarder">✓</button>
+                      <button class="btn-edit-action btn-cancel" (click)="cancelEditDeckName()" title="Annuler">×</button>
+                    </div>
+                  </div>
+                } @else {
+                  <!-- Display Mode -->
+                  <h3 class="deck-name">{{ deck.name }}</h3>
+                }
+
+                <div class="deck-meta">
+                  <span class="card-count">{{ deck.cards.length }} cartes uniques</span>
+                  <span class="deck-date">{{ formatDate(deck.updatedAt) }}</span>
+                </div>
+
+                @if (deck.deckCode) {
+                  <div class="deck-code-preview">
+                    Code: <code>{{ deck.deckCode.substring(0, 20) }}...</code>
+                  </div>
+                }
+              </div>
+
+              <!-- Actions -->
+              <div class="deck-card-actions" (click)="$event.stopPropagation()">
+                <button
+                  class="btn-action btn-load"
+                  (click)="loadDeck(deck)"
+                  title="Charger ce deck">
+                  📂 Charger
+                </button>
+                <button
+                  class="btn-action btn-rename"
+                  (click)="startEditDeckName(deck)"
+                  title="Renommer">
+                  ✏️
+                </button>
+                <button
+                  class="btn-action btn-delete"
+                  (click)="deleteDeck(deck, $event)"
+                  title="Supprimer">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="manager-footer">
+      <button class="btn btn-secondary" (click)="close()">
+        Fermer
+      </button>
+      <button class="btn btn-primary" (click)="createNewDeck()">
+        ➕ Nouveau Deck
+      </button>
+    </div>
+  </div>
+</div>

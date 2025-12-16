@@ -1,0 +1,163 @@
+.card-collection-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// ============ ÉTATS (LOADING, EMPTY) ============
+
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
+  color: #aaa;
+}
+
+.loading-state {
+  .spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 153, 0, 0.2);
+    border-top-color: #ff9900;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+.empty-state {
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0.3rem 0;
+    font-size: 1.1rem;
+    color: #999;
+  }
+
+  .empty-hint {
+    font-size: 0.9rem;
+    color: #666;
+  }
+}
+
+// ============ VIRTUAL SCROLL VIEWPORT ============
+
+.cards-viewport {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// ============ GRILLE DE CARTES ============
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 1400px) {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.8rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.6rem;
+    padding: 0.6rem;
+  }
+}
+
+// ============ CARD WRAPPER ============
+
+.card-wrapper {
+  padding: 1rem 1rem 0 1rem;
+}
+
+// ============ PAGINATION ============
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 2px solid rgba(255, 153, 0, 0.3);
+  margin-top: 1rem;
+
+  .btn-page {
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #ffaa00 0%, #ff8800 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 153, 0, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  .page-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+
+    .cards-count-inline {
+      font-size: 0.85rem;
+      color: #aaa;
+      font-weight: 400;
+    }
+  }
+}
+
+// ============ ANIMATIONS ============
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============ OPTIMISATIONS DE PERFORMANCE ============
+
+.card-wrapper {
+  will-change: transform;
+}

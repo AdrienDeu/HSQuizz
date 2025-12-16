@@ -114,22 +114,41 @@
   }
 }
 
-.leaderboard-btn {
-  background: linear-gradient(180deg, #6b5b95 0%, #4a3f6b 100%);
-  border: 2px solid #8b7bb5;
-  color: #f4e4bc;
-  
+.deck-builder-btn {
+  background: linear-gradient(180deg, #ffaa00 0%, #ff8800 100%);
+  border: 2px solid #ffd700;
+  color: #1a1a1a;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(255, 153, 0, 0.4);
+
   &:hover {
-    background: linear-gradient(180deg, #7b6ba5 0%, #5a4f7b 100%);
+    background: linear-gradient(180deg, #ffbb22 0%, #ff9922 100%);
+    box-shadow: 0 5px 12px rgba(255, 153, 0, 0.6);
+  }
+}
+
+.leaderboard-btn {
+  background: linear-gradient(180deg, #ffaa00 0%, #ff8800 100%);
+  border: 2px solid #ffd700;
+  color: #1a1a1a;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(255, 153, 0, 0.4);
+
+  &:hover {
+    background: linear-gradient(180deg, #ffbb22 0%, #ff9922 100%);
+    box-shadow: 0 5px 12px rgba(255, 153, 0, 0.6);
   }
 }
 
 .suggestions-btn {
-  background: linear-gradient(180deg, #ff9900 0%, #cc7a00 100%);
-  border: 2px solid #ffcc00;
-  color: #1a1a2e;
-  
+  background: linear-gradient(180deg, #ffaa00 0%, #ff8800 100%);
+  border: 2px solid #ffd700;
+  color: #1a1a1a;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(255, 153, 0, 0.4);
+
   &:hover {
-    background: linear-gradient(180deg, #ffaa22 0%, #dd8811 100%);
+    background: linear-gradient(180deg, #ffbb22 0%, #ff9922 100%);
+    box-shadow: 0 5px 12px rgba(255, 153, 0, 0.6);
   }
 }

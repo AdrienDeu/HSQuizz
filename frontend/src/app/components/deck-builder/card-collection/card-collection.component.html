@@ -1,0 +1,57 @@
+<div class="card-collection-container">
+  @if (loading) {
+    <!-- État de chargement -->
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement des cartes...</p>
+    </div>
+  } @else if (cards.length === 0) {
+    <!-- État vide -->
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <p>Aucune carte trouvée</p>
+      <p class="empty-hint">Essayez de modifier vos filtres</p>
+    </div>
+  } @else {
+    <!-- Collection de cartes -->
+    <div class="cards-viewport">
+      <div class="cards-grid">
+        @for (card of displayedCards; track trackByCardId($index, card)) {
+          <div class="card-wrapper">
+            <!-- Carte affichée -->
+            <app-deck-card-item
+              [card]="card"
+              (cardClick)="onCardClick($event)"
+            ></app-deck-card-item>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-controls">
+        <button
+          class="btn-page"
+          (click)="previousPage()"
+          [disabled]="!hasPreviousPage"
+          title="Page précédente"
+        >
+          ← Précédent
+        </button>
+
+        <div class="page-info">
+          Page {{ currentPage + 1 }} / {{ totalPages }}
+          <span class="cards-count-inline">({{ displayedCards.length }} cartes)</span>
+        </div>
+
+        <button
+          class="btn-page"
+          (click)="nextPage()"
+          [disabled]="!hasNextPage"
+          title="Page suivante"
+        >
+          Suivant →
+        </button>
+      </div>
+    </div>
+  }
+</div>

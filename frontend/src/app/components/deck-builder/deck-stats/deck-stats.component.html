@@ -1,0 +1,154 @@
+<div class="deck-stats-container">
+  @if (stats) {
+    <!-- Progression du deck -->
+    <div class="stats-section progress-section">
+      <h3>Progression</h3>
+      <div class="progress-bar-container">
+        <div
+          class="progress-bar"
+          [style.width.%]="stats.deckCompletionPercent"
+          [class.complete]="stats.totalCards === 30"
+        ></div>
+      </div>
+      <div class="progress-info">
+        <span class="progress-text">{{ stats.totalCards }}/30 cartes</span>
+        <span class="progress-percent">{{ stats.deckCompletionPercent }}%</span>
+      </div>
+    </div>
+
+    <!-- Courbe de Mana -->
+    <div class="stats-section mana-curve-section">
+      <h3>📊 Courbe de Mana</h3>
+      <div class="mana-curve">
+        @for (data of manaCurveData; track data.cost) {
+          <div class="mana-bar-container">
+            <div
+              class="mana-bar"
+              [style.height.%]="data.height"
+              [class.has-cards]="data.count > 0"
+              [title]="data.count + ' carte(s) à ' + getManaCostLabel(data.cost) + ' mana'"
+            >
+              @if (data.count > 0) {
+                <span class="bar-count">{{ data.count }}</span>
+              }
+            </div>
+            <span class="mana-label">{{ getManaCostLabel(data.cost) }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Distribution des Types -->
+    <div class="stats-section types-section">
+      <h3>🃏 Types de Cartes</h3>
+      <div class="type-list">
+        <div class="type-item">
+          <span class="type-icon">⚔️</span>
+          <span class="type-label">Serviteurs</span>
+          <span class="type-value">{{ stats.typeDistribution.minions }}</span>
+        </div>
+        <div class="type-item">
+          <span class="type-icon">✨</span>
+          <span class="type-label">Sorts</span>
+          <span class="type-value">{{ stats.typeDistribution.spells }}</span>
+        </div>
+        <div class="type-item">
+          <span class="type-icon">🗡️</span>
+          <span class="type-label">Armes</span>
+          <span class="type-value">{{ stats.typeDistribution.weapons }}</span>
+        </div>
+        @if (stats.typeDistribution.locations > 0) {
+          <div class="type-item">
+            <span class="type-icon">🏛️</span>
+            <span class="type-label">Lieux</span>
+            <span class="type-value">{{ stats.typeDistribution.locations }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Phases de Jeu -->
+    <div class="stats-section phases-section">
+      <h3>⏱️ Phases de Jeu</h3>
+      <div class="phase-list">
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-label">Début (0-3)</span>
+            <span
+              class="phase-value"
+              [style.color]="getPhaseColor('early')"
+            >
+              {{ stats.gamePhaseDistribution.early }} ({{ stats.gamePhaseDistribution.earlyPercent }}%)
+            </span>
+          </div>
+          <div class="phase-bar-bg">
+            <div
+              class="phase-bar"
+              [style.width.%]="stats.gamePhaseDistribution.earlyPercent"
+              [style.background]="getPhaseColor('early')"
+            ></div>
+          </div>
+          @if (getPhaseWarning('early'); as warning) {
+            <span class="phase-warning">⚠️ {{ warning }}</span>
+          }
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-label">Milieu (4-6)</span>
+            <span
+              class="phase-value"
+              [style.color]="getPhaseColor('mid')"
+            >
+              {{ stats.gamePhaseDistribution.mid }} ({{ stats.gamePhaseDistribution.midPercent }}%)
+            </span>
+          </div>
+          <div class="phase-bar-bg">
+            <div
+              class="phase-bar"
+              [style.width.%]="stats.gamePhaseDistribution.midPercent"
+              [style.background]="getPhaseColor('mid')"
+            ></div>
+          </div>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-label">Fin (7+)</span>
+            <span
+              class="phase-value"
+              [style.color]="getPhaseColor('late')"
+            >
+              {{ stats.gamePhaseDistribution.late }} ({{ stats.gamePhaseDistribution.latePercent }}%)
+            </span>
+          </div>
+          <div class="phase-bar-bg">
+            <div
+              class="phase-bar"
+              [style.width.%]="stats.gamePhaseDistribution.latePercent"
+              [style.background]="getPhaseColor('late')"
+            ></div>
+          </div>
+          @if (getPhaseWarning('late'); as warning) {
+            <span class="phase-warning">⚠️ {{ warning }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Coût Moyen -->
+    <div class="stats-section average-section">
+      <h3>📈 Coût Moyen</h3>
+      <div class="average-display">
+        <span class="average-value">{{ stats.averageManaCost }}</span>
+        <span class="average-label">mana</span>
+      </div>
+    </div>
+  } @else {
+    <!-- État vide -->
+    <div class="empty-stats">
+      <p>Aucune statistique disponible</p>
+      <p class="empty-hint">Ajoutez des cartes au deck</p>
+    </div>
+  }
+</div>

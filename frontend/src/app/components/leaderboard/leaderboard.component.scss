@@ -153,9 +153,21 @@
 .btn-primary {
   background: linear-gradient(145deg, #ff9900, #cc7700);
   color: white;
-  
+
   &:hover {
     background: linear-gradient(145deg, #ffaa22, #dd8800);
+    transform: translateY(-2px);
+  }
+}
+
+.btn-secondary {
+  background: linear-gradient(145deg, #8b7355, #6a5843);
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: linear-gradient(145deg, #a89070, #8b7355);
     transform: translateY(-2px);
   }
 }
@@ -163,6 +175,8 @@
 // Leaderboard Content
 .leaderboard-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-container {
@@ -172,24 +186,52 @@
   overflow: hidden;
   max-height: 60vh;
   overflow-y: auto;
-  
+  position: relative;
+
   // Custom scrollbar
   &::-webkit-scrollbar {
     width: 8px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.2);
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #8b7355;
     border-radius: 4px;
-    
+
     &:hover {
       background: #a89070;
     }
   }
+}
+
+.table-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+
+  p {
+    color: #f4e4bc;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+.loading-table {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .leaderboard-table {
@@ -307,12 +349,37 @@
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  margin-bottom: 1rem;
-  margin-top: 2rem;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 12px;
   border: 1px solid rgba(139, 115, 85, 0.3);
+
+  &.top {
+    margin-bottom: 1.5rem;
+  }
+
+  &.bottom {
+    margin-top: 1.5rem;
+  }
+}
+
+.pagination-info {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(139, 115, 85, 0.3);
+
+  &.top {
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #a89070;
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 600;
+  }
 }
 
 .pagination-controls {
@@ -320,6 +387,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .pagination-btn {
@@ -332,12 +400,12 @@
   color: #f4e4bc;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover:not(:disabled) {
     background: rgba(255, 153, 0, 0.2);
     border-color: #ff9900;
   }
-  
+
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -347,11 +415,13 @@
 .page-numbers {
   display: flex;
   gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .page-btn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -363,18 +433,68 @@
   color: #a89070;
   cursor: pointer;
   transition: all 0.2s;
-  
-  &:hover:not(.active) {
+
+  &:hover:not(.active):not(:disabled) {
     background: rgba(255, 153, 0, 0.2);
     border-color: #ff9900;
     color: #f4e4bc;
   }
-  
+
   &.active {
     background: linear-gradient(145deg, #ff9900, #cc7700);
     border-color: #ff9900;
     color: white;
   }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.page-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  label {
+    color: #a89070;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+.page-input {
+  width: 70px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border: 2px solid #8b7355;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #f4e4bc;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #ff9900;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  // Remove spinner arrows
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  -moz-appearance: textfield;
 }
 
 // Responsive

@@ -36,24 +36,35 @@
     </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="loading">
+  <!-- Loading initial -->
+  <div *ngIf="loading && leaderboardEntries.length === 0" class="loading">
     <div class="spinner"></div>
     <p>Chargement du leaderboard...</p>
   </div>
 
   <!-- Error -->
-  <div *ngIf="error && !loading" class="error-message">
+  <div *ngIf="error && !loading && leaderboardEntries.length === 0" class="error-message">
     <p>{{ error }}</p>
-    <button class="btn btn-primary" (click)="loadLeaderboard()">
+    <button class="btn btn-primary" (click)="loadPage(currentPage)">
       Réessayer
     </button>
   </div>
 
   <!-- Leaderboard Table -->
-  <div *ngIf="!loading && !error && leaderboardEntries.length > 0" class="leaderboard-content">
+  <div *ngIf="leaderboardEntries.length > 0 || (loading && leaderboardEntries.length > 0)" class="leaderboard-content">
+    <!-- Info en haut -->
+    <div class="pagination-info top">
+      <p>Joueurs {{ getDisplayedRange() }} sur {{ maxPlayers }}</p>
+    </div>
+
     <div class="table-container">
-      <table class="leaderboard-table">
+      <!-- Loading overlay pour le tableau -->
+      <div *ngIf="loading" class="table-loading-overlay">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+      </div>
+
+      <table class="leaderboard-table" [class.loading-table]="loading">
         <thead>
           <tr>
             <th class="rank-col">Rang</th>
@@ -62,8 +73,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr 
-            *ngFor="let entry of leaderboardEntries" 
+          <tr
+            *ngFor="let entry of leaderboardEntries"
             [class]="getMedalClass(entry.rank)"
           >
             <td class="rank-cell">
@@ -78,35 +89,58 @@
         </tbody>
       </table>
     </div>
-  </div>
 
-  <!-- Pagination Bottom -->
-  <div *ngIf="!loading && !error && allEntries.length > 0" class="pagination-section">
-    <div class="pagination-controls">
-      <button 
-        class="pagination-btn" 
-        (click)="previousPage()" 
-        [disabled]="currentPage === 1"
-      >
-        ◀ Précédent
-      </button>
-      <div class="page-numbers">
-        <button 
-          *ngFor="let page of [].constructor(totalPages); let i = index"
-          class="page-btn" 
-          [class.active]="currentPage === i + 1"
-          (click)="goToPage(i + 1)"
+    <!-- Pagination complète en bas -->
+    <div class="pagination-section bottom">
+      <div class="pagination-controls">
+        <button
+          class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1 || loading"
+          title="Page précédente"
         >
-          {{ i + 1 }}
+          ◀ Précédent
+        </button>
+
+        <div class="page-numbers">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            class="page-btn"
+            [class.active]="currentPage === page"
+            [disabled]="loading"
+            (click)="loadPage(page)"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <button
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages || loading"
+          title="Page suivante"
+        >
+          Suivant ▶
         </button>
       </div>
-      <button 
-        class="pagination-btn" 
-        (click)="nextPage()" 
-        [disabled]="currentPage === totalPages"
-      >
-        Suivant ▶
-      </button>
+
+      <!-- Navigation directe -->
+      <div class="page-jump">
+        <label for="page-input">Aller à la page :</label>
+        <input
+          id="page-input"
+          type="number"
+          [(ngModel)]="pageInput"
+          (keyup.enter)="goToPageFromInput()"
+          [disabled]="loading"
+          min="1"
+          [max]="totalPages"
+          class="page-input"
+        />
+        <button class="btn btn-secondary" (click)="goToPageFromInput()" [disabled]="loading">
+          Aller
+        </button>
+      </div>
     </div>
   </div>
 </div>

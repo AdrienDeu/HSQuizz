@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="leaderboard-header">
     <h1>🏆 Leaderboard</h1>
-    <p class="subtitle">Top 200 des meilleurs joueurs Hearthstone</p>
+    <p class="subtitle">Top des meilleurs joueurs Hearthstone</p>
   </div>
 
   <!-- Filtres -->
@@ -54,7 +54,7 @@
   <div *ngIf="leaderboardEntries.length > 0 || (loading && leaderboardEntries.length > 0)" class="leaderboard-content">
     <!-- Info en haut -->
     <div class="pagination-info top">
-      <p>Joueurs {{ getDisplayedRange() }} sur {{ totalEntries }}</p>
+      <p>Joueurs {{ getDisplayedRange() }} </p>
     </div>
 
     <div class="table-container">

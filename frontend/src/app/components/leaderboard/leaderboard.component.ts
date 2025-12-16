@@ -56,7 +56,7 @@ export class LeaderboardComponent implements OnInit {
     this.loading = true;
     this.error = null;
     this.currentPage = page;
-    this.leaderboardService.getLeaderboardPage(this.selectedRegion, this.selectedGameMode, page, this.itemsPerPage).subscribe({
+    this.leaderboardService.getLeaderboardPage(this.selectedRegion, this.selectedGameMode, page).subscribe({
       next: (entries) => {
         this.leaderboardEntries = entries;
         // Si on reçoit moins que itemsPerPage, c'est la dernière page

@@ -45,7 +45,7 @@
   <!-- Error -->
   <div *ngIf="error && !loading && leaderboardEntries.length === 0" class="error-message">
     <p>{{ error }}</p>
-    <button class="btn btn-primary" (click)="loadPage(currentPage)">
+    <button class="btn btn-primary" (click)="loadLeaderboardPage(currentPage)">
       Réessayer
     </button>
   </div>
@@ -54,7 +54,7 @@
   <div *ngIf="leaderboardEntries.length > 0 || (loading && leaderboardEntries.length > 0)" class="leaderboard-content">
     <!-- Info en haut -->
     <div class="pagination-info top">
-      <p>Joueurs {{ getDisplayedRange() }} sur {{ maxPlayers }}</p>
+      <p>Joueurs {{ getDisplayedRange() }} sur {{ totalEntries }}</p>
     </div>
 
     <div class="table-container">
@@ -102,17 +102,7 @@
           ◀ Précédent
         </button>
 
-        <div class="page-numbers">
-          <button
-            *ngFor="let page of getPageNumbers()"
-            class="page-btn"
-            [class.active]="currentPage === page"
-            [disabled]="loading"
-            (click)="loadPage(page)"
-          >
-            {{ page }}
-          </button>
-        </div>
+
 
         <button
           class="pagination-btn"
@@ -130,14 +120,14 @@
         <input
           id="page-input"
           type="number"
-          [(ngModel)]="pageInput"
-          (keyup.enter)="goToPageFromInput()"
+          #pageInput
+          (keyup.enter)="goToPage(pageInput.valueAsNumber)"
           [disabled]="loading"
           min="1"
           [max]="totalPages"
           class="page-input"
         />
-        <button class="btn btn-secondary" (click)="goToPageFromInput()" [disabled]="loading">
+        <button class="btn btn-secondary" (click)="goToPage(pageInput.valueAsNumber)" [disabled]="loading">
           Aller
         </button>
       </div>

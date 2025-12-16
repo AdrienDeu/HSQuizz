@@ -1,3 +1,25 @@
+// Style global pour le bouton "Tout sélectionner"
+.btn-select-all {
+  background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+  color: #5a3c00;
+  font-weight: bold;
+  border: none;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 8px rgba(255, 204, 51, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+}
+
+.btn-select-all:hover, .btn-select-all:focus {
+  background: linear-gradient(90deg, #ffd966 0%, #ffe599 100%);
+  color: #7a5600;
+  box-shadow: 0 4px 16px rgba(255, 204, 51, 0.25);
+  transform: translateY(-2px) scale(1.04);
+}
 /* Global styles for HSQuizz */
 
 * {

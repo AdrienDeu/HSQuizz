@@ -13,15 +13,15 @@
 
     <div class="navbar-actions-wrapper" [class.menu-open]="isMenuOpen">
       <div class="navbar-actions">
-        <a routerLink="/deck-builder" class="nav-btn deck-builder-btn" title="Create a deck">
+        <a routerLink="/deck-builder" class="nav-btn deck-builder-btn" title="Create a deck" (click)="closeMenu()">
           <span class="btn-icon"></span>
           <span class="btn-text">Deck Builder</span>
         </a>
-        <a routerLink="/leaderboard" class="nav-btn leaderboard-btn" title="View the leaderboard">
+        <a routerLink="/leaderboard" class="nav-btn leaderboard-btn" title="View the leaderboard" (click)="closeMenu()">
           <span class="btn-icon"></span>
           <span class="btn-text">Leaderboard</span>
         </a>
-        <a [href]="mailtoLink" class="nav-btn suggestions-btn" title="Send a suggestion">
+        <a [href]="mailtoLink" class="nav-btn suggestions-btn" title="Send a suggestion" (click)="closeMenu()">
           <span class="btn-icon"></span>
           <span class="btn-text">Suggestions</span>
         </a>

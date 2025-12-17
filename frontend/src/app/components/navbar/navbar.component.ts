@@ -23,6 +23,10 @@ export class NavbarComponent {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
+  closeMenu(): void {
+    this.isMenuOpen = false;
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {
     if (window.innerWidth > 768) {

@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { DeckStorageService } from '../../../services/deck-storage.service';
 import { DeckBuilderService } from '../../../services/deck-builder.service';
 import { SavedDeck } from '../../../models/deck.model';
@@ -164,13 +163,11 @@ export class DeckManagerComponent implements OnInit, OnDestroy {
   deleteDeck(deck: SavedDeck, event: Event): void {
     event.stopPropagation();
 
-    if (confirm(`Êtes-vous sûr de vouloir supprimer le deck "${deck.name}" ?\n\nCette action est irréversible.`)) {
       this.deckStorageService.deleteDeck(deck.id);
       this.loadDecks();
       if (this.selectedDeckId === deck.id) {
         this.selectedDeckId = null;
       }
-    }
   }
 
   /**

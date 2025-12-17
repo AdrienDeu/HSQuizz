@@ -156,7 +156,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    */
   onFormatChange(): void {
     this.deckBuilderService.updateDeckMetadata({ format: this.selectedFormat });
-    this.showSuccess(`Format changed : ${this.selectedFormat === 'standard' ? 'Standard' : 'Wild'}`);
+    this.showSuccess(`Format changé : ${this.selectedFormat === 'standard' ? 'Standard' : 'Libre'}`);
   }
 
   /**
@@ -173,6 +173,11 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    * Crée un nouveau deck
    */
   newDeck(): void {
+    if (this.currentStats && this.currentStats.totalCards > 0) {
+      if (!confirm('Créer un nouveau deck ? Les modifications non sauvegardées seront perdues.')) {
+        return;
+      }
+    }
 
     this.deckBuilderService.loadDeck({
       id: this.generateUUID(),

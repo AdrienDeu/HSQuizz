@@ -36,10 +36,29 @@
     </div>
   </div>
 
-  <!-- Loading initial -->
-  <div *ngIf="loading && leaderboardEntries.length === 0" class="loading">
-    <div class="spinner"></div>
-    <p>Loading leaderboard...</p>
+  <!-- Initial Loading Skeleton -->
+  <div *ngIf="loading && leaderboardEntries.length === 0" class="leaderboard-skeleton">
+    <div class="skeleton-header"></div>
+    <div class="skeleton-filters">
+      <div class="skeleton-filter-item"></div>
+      <div class="skeleton-filter-item"></div>
+    </div>
+    <div class="skeleton-table">
+      <div class="skeleton-table-header">
+        <div class="skeleton-th"></div>
+        <div class="skeleton-th"></div>
+        <div class="skeleton-th"></div>
+      </div>
+      <div class="skeleton-table-row" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]">
+        <div class="skeleton-td"></div>
+        <div class="skeleton-td"></div>
+        <div class="skeleton-td"></div>
+      </div>
+    </div>
+    <div class="skeleton-pagination">
+      <div class="skeleton-pagination-btn"></div>
+      <div class="skeleton-pagination-btn"></div>
+    </div>
   </div>
 
   <!-- Error -->
@@ -51,7 +70,7 @@
   </div>
 
   <!-- Leaderboard Table -->
-  <div *ngIf="leaderboardEntries.length > 0 || (loading && leaderboardEntries.length > 0)" class="leaderboard-content">
+  <div *ngIf="leaderboardEntries.length > 0" class="leaderboard-content">
     <!-- Info en haut -->
     <div class="pagination-info top">
       <p>Players {{ getDisplayedRange() }} </p>

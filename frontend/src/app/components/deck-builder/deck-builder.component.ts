@@ -506,7 +506,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    * Récupère le nom traduit d'une classe
    */
   getClassName(classCode: string): string {
-    return CardService.translateClass(classCode);
+    return classCode;
   }
 
   /**
@@ -547,6 +547,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    */
   getStorageInfo(): string {
     const info = this.deckStorageService.getStorageInfo();
-    return `${info.count}/${info.limit} decks sauvegardés`;
+    return `${info.count}/${info.limit} decks saved`;
   }
 }

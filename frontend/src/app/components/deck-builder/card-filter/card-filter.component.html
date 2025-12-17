@@ -1,12 +1,12 @@
 <div class="card-filter">
   <!-- Header with Clear Button -->
   <div class="filter-header">
-    <h3>Filtres</h3>
+    <h3>Filters</h3>
     <button
       class="clear-btn"
       (click)="clearAllFilters()"
       [disabled]="activeFiltersCount === 0">
-      Effacer
+      Clear
       <span class="filter-badge" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
     </button>
   </div>
@@ -14,19 +14,19 @@
   <!-- Search Bar -->
   <div class="filter-section search-section">
     <label>
-      <span class="filter-label">Recherche</span>
+      <span class="filter-label">Research</span>
       <input
         type="text"
         class="search-input"
         [value]="filters.searchQuery"
         (input)="onSearchInput($event)"
-        placeholder="Nom de carte...">
+        placeholder="Name of card...">
     </label>
   </div>
 
   <!-- Class Filter -->
   <div class="filter-section">
-    <h4 class="filter-label">Classe</h4>
+    <h4 class="filter-label">Class</h4>
     <div class="filter-grid class-grid">
       <button
         *ngFor="let cls of classes"
@@ -42,7 +42,7 @@
 
   <!-- Mana Cost Filter -->
   <div class="filter-section">
-    <h4 class="filter-label">Coût en mana</h4>
+    <h4 class="filter-label">Mana cost</h4>
     <div class="filter-grid mana-grid">
       <button
         *ngFor="let cost of manaCosts"
@@ -56,7 +56,7 @@
 
   <!-- Rarity Filter -->
   <div class="filter-section">
-    <h4 class="filter-label">Rareté</h4>
+    <h4 class="filter-label">Rarity</h4>
     <div class="filter-list">
       <label
         *ngFor="let rarity of rarities"
@@ -74,7 +74,7 @@
 
   <!-- Type Filter -->
   <div class="filter-section">
-    <h4 class="filter-label">Type de carte</h4>
+    <h4 class="filter-label">Card type</h4>
     <div class="filter-list">
       <label
         *ngFor="let type of types"
@@ -92,7 +92,7 @@
   <!-- Mechanics Filter (Collapsible) -->
   <div class="filter-section mechanics-section">
     <h4 class="filter-label clickable" (click)="showMechanics = !showMechanics">
-      <span>Mécaniques</span>
+      <span>Mechanics</span>
       <span class="toggle-icon">{{ showMechanics ? '▼' : '►' }}</span>
     </h4>
     <div class="filter-list mechanics-list" *ngIf="showMechanics">

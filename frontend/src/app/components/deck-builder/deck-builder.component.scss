@@ -337,8 +337,9 @@
 
   .card-collection-content {
     background: rgba(0, 0, 0, 0.3);
+    padding-top: 50px; // Add padding to push down content
     border-radius: 0 0 8px 8px;
-    min-height: 900px;
+    min-height: 700px; // Reduce min-height for a more compact look
     overflow-y: auto;
     overflow-x: hidden;
 

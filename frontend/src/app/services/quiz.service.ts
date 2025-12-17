@@ -93,14 +93,14 @@ export class QuizService {
 
     // For classes and rarities, also accept translations
     if (question.hiddenAttribute === 'cardClass') {
-      const translatedClass = CardService.translateClass(question.card.cardClass);
+      const translatedClass = question.card.cardClass;
       if (normalizedUserAnswer === this.normalizeString(translatedClass)) {
         return true;
       }
     }
 
     if (question.hiddenAttribute === 'rarity' && question.card.rarity) {
-      const translatedRarity = CardService.translateRarity(question.card.rarity);
+      const translatedRarity = question.card.rarity;
       if (normalizedUserAnswer === this.normalizeString(translatedRarity)) {
         return true;
       }
@@ -125,7 +125,7 @@ export class QuizService {
       case 'name':
         return card.name;
       case 'cardClass':
-        return CardService.translateClass(card.cardClass);
+        return card.cardClass;
       case 'cost':
         return card.cost?.toString() ?? '0';
       case 'attack':
@@ -133,9 +133,9 @@ export class QuizService {
       case 'health':
         return card.health?.toString() ?? '0';
       case 'rarity':
-        return CardService.translateRarity(card.rarity ?? '');
+        return card.rarity ?? '';
       case 'set':
-        return CardService.translateSet(card.set);
+        return card.set;
       default:
         return '';
     }

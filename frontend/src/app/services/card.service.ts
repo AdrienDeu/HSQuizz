@@ -164,7 +164,7 @@ export class CardService {
   /**
    * Traduit le type de carte en français
    */
-  static translateType(type: string): string {
+  static Type(type: string): string {
     const translations: Record<string, string> = {
       'MINION': 'Serviteur',
       'SPELL': 'Sort',
@@ -179,7 +179,7 @@ export class CardService {
   /**
    * Traduit la classe de carte en français
    */
-  static translateClass(cardClass: string): string {
+  static Class(cardClass: string): string {
     const translations: Record<string, string> = {
       'NEUTRAL': 'Neutral',
       'MAGE': 'Mage',
@@ -200,7 +200,7 @@ export class CardService {
   /**
    * Traduit la rareté en français
    */
-  static translateRarity(rarity: string): string {
+  static Rarity(rarity: string): string {
     const translations: Record<string, string> = {
       'FREE': 'Gratuit',
       'COMMON': 'Commune',
@@ -214,27 +214,27 @@ export class CardService {
   /**
    * Traduit l'extension en français
    */
-  static translateSet(set: string): string {
-    return SET_TRANSLATIONS[set] || set;
+  static Set(set: string): string {
+    return set;
   }
 
   /**
    * Traduit la race en français
    */
-  static translateRace(race: string): string {
+  static Race(race: string): string {
     const translations: Record<string, string> = {
-      'BEAST': 'Bête',
+      'BEAST': 'Beast',
       'DRAGON': 'Dragon',
       'MURLOC': 'Murloc',
-      'DEMON': 'Démon',
-      'MECH': 'Méca',
+      'DEMON': 'Demon',
+      'MECH': 'Mech',
       'PIRATE': 'Pirate',
       'TOTEM': 'Totem',
-      'ELEMENTAL': 'Élémentaire',
-      'UNDEAD': 'Mort-vivant',
+      'ELEMENTAL': 'Elemental',
+      'UNDEAD': 'Undead ',
       'NAGA': 'Naga',
-      'QUILBOAR': 'Sanglie',
-      'ALL': 'Tout'
+      'QUILBOAR': 'Quilboar',
+      'ALL': 'All'
     };
     return translations[race] || race;
   }

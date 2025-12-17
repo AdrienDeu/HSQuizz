@@ -33,21 +33,22 @@ export class CardDisplayComponent {
     return attribute === this.hiddenAttribute && !this.revealed;
   }
 
-  get translatedType(): string {
-    return CardService.translateType(this.card.type);
+  get Type(): string {
+    return this.card.type;
   }
 
-  get translatedClass(): string {
-    return CardService.translateClass(this.card.cardClass);
+  get Class(): string {
+    return this.card.cardClass;
   }
 
-  get translatedRarity(): string {
-    return this.card.rarity ? CardService.translateRarity(this.card.rarity) : '-';
+  get Rarity(): string {
+    return this.card.rarity ?? '-';
   }
 
-  get translatedRace(): string {
-    return this.card.race ? CardService.translateRace(this.card.race) : '';
+  get Race(): string {
+    return this.card.race ?? '';
   }
+
 
   get Set(): string {
     return this.card.set;

@@ -16,12 +16,12 @@
     <div class="card-info-row">
       <div class="info-item">
         <span class="label">Type</span>
-        <span class="value">{{ translatedType }}</span>
+        <span class="value">{{ Type }}</span>
       </div>
       <div class="info-item">
         <span class="label">Classe</span>
         <span class="value" [class.hidden]="isHidden('cardClass')">
-          {{ isHidden('cardClass') ? '???' : translatedClass }}
+          {{ isHidden('cardClass') ? '???' : Class }}
         </span>
       </div>
     </div>
@@ -31,15 +31,13 @@
       <div class="info-item">
         <span class="label">Rarity</span>
         <span class="value rarity-badge" [class]="rarityClass" [class.hidden]="isHidden('rarity')">
-          {{ isHidden('rarity') ? '???' : translatedRarity }}
+          {{ isHidden('rarity') ? '???' : rarityClass }}
         </span>
       </div>
-      @if (translatedRace) {
         <div class="info-item">
           <span class="label">Race</span>
-          <span class="value">{{ translatedRace }}</span>
+          <span class="value">{{ card.race }}</span>
         </div>
-      }
     </div>
 
     <!-- Stats pour serviteurs/armes -->

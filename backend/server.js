@@ -16,7 +16,7 @@ const PORT = 3000;
 const webClient = axios.create({
     headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://hearthstone.blizzard.com/fr-fr/community/leaderboards',
+        'Referer': 'https://hearthstone.blizzard.com/en-US/community/leaderboards',
         'Accept': 'application/json'
     }
 });
@@ -31,7 +31,7 @@ async function getLatestSeasonId(mode, region) {
     }
     try {
         console.log("🔄 Mise à jour du cache des saisons...");
-        const response = await webClient.get('https://hearthstone.blizzard.com/fr-fr/api/community/leaderboards');
+        const response = await webClient.get('https://hearthstone.blizzard.com/en-US/api/community/leaderboards');
         seasonsCache = { timestamp: now, data: response.data };
         return findSeasonInMetadata(response.data, mode, region);
     } catch (e) {
@@ -74,7 +74,7 @@ app.get('/api/blizzard/leaderboardsData', async (req, res) => {
         // On injecte la saison trouvée automatiquement
         if (seasonId) params.seasonId = seasonId;
 
-        const response = await webClient.get('https://hearthstone.blizzard.com/fr-fr/api/community/leaderboardsData', { params });
+        const response = await webClient.get('https://hearthstone.blizzard.com/en-US/api/community/leaderboardsData', { params });
         const rows = response.data.leaderboard ? response.data.leaderboard.rows : [];
 
         console.log(`✅ SUCCÈS : ${rows.length} joueurs envoyés au site.`);
@@ -113,9 +113,9 @@ app.get('/api/hearthstone/cards', async (req, res) => {
 
     try {
         console.log("🔄 Récupération des cartes depuis HearthstoneJSON...");
-        console.log("URL:", 'https://api.hearthstonejson.com/v1/latest/frFR/cards.json');
+        console.log("URL:", 'https://api.hearthstonejson.com/v1/latest/enUS/cards.json');
 
-        const response = await axios.get('https://api.hearthstonejson.com/v1/latest/frFR/cards.json', {
+        const response = await axios.get('https://api.hearthstonejson.com/v1/latest/enUS/cards.json', {
             timeout: 30000, // Augmenté à 30 secondes
             headers: {
                 'Accept': 'application/json',

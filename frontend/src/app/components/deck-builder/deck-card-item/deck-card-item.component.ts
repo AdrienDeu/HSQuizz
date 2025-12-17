@@ -37,22 +37,22 @@ export class DeckCardItemComponent {
   /**
    * Retourne le nom traduit du type
    */
-  get translatedType(): string {
-    return CardService.translateType(this.card.type);
+  get Type(): string {
+    return this.card.type;
   }
 
   /**
    * Retourne le nom traduit de la classe
    */
   get translatedClass(): string {
-    return CardService.translateClass(this.card.cardClass);
+    return this.card.cardClass;
   }
 
   /**
    * Retourne le nom traduit de la rareté
    */
-  get translatedRarity(): string {
-    return this.card.rarity ? CardService.translateRarity(this.card.rarity) : '-';
+  get Rarity(): string {
+    return this.card.rarity?.toString() || '-';
   }
 
   /**

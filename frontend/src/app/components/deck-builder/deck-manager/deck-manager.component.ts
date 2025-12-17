@@ -191,7 +191,7 @@ export class DeckManagerComponent implements OnInit, OnDestroy {
    * Obtient le nom traduit d'une classe
    */
   getClassName(classCode: string): string {
-    return CardService.translateClass(classCode);
+    return classCode ?? '-';
   }
 
   /**

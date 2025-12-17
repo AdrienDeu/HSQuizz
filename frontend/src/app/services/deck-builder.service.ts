@@ -316,7 +316,7 @@ export class DeckBuilderService {
       if (cardClass !== 'NEUTRAL' && cardClass !== deck.heroClass) {
         return {
           valid: false,
-          reason: `Carte ${CardService.translateClass(cardClass)} incompatible avec ${CardService.translateClass(deck.heroClass)}`
+          reason: `Carte ${cardClass} incompatible avec ${deck.heroClass}`
         };
       }
     }

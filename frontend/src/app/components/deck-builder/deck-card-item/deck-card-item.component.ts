@@ -96,4 +96,8 @@ export class DeckCardItemComponent {
     };
     return colors[this.card.cardClass] || '#888';
   }
+
+  get cardImageUrl(): string {
+    return `https://art.hearthstonejson.com/v1/render/latest/enUS/256x/${this.card.id}.png`;
+  }
 }

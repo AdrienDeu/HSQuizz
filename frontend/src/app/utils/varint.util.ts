@@ -43,7 +43,8 @@ export class VarintUtil {
   }
 
   /**
-   * Décode un varint depuis un tableau de bytes
+   * Décode un varint depuis un tableau de bytes.
+   * Si le varint est incomplet, une erreur est levée.
    *
    * @param bytes - Tableau de bytes source
    * @param offset - Position de départ dans le tableau (défaut: 0)
@@ -54,34 +55,43 @@ export class VarintUtil {
    * VarintUtil.decode([127]) => { value: 127, bytesRead: 1 }
    * VarintUtil.decode([128, 1]) => { value: 128, bytesRead: 2 }
    * VarintUtil.decode([172, 2]) => { value: 300, bytesRead: 2 }
+   * VarintUtil.decode([128]) // throw 'Varint decode error: incomplete varint'
    */
   static decode(bytes: number[], offset: number = 0): { value: number; bytesRead: number } {
     let value = 0;
     let shift = 0;
     let bytesRead = 0;
+    let hasMore = true;
 
-    while (offset + bytesRead < bytes.length) {
+    while (hasMore && offset + bytesRead < bytes.length) {
       const byte = bytes[offset + bytesRead];
       bytesRead++;
 
-      // Ajoute les 7 bits de données à la valeur
-      value |= (byte & 0x7F) << shift;
+      value |= (byte & 0x7f) << shift;
       shift += 7;
 
-      // Si le bit de continuation n'est pas activé, on a fini
       if ((byte & 0x80) === 0) {
-        break;
+        hasMore = false;
       }
 
-      // Protection contre les boucles infinies
       if (bytesRead > 10) {
         throw new Error('Varint decode error: too many bytes');
       }
     }
 
-    if (offset + bytesRead > bytes.length && bytesRead === 0) {
+    if (hasMore && bytesRead > 0) {
+      throw new Error('Varint decode error: incomplete varint');
+    }
+
+    if (bytesRead === 0 && offset >= bytes.length) {
+      // Pas de données à lire à l'offset spécifié, mais ce n'est pas une erreur en soi.
+      // Retourner 0 pour la valeur et les bytes lus est un comportement attendu.
+    } else if (offset + bytesRead > bytes.length && bytesRead === 0) {
+      // Cette condition est maintenant gérée par la logique ci-dessus.
+      // On la garde pour la rétrocompatibilité si d'autres cas existent.
       throw new Error('Varint decode error: no data to read');
     }
+
 
     return { value, bytesRead };
   }
@@ -112,16 +122,23 @@ export class VarintUtil {
   }
 
   /**
-   * Valide qu'un tableau de bytes représente un varint valide
+   * Valide qu'un tableau de bytes représente un varint valide.
+   * Un varint est valide s'il est complet et correctement formaté.
    *
    * @param bytes - Tableau de bytes à valider
    * @param offset - Position de départ
    * @returns true si valide, false sinon
    */
   static isValid(bytes: number[], offset: number = 0): boolean {
+    if (!bytes || bytes.length === 0 || offset >= bytes.length) {
+      return false;
+    }
+    
     try {
       const result = this.decode(bytes, offset);
-      return result.bytesRead > 0 && result.bytesRead <= 10;
+      // Un varint valide doit avoir lu au moins un byte.
+      // Si un varint est incomplet, decode lève une exception, qui est attrapée.
+      return result.bytesRead > 0;
     } catch {
       return false;
     }

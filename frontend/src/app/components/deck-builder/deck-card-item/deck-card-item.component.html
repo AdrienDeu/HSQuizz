@@ -1,51 +1,16 @@
-<div class="card-item" [class.compact]="compact" (click)="onClick()">
-  <!-- Coût de mana -->
+<div 
+  class="card-item"
+  [class.compact]="compact"
+  (click)="onClick()"
+  [style.background-image]="'url(' + cardImageUrl + ')'">
+
   <div class="card-cost-badge">{{ card.cost ?? 0 }}</div>
-
-  <!-- Nom de la carte -->
-  <div class="card-name" [style.border-color]="classColor">
-    {{ card.name }}
+  
+  <div class="card-name-bar">
+    <span class="card-name">{{ card.name }}</span>
   </div>
 
-  <!-- Type et classe -->
-  <div class="card-info">
-    <span class="card-type">{{ translatedType }}</span>
-    <span class="card-class" [style.color]="classColor">{{ translatedClass }}</span>
-  </div>
-
-  <!-- Stats (serviteur ou arme) -->
-  @if (showDetails && !compact) {
-    <div class="card-stats">
-      @if (isMinion) {
-        <div class="stat-group">
-          <span class="stat-label">ATK</span>
-          <span class="stat-value">{{ card.attack ?? '-' }}</span>
-        </div>
-        <div class="stat-group">
-          <span class="stat-label">HP</span>
-          <span class="stat-value">{{ card.health ?? '-' }}</span>
-        </div>
-      }
-      @if (isWeapon) {
-        <div class="stat-group">
-          <span class="stat-label">ATK</span>
-          <span class="stat-value">{{ card.attack ?? '-' }}</span>
-        </div>
-        <div class="stat-group">
-          <span class="stat-label">DUR</span>
-          <span class="stat-value">{{ card.durability ?? '-' }}</span>
-        </div>
-      }
-      @if (isSpell) {
-        <div class="stat-group spell-indicator">
-          <span class="spell-icon">✨</span>
-        </div>
-      }
-    </div>
+  @if (card.rarity) {
+    <div class="rarity-gem" [class]="rarityClass"></div>
   }
-
-  <!-- Badge de rareté -->
-  <div class="rarity-badge" [class]="rarityClass">
-    {{ translatedRarity }}
-  </div>
 </div>

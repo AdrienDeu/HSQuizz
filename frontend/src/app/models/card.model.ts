@@ -23,6 +23,7 @@ export interface Card {
   elite?: boolean; // Légendaire
   artist?: string;
   spellSchool?: string;
+  imageUrl?: string;
 }
 
 /**

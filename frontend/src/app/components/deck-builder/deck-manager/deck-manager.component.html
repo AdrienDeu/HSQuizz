@@ -88,7 +88,7 @@
               <!-- Deck Header -->
               <div class="deck-card-header">
                 <div class="deck-class">
-                  <span class="class-icon">{{ getClassIcon(deck.heroClass) }}</span>
+                  <img [src]="getClassIcon(deck.heroClass)" class="class-icon" [alt]="getClassName(deck.heroClass)">
                   <span class="class-name">{{ getClassName(deck.heroClass) }}</span>
                 </div>
                 <div class="deck-format">{{ deck.format === 'standard' ? '🎯 Standard' : '🌟 Libre' }}</div>

@@ -68,4 +68,8 @@ export class CardDisplayComponent {
   get rarityClass(): string {
     return this.card.rarity?.toLowerCase() ?? 'common';
   }
+
+  get cardImageUrl(): string {
+    return `https://art.hearthstonejson.com/v1/render/latest/enUS/512x/${this.card.id}.png`;
+  }
 }

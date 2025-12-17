@@ -198,21 +198,15 @@ export class DeckManagerComponent implements OnInit, OnDestroy {
    * Obtient l'icône d'une classe
    */
   getClassIcon(classCode: string): string {
-    const icons: { [key: string]: string } = {
-      'NEUTRAL': '⚪',
-      'MAGE': '🔮',
-      'WARRIOR': '⚔️',
-      'PALADIN': '🛡️',
-      'HUNTER': '🏹',
-      'ROGUE': '🗡️',
-      'PRIEST': '✨',
-      'SHAMAN': '⚡',
-      'WARLOCK': '🔥',
-      'DRUID': '🌿',
-      'DEMONHUNTER': '😈',
-      'DEATHKNIGHT': '💀'
-    };
-    return icons[classCode] || '⚪';
+    const baseUrl = 'https://raw.githubusercontent.com/HearthSim/hs-icons/main/dist/images/class-icons/';
+    const className = classCode.toLowerCase().replace('deathknight', 'death-knight').replace('demonhunter', 'demon-hunter');
+    
+    // Pour NEUTRAL, nous pouvons utiliser une icône générique ou laisser vide
+    if (className === 'neutral') {
+      return ''; // ou une URL vers une icône de placeholder
+    }
+    
+    return `${baseUrl}${className}.svg`;
   }
 
   /**

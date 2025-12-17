@@ -27,21 +27,6 @@
   text-align: center;
   margin-bottom: 1rem;
   
-  .header-logo {
-    max-width: 280px;
-    height: auto;
-    margin: 0 auto;
-    display: block;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
-    
-    @media (min-width: 768px) {
-      max-width: 350px;
-    }
-    
-    @media (min-width: 1200px) {
-      max-width: 400px;
-    }
-  }
   
   h1 {
     font-size: 2.5rem;
@@ -715,7 +700,15 @@
 }
 
 .btn-settings {
+  background: rgba(255, 153, 0, 0.1);
+  border: 2px solid #ff9900;
+  color: #ff9900;
   margin-left: auto;
+  
+  &:hover {
+    background: rgba(255, 153, 0, 0.2);
+    transform: translateY(-2px);
+  }
 }
 
 // Mode info badges
@@ -755,6 +748,10 @@
   border-radius: 10px;
   margin-bottom: 1rem;
   transition: all 0.3s ease;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+
 
   &:hover {
     border-color: rgba(139, 115, 85, 0.5);

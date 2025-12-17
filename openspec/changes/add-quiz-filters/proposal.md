@@ -18,4 +18,4 @@ Permettre aux utilisateurs de personnaliser leur expérience de quiz en filtrant
   - `frontend/src/app/components/quiz/quiz.component.ts` - logique de configuration
   - `frontend/src/app/components/quiz/quiz.component.html` - UI de configuration
   - `frontend/src/app/models/card.model.ts` - types pour les filtres
-  - Nouveau composant: `quiz-settings` (optionnel)
+  - New composant: `quiz-settings` (optionnel)

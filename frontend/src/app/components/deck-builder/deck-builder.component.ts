@@ -42,7 +42,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
   // État local
   currentDeck: Deck | null = null;
   currentStats: DeckStatistics | null = null;
-  deckName: string = 'Nouveau Deck';
+  deckName: string = 'New Deck';
   selectedClass: string = 'MAGE'; // Classe par défaut: Mage
   selectedFormat: 'standard' | 'wild' = 'standard';
   showExportModal: boolean = false;
@@ -57,16 +57,16 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
   // Options de classes (sans Neutre)
   readonly classes = [
     { code: 'MAGE', name: 'Mage', icon: '🔮' },
-    { code: 'WARRIOR', name: 'Guerrier', icon: '⚔️' },
+    { code: 'WARRIOR', name: 'Warrior', icon: '⚔️' },
     { code: 'PALADIN', name: 'Paladin', icon: '🛡️' },
-    { code: 'HUNTER', name: 'Chasseur', icon: '🏹' },
-    { code: 'ROGUE', name: 'Voleur', icon: '🗡️' },
-    { code: 'PRIEST', name: 'Prêtre', icon: '✨' },
-    { code: 'SHAMAN', name: 'Chaman', icon: '⚡' },
-    { code: 'WARLOCK', name: 'Démoniste', icon: '🔥' },
-    { code: 'DRUID', name: 'Druide', icon: '🌿' },
-    { code: 'DEMONHUNTER', name: 'Chasseur de démons', icon: '😈' },
-    { code: 'DEATHKNIGHT', name: 'Chevalier de la mort', icon: '💀' }
+    { code: 'HUNTER', name: 'Hunter', icon: '🏹' },
+    { code: 'ROGUE', name: 'Rogue', icon: '🗡️' },
+    { code: 'PRIEST', name: 'Priest', icon: '✨' },
+    { code: 'SHAMAN', name: 'Shaman', icon: '⚡' },
+    { code: 'WARLOCK', name: 'Warlock', icon: '🔥' },
+    { code: 'DRUID', name: 'Druid', icon: '🌿' },
+    { code: 'DEMONHUNTER', name: 'Demon Hunter', icon: '😈' },
+    { code: 'DEATHKNIGHT', name: 'Death Knight', icon: '💀' }
   ];
 
   constructor(
@@ -181,7 +181,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
 
     this.deckBuilderService.loadDeck({
       id: this.generateUUID(),
-      name: 'Nouveau Deck',
+      name: 'New Deck',
       heroClass: 'MAGE',
       format: 'standard',
       cards: [],
@@ -200,7 +200,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       sets: []
     });
 
-    this.showSuccess('Nouveau deck créé');
+    this.showSuccess('New deck created');
   }
 
   // ============ SAUVEGARDE ============

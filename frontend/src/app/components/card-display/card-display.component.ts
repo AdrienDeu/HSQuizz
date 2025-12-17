@@ -49,8 +49,8 @@ export class CardDisplayComponent {
     return this.card.race ? CardService.translateRace(this.card.race) : '';
   }
 
-  get translatedSet(): string {
-    return SET_TRANSLATIONS[this.card.set] || this.card.set;
+  get Set(): string {
+    return this.card.set;
   }
 
   get cleanText(): string {

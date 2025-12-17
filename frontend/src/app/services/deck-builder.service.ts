@@ -105,7 +105,7 @@ export class DeckBuilderService {
   public createEmptyDeck(): Deck {
     return {
       id: this.generateUUID(),
-      name: 'Nouveau Deck',
+      name: 'New Deck',
       heroClass: 'NEUTRAL',
       format: 'standard',
       cards: [],

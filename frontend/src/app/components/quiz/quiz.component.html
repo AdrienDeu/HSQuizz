@@ -1,7 +1,6 @@
 <div class="quiz-container">
   <!-- Header -->
   <header class="quiz-header">
-    <img src="logo.webp" alt="HSQuizz Logo" class="header-logo">
     @if (!quizStarted) {
       <p class="subtitle">Configure your Hearthstone Quiz!</p>
     } @else {
@@ -129,7 +128,7 @@
     <!-- Stats -->
     <div class="stats-bar">
       <div class="stat">
-        <span class="stat-label">Question</span>
+        <span class="stat-label">Questions</span>
         <span class="stat-value">{{ currentQuestionNumber }} / {{ settings.numberOfQuestions }}</span>
       </div>
       <div class="stat">

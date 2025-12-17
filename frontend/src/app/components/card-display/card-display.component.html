@@ -13,18 +13,6 @@
 
   <!-- Corps de la carte -->
   <div class="card-body">
-    <!-- Illustration -->
-    @if (revealed) {
-      <div class="card-illustration">
-        <img [src]="cardImageUrl" [alt]="'Illustration de ' + card.name" />
-      </div>
-    } @else {
-      <!-- Placeholder for hidden card -->
-      <div class="card-illustration-hidden">
-        <img src="assets/mana-crystal.png" alt="Hidden Card" />
-      </div>
-    }
-    <!-- Info ligne 1: Type et Classe -->
     <div class="card-info-row">
       <div class="info-item">
         <span class="label">Type</span>
@@ -41,7 +29,7 @@
     <!-- Info ligne 2: Rareté et Race -->
     <div class="card-info-row">
       <div class="info-item">
-        <span class="label">Rareté</span>
+        <span class="label">Rarity</span>
         <span class="value rarity-badge" [class]="rarityClass" [class.hidden]="isHidden('rarity')">
           {{ isHidden('rarity') ? '???' : translatedRarity }}
         </span>
@@ -90,8 +78,8 @@
 
     <!-- Extension -->
     <div class="card-set">
-      <span class="label">Extension</span>
-      <span class="value">{{ translatedSet }}</span>
+      <span class="label">Set</span>
+      <span class="value">{{ Set }}</span>
     </div>
   </div>
 </div>

@@ -181,18 +181,18 @@ export class CardService {
    */
   static translateClass(cardClass: string): string {
     const translations: Record<string, string> = {
-      'NEUTRAL': 'Neutre',
+      'NEUTRAL': 'Neutral',
       'MAGE': 'Mage',
-      'WARRIOR': 'Guerrier',
+      'WARRIOR': 'Warrior',
       'PALADIN': 'Paladin',
-      'HUNTER': 'Chasseur',
-      'ROGUE': 'Voleur',
-      'PRIEST': 'Prêtre',
-      'SHAMAN': 'Chaman',
-      'WARLOCK': 'Démoniste',
-      'DRUID': 'Druide',
-      'DEMONHUNTER': 'Chasseur de démons',
-      'DEATHKNIGHT': 'Chevalier de la mort'
+      'HUNTER': 'Hunter',
+      'ROGUE': 'Rogue',
+      'PRIEST': 'Priest',
+      'SHAMAN': 'Shaman',
+      'WARLOCK': 'Warlock',
+      'DRUID': 'Druid',
+      'DEMONHUNTER': 'Demon Hunter',
+      'DEATHKNIGHT': 'Death Knight'
     };
     return translations[cardClass] || cardClass;
   }

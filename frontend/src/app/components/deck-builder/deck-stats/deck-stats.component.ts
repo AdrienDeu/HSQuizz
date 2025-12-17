@@ -75,10 +75,10 @@ export class DeckStatsComponent implements OnChanges {
     const percent = this.stats.gamePhaseDistribution[`${phase}Percent`];
 
     if (phase === 'early' && percent < 20) {
-      return 'Peu de cartes early game';
+      return 'Few early game cards';
     }
     if (phase === 'late' && percent > 40) {
-      return 'Trop de cartes late game';
+      return 'Too much late game cards';
     }
     return null;
   }

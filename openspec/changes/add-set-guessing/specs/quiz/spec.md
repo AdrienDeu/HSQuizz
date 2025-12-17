@@ -46,13 +46,13 @@ Le système SHALL accepter comme réponse correcte :
 ### Requirement: REQ-QUIZ-ATTR-001 Liste des attributs devinables
 
 Le type `HiddenAttribute` SHALL inclure les valeurs suivantes :
-- `name` - Nom de la carte
-- `cardClass` - Classe
-- `cost` - Coût en mana
-- `attack` - Attaque
-- `health` - Points de vie
-- `rarity` - Rareté
-- `set` - Extension (NOUVEAU)
+- `name` - Name of the card
+- `cardClass` - Class
+- `cost` - Mana cost
+- `attack` - Attack
+- `health` - Health
+- `rarity` - Rarity
+- `set` - Set
 
 #### Scenario: Options disponibles dans le sélecteur
 - **Given** l'utilisateur est sur l'écran de configuration

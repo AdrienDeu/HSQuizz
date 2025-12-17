@@ -68,6 +68,22 @@ export class QuizService {
     setTimeout(() => this.nextQuestion(), 2000); 
   }
 
+  public skipQuestion(): void {
+    const currentQuestion = this._question$.getValue();
+    if (!currentQuestion || currentQuestion.answered) return;
+
+    const revealedQuestion: QuizQuestion = {
+      ...currentQuestion,
+      userAnswer: 'Je ne sais pas', // Indiquer que la question a été passée
+      answered: true,
+      correct: false, // Compter comme incorrect
+      revealed: true
+    };
+    this._question$.next(revealedQuestion);
+
+    setTimeout(() => this.nextQuestion(), 2000); 
+  }
+
   private nextQuestion(): void {
     const questionNum = this._questionNumber$.getValue();
 
@@ -90,6 +106,14 @@ export class QuizService {
   public backToSettings(): void {
     this._quizIsOver$.next(false);
     this._question$.next(null);
+  }
+
+  public restartQuiz(): void {
+    this._score$.next(0);
+    this._questionNumber$.next(0);
+    this._quizIsOver$.next(false);
+    this._quizDeck = this.shuffleArray([...this._quizDeck]);
+    this.nextQuestion();
   }
 
   private createQuestion(card: Card, hiddenAttribute: HiddenAttribute): QuizQuestion {

@@ -86,10 +86,12 @@ export class QuizComponent implements OnInit {
     this.quizService.submitAnswer(answer);
   }
   
+  public skipQuestion(): void {
+    this.quizService.skipQuestion();
+  }
+  
   public restartQuiz(): void {
-    this.cardService.getCards(true).pipe(first()).subscribe(allCards => {
-      this.quizService.startQuiz(this.settings, allCards);
-    });
+    this.quizService.restartQuiz();
   }
 
   public backToSettings(): void {

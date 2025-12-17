@@ -23,21 +23,15 @@ export class CardService {
    * pour la durée de la session, afin d'éviter de multiples appels pour la même liste.
    */
   public getCards(includeNonCollectible: boolean = false): Observable<Card[]> {
-    const cacheKey = includeNonCollectible ? 'all' : 'collectible';
-
-    if (!this.cardsCache[cacheKey]) {
-      const params = new HttpParams().set('includeNonCollectible', includeNonCollectible.toString());
-      
-      this.cardsCache[cacheKey] = this.http.get<Card[]>(this.API_URL, { params }).pipe(
-        tap(cards => console.log(`✅ ${cards.length} cartes chargées depuis l'API (mode: ${cacheKey})`)),
-        catchError(error => {
-          console.error(`⚠️ Erreur API pour les cartes (mode: ${cacheKey}), retour d'un tableau vide.`, error.message);
-          return of([]); // En cas d'erreur, retourner un tableau vide pour ne pas casser l'application.
-        }),
-        shareReplay(1) // Met en cache la dernière réponse et la rejoue pour les nouveaux abonnés.
-      );
-    }
-    return this.cardsCache[cacheKey];
+    const params = new HttpParams().set('includeNonCollectible', includeNonCollectible.toString());
+    
+    return this.http.get<Card[]>(this.API_URL, { params }).pipe(
+      tap(cards => console.log(`✅ ${cards.length} cartes chargées depuis l'API (mode: ${includeNonCollectible ? 'all' : 'collectible'})`)),
+      catchError(error => {
+        console.error(`⚠️ Erreur API pour les cartes (mode: ${includeNonCollectible ? 'all' : 'collectible'}), retour d'un tableau vide.`, error.message);
+        return of([]); // En cas d'erreur, retourner un tableau vide pour ne pas casser l'application.
+      })
+    );
   }
 
   /**

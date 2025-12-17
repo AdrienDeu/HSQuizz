@@ -25,7 +25,7 @@ export class CardCollectionComponent implements OnInit, OnChanges {
 
   // Pagination
   displayedCards: Card[] = [];
-  private pageSize = 50;
+  private pageSize = 30;
   currentPage = 0;
   totalPages = 0;
 

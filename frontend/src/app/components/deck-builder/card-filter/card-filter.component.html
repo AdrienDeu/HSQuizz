@@ -34,6 +34,7 @@
         [class.active]="isClassSelected(cls.code)"
         (click)="toggleClass(cls.code)"
         [title]="cls.name">
+        <img [src]="cls.icon" [alt]="cls.name" class="class-icon" />
         <span class="name">{{ cls.name }}</span>
       </button>
     </div>

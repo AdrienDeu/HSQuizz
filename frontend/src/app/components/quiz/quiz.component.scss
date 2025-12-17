@@ -660,6 +660,49 @@
   border-radius: 8px;
 }
 
+.quiz-start-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem; // Add some space above
+  flex-wrap: wrap; // Allow wrapping on smaller screens
+}
+
+.input-group-number {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid #8b7355;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  
+  .input-label {
+    color: #f4e4bc;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .number-input {
+    width: 60px; // Fixed width for the number input
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+    border: none;
+    background: transparent;
+    color: #f4e4bc;
+    outline: none;
+    text-align: center;
+    
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield; // Firefox
+  }
+}
+
 .btn-large {
   padding: 1rem 2rem;
   font-size: 1.2rem;

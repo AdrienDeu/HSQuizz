@@ -43,21 +43,6 @@
         </div>
       </div>
 
-      <!-- Number of Questions -->
-      <div class="settings-section">
-        <h3>Number of Questions</h3>
-        <div class="input-group">
-          <input
-            type="number"
-            class="answer-input"
-            [(ngModel)]="settings.numberOfQuestions"
-            min="1"
-            max="100"
-            step="1"
-            >
-        </div>
-      </div>
-
       <!-- Set selector -->
       <div class="settings-section">
         <h3>Sets</h3>
@@ -115,12 +100,26 @@
         @if (error) {
           <p class="error-inline">{{ error }}</p>
         }
-        <button
-          class="btn btn-primary btn-large"
-          (click)="startQuiz()"
-          [disabled]="previewCardCount === 0 || settings.numberOfQuestions <= 0">
-          Start Quiz
-        </button>
+        <div class="quiz-start-controls">
+          <div class="input-group-number">
+            <label for="num-questions" class="input-label">Questions:</label>
+            <input
+              type="number"
+              id="num-questions"
+              class="number-input"
+              [(ngModel)]="settings.numberOfQuestions"
+              min="1"
+              max="100"
+              step="1"
+            >
+          </div>
+          <button
+            class="btn btn-primary btn-large"
+            (click)="startQuiz()"
+            [disabled]="previewCardCount === 0 || settings.numberOfQuestions <= 0">
+            Start Quiz
+          </button>
+        </div>
       </div>
     </div>
   }

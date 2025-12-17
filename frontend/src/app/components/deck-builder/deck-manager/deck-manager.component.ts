@@ -126,10 +126,6 @@ export class DeckManagerComponent implements OnInit, OnDestroy {
    * Charge un deck dans le builder
    */
   loadDeck(deck: SavedDeck): void {
-    if (confirm(`Charger le deck "${deck.name}" ?\n\nLes modifications non sauvegardées du deck actuel seront perdues.`)) {
-      this.deckBuilderService.loadDeck(deck);
-      this.closeManager.emit();
-    }
   }
 
   /**
@@ -153,7 +149,6 @@ export class DeckManagerComponent implements OnInit, OnDestroy {
    */
   saveDeckName(deck: SavedDeck): void {
     if (!this.editingDeckName.trim()) {
-      alert('Le nom du deck ne peut pas être vide');
       return;
     }
 

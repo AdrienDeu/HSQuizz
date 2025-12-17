@@ -1,14 +1,14 @@
 <div class="leaderboard-container">
   <!-- Header -->
   <div class="leaderboard-header">
-    <h1>🏆 Leaderboard</h1>
-    <p class="subtitle">Top des meilleurs joueurs Hearthstone</p>
+    <h1>Leaderboard</h1>
+    <p class="subtitle">Top Hearthstone players</p>
   </div>
 
   <!-- Filtres -->
   <div class="filters-section">
     <div class="filter-group">
-      <label for="region-select">Région</label>
+      <label for="region-select">Region</label>
       <select 
         id="region-select" 
         [(ngModel)]="selectedRegion" 
@@ -22,7 +22,7 @@
     </div>
 
     <div class="filter-group">
-      <label for="gamemode-select">Mode de jeu</label>
+      <label for="gamemode-select">Game Mode</label>
       <select 
         id="gamemode-select" 
         [(ngModel)]="selectedGameMode" 
@@ -39,14 +39,14 @@
   <!-- Loading initial -->
   <div *ngIf="loading && leaderboardEntries.length === 0" class="loading">
     <div class="spinner"></div>
-    <p>Chargement du leaderboard...</p>
+    <p>Loading leaderboard...</p>
   </div>
 
   <!-- Error -->
   <div *ngIf="error && !loading && leaderboardEntries.length === 0" class="error-message">
     <p>{{ error }}</p>
     <button class="btn btn-primary" (click)="loadLeaderboardPage(currentPage)">
-      Réessayer
+      Retry
     </button>
   </div>
 
@@ -54,21 +54,21 @@
   <div *ngIf="leaderboardEntries.length > 0 || (loading && leaderboardEntries.length > 0)" class="leaderboard-content">
     <!-- Info en haut -->
     <div class="pagination-info top">
-      <p>Joueurs {{ getDisplayedRange() }} </p>
+      <p>Players {{ getDisplayedRange() }} </p>
     </div>
 
     <div class="table-container">
-      <!-- Loading overlay pour le tableau -->
+      <!-- Loading overlay for table -->
       <div *ngIf="loading" class="table-loading-overlay">
         <div class="spinner"></div>
-        <p>Chargement...</p>
+        <p>Loading...</p>
       </div>
 
       <table class="leaderboard-table" [class.loading-table]="loading">
         <thead>
           <tr>
-            <th class="rank-col">Rang</th>
-            <th class="player-col">Joueur</th>
+            <th class="rank-col">Rank</th>
+            <th class="player-col">Player</th>
             <th *ngIf="selectedGameMode === 'battlegrounds' || selectedGameMode === 'battlegroundsduo'" class="rating-col">Rating</th>
           </tr>
         </thead>
@@ -97,9 +97,9 @@
           class="pagination-btn"
           (click)="previousPage()"
           [disabled]="currentPage === 1 || loading"
-          title="Page précédente"
+          title="Previous page"
         >
-          ◀ Précédent
+          ◀ Previous
         </button>
 
 
@@ -108,9 +108,9 @@
           class="pagination-btn"
           (click)="nextPage()"
           [disabled]="currentPage === totalPages || loading"
-          title="Page suivante"
+          title="Next page"
         >
-          Suivant ▶
+          Next ▶
         </button>
       </div>
 

@@ -53,6 +53,7 @@ export class QuizComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loading = true; // Set global loading for initial load
     this.loadCards(true);
   }
 
@@ -60,26 +61,27 @@ export class QuizComponent implements OnInit {
    * Charge les cartes depuis le service
    */
   loadCards(isInitialLoad: boolean = false): void {
-    // Si c'est un rechargement (pas le chargement initial), on utilise reloadingCards
-    if (!isInitialLoad && this.allCards.length > 0) {
-      this.reloadingCards = true;
-    } else {
-      this.loading = true;
+    if (!isInitialLoad) {
+      this.reloadingCards = true; // Use localized loading for subsequent reloads
     }
     this.error = null;
 
     this.cardService.getCollectibleCards(this.includeNonCollectible).subscribe({
       next: (cards) => {
         this.allCards = cards;
-        this.loading = false;
+        if (isInitialLoad) { // Only set global loading to false if it was an initial load
+          this.loading = false;
+        }
         this.reloadingCards = false;
         if (isInitialLoad) {
           this.loadAvailableSets();
         }
       },
       error: (err) => {
-        this.error = 'Erreur lors du chargement des cartes. Veuillez rafraîchir la page.';
-        this.loading = false;
+        this.error = 'Error loading cards. Please refresh the page.';
+        if (isInitialLoad) { // Only set global loading to false if it was an initial load
+          this.loading = false;
+        }
         this.reloadingCards = false;
         console.error('Error loading cards:', err);
       }
@@ -104,7 +106,7 @@ export class QuizComponent implements OnInit {
     this.applyFilters();
     
     if (this.filteredCards.length === 0) {
-      this.error = 'Aucune carte ne correspond aux filtres sélectionnés.';
+      this.error = 'No cards match the selected filters.';
       return;
     }
     
@@ -265,14 +267,14 @@ export class QuizComponent implements OnInit {
    */
   get selectedSetsDisplay(): string {
     if (this.settings.selectedSets.length === 0) {
-      return 'Toutes les extensions';
+      return 'All sets';
     }
     if (this.settings.selectedSets.length <= 2) {
       return this.settings.selectedSets
         .map(code => SET_TRANSLATIONS[code] || code)
         .join(', ');
     }
-    return `${this.settings.selectedSets.length} extensions`;
+    return `${this.settings.selectedSets.length} sets`;
   }
 
   /**

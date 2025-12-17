@@ -3,9 +3,9 @@
   <header class="quiz-header">
     <img src="logo.webp" alt="HSQuizz Logo" class="header-logo">
     @if (!quizStarted) {
-      <p class="subtitle">Configurez votre quiz Hearthstone !</p>
+      <p class="subtitle">Configure your Hearthstone Quiz!</p>
     } @else {
-      <p class="subtitle">Devinez : {{ currentAttributeLabel }}</p>
+      <p class="subtitle">Guess : {{ currentAttributeLabel }}</p>
     }
   </header>
 
@@ -13,7 +13,7 @@
   @if (loading) {
     <div class="loading">
       <div class="spinner"></div>
-      <p>Chargement des cartes...</p>
+      <p>Loading cards...</p>
     </div>
   }
 
@@ -21,7 +21,7 @@
   @if (error && !quizStarted) {
     <div class="error-message">
       <p>{{ error }}</p>
-      <button class="btn btn-primary" (click)="loadCards()">Réessayer</button>
+      <button class="btn btn-primary" (click)="loadCards()">Retry</button>
     </div>
   }
 
@@ -30,7 +30,7 @@
     <div class="settings-panel" [class.reloading]="reloadingCards">
       <!-- Attribute selector -->
       <div class="settings-section">
-        <h3>🎯 Que voulez-vous deviner ?</h3>
+        <h3>What do you want to guess?</h3>
         <div class="attribute-options">
           @for (option of attributeOptions; track option.value) {
             <button 
@@ -45,13 +45,13 @@
 
       <!-- Set selector -->
       <div class="settings-section">
-        <h3>📦 Extensions</h3>
+        <h3>Sets</h3>
         <div class="sets-header">
           <button class="btn btn-small" (click)="toggleAllSets()">
-            {{ settings.selectedSets.length === availableSets.length ? 'Tout désélectionner' : 'Tout sélectionner' }}
+            {{ settings.selectedSets.length === availableSets.length ? 'Deselect All' : 'Select All' }}
           </button>
           <span class="sets-count">
-            {{ settings.selectedSets.length === 0 ? 'Toutes' : settings.selectedSets.length + ' sélectionnée(s)' }}
+            {{ settings.selectedSets.length === 0 ? 'All' : settings.selectedSets.length + ' selected' }}
           </span>
         </div>
         <div class="sets-grid">
@@ -69,7 +69,7 @@
 
       <!-- Collectible filter -->
       <div class="settings-section">
-        <h3>🃏 Filtres de cartes</h3>
+        <h3>🃏 Card Filters</h3>
         <label class="filter-checkbox" [class.loading]="reloadingCards">
           <input
             type="checkbox"
@@ -79,7 +79,7 @@
           <span class="custom-checkbox"></span>
           <div class="filter-label">
             <span class="filter-label-main">
-              Inclure les éléments non-collectibles
+              Include uncollectible items
               @if (reloadingCards) {
                 <span class="loading-spinner-inline">⏳</span>
               }
@@ -92,9 +92,9 @@
       <div class="settings-section start-section">
         <p class="preview-count">
           @if (reloadingCards) {
-            <span class="loading-text">Chargement des cartes...</span>
+            <span class="loading-text">Loading cards...</span>
           } @else {
-            {{ previewCardCount }} cartes disponibles
+            {{ previewCardCount }} cards available
           }
         </p>
         @if (error) {
@@ -104,7 +104,7 @@
           class="btn btn-primary btn-large"
           (click)="startQuiz()"
           [disabled]="previewCardCount === 0">
-          🚀 Démarrer le quiz
+          Start Quiz
         </button>
       </div>
     </div>
@@ -119,11 +119,11 @@
         <span class="stat-value">{{ correctAnswers }}/{{ totalAnswered }}</span>
       </div>
       <div class="stat">
-        <span class="stat-label">Réussite</span>
+        <span class="stat-label">Success Rate</span>
         <span class="stat-value">{{ successRate }}%</span>
       </div>
       <button class="btn btn-small btn-settings" (click)="backToSettings()">
-        ⚙️ Paramètres
+        Settings
       </button>
     </div>
 
@@ -131,7 +131,7 @@
     <div class="mode-info">
       <span class="mode-badge">{{ currentAttributeLabel }}</span>
       <span class="mode-badge">{{ selectedSetsDisplay }}</span>
-      <span class="mode-badge">{{ filteredCards.length }} cartes</span>
+      <span class="mode-badge">{{ filteredCards.length }} cards</span>
     </div>
 
     <div class="quiz-content">
@@ -139,7 +139,7 @@
       <app-card-display
         [card]="currentQuestion.card"
         [hiddenAttribute]="currentQuestion.hiddenAttribute"
-        [revealed]="currentQuestion.revealed || currentQuestion.correct === true">
+        [revealed]="currentQuestion.answered">
       </app-card-display>
 
       <!-- Answer section -->
@@ -158,26 +158,26 @@
               class="btn btn-primary"
               (click)="submitAnswer()"
               [disabled]="!userAnswer.trim()">
-              Valider
+              Submit
             </button>
           </div>
           <button class="btn btn-secondary btn-reveal" (click)="revealAnswer()">
-            Je ne sais pas 😅
+            I don't know
           </button>
         } @else {
           <!-- Feedback -->
           <div class="feedback" [class.correct]="currentQuestion.correct" [class.incorrect]="!currentQuestion.correct">
             @if (currentQuestion.correct) {
-              <div class="feedback-icon">✅</div>
-              <h2>Correct !</h2>
-              <p class="correct-answer">{{ correctAnswer }}</p>
+              <div class="feedback-icon"></div>
+              <h2>Correct!</h2>
+              <p class="correct-answer">Answer : {{ correctAnswer }}</p>
             } @else {
-              <div class="feedback-icon">❌</div>
-              <h2>{{ currentQuestion.revealed ? 'Réponse révélée' : 'Incorrect' }}</h2>
+              <div class="feedback-icon"></div>
+              <h2>{{ currentQuestion.revealed ? 'Answer Revealed' : 'Incorrect' }}</h2>
               @if (currentQuestion.userAnswer) {
-                <p class="user-answer">Votre réponse : {{ currentQuestion.userAnswer }}</p>
+                <p class="user-answer">Your answer: {{ currentQuestion.userAnswer }}</p>
               }
-              <p class="correct-answer">Réponse : <strong>{{ correctAnswer }}</strong></p>
+              <p class="correct-answer">Answer : <strong>{{ correctAnswer }}</strong></p>
             }
           </div>
 
@@ -185,11 +185,11 @@
           <div class="action-buttons">
             @if (!currentQuestion.correct && !currentQuestion.revealed) {
               <button class="btn btn-secondary" (click)="retry()">
-                Réessayer
+                Retry
               </button>
             }
             <button class="btn btn-primary" (click)="nextCard()">
-              Carte suivante →
+              Next Card
             </button>
           </div>
         }
@@ -200,9 +200,9 @@
   <!-- Footer -->
   <footer class="quiz-footer">
     @if (quizStarted) {
-      <p>{{ filteredCards.length }} cartes dans cette sélection</p>
+      <p>{{ filteredCards.length }} cards in this selection</p>
     } @else {
-      <p>{{ allCards.length }} cartes au total</p>
+      <p>{{ allCards.length }} total cards</p>
     }
   </footer>
 </div>

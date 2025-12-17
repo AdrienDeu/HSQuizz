@@ -3,14 +3,14 @@
     <!-- État de chargement -->
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Chargement des cartes...</p>
+      <p>Loading cards...</p>
     </div>
   } @else if (cards.length === 0) {
     <!-- État vide -->
     <div class="empty-state">
-      <div class="empty-icon">🔍</div>
-      <p>Aucune carte trouvée</p>
-      <p class="empty-hint">Essayez de modifier vos filtres</p>
+      <div class="empty-icon"></div>
+      <p>No cards found</p>
+      <p class="empty-hint">Try modifying your filters</p>
     </div>
   } @else {
     <!-- Collection de cartes -->
@@ -33,9 +33,9 @@
           class="btn-page"
           (click)="previousPage()"
           [disabled]="!hasPreviousPage"
-          title="Page précédente"
+          title="Previous page"
         >
-          ← Précédent
+          ← Previous
         </button>
 
         <div class="page-info">
@@ -47,7 +47,7 @@
           class="btn-page"
           (click)="nextPage()"
           [disabled]="!hasNextPage"
-          title="Page suivante"
+          title="Next page"
         >
           Suivant →
         </button>

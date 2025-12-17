@@ -2,7 +2,7 @@
   @if (stats) {
     <!-- Progression du deck -->
     <div class="stats-section progress-section">
-      <h3>Progression</h3>
+      <h3>Progress</h3>
       <div class="progress-bar-container">
         <div
           class="progress-bar"
@@ -11,14 +11,14 @@
         ></div>
       </div>
       <div class="progress-info">
-        <span class="progress-text">{{ stats.totalCards }}/30 cartes</span>
+        <span class="progress-text">{{ stats.totalCards }}/30 cards</span>
         <span class="progress-percent">{{ stats.deckCompletionPercent }}%</span>
       </div>
     </div>
 
     <!-- Courbe de Mana -->
     <div class="stats-section mana-curve-section">
-      <h3>📊 Courbe de Mana</h3>
+      <h3>Mana Curve</h3>
       <div class="mana-curve">
         @for (data of manaCurveData; track data.cost) {
           <div class="mana-bar-container">
@@ -26,7 +26,7 @@
               class="mana-bar"
               [style.height.%]="data.height"
               [class.has-cards]="data.count > 0"
-              [title]="data.count + ' carte(s) à ' + getManaCostLabel(data.cost) + ' mana'"
+              [title]="data.count + ' card(s) at ' + getManaCostLabel(data.cost) + ' mana'"
             >
               @if (data.count > 0) {
                 <span class="bar-count">{{ data.count }}</span>
@@ -40,27 +40,24 @@
 
     <!-- Distribution des Types -->
     <div class="stats-section types-section">
-      <h3>🃏 Types de Cartes</h3>
+      <h3>Card Types</h3>
       <div class="type-list">
         <div class="type-item">
-          <span class="type-icon">⚔️</span>
-          <span class="type-label">Serviteurs</span>
+                      <span class="type-icon"></span>          <span class="type-label">Minions</span>
           <span class="type-value">{{ stats.typeDistribution.minions }}</span>
         </div>
         <div class="type-item">
-          <span class="type-icon">✨</span>
-          <span class="type-label">Sorts</span>
+                      <span class="type-icon"></span>          <span class="type-label">Spells</span>
           <span class="type-value">{{ stats.typeDistribution.spells }}</span>
         </div>
         <div class="type-item">
-          <span class="type-icon">🗡️</span>
-          <span class="type-label">Armes</span>
+                      <span class="type-icon"></span>          <span class="type-label">Weapons</span>
           <span class="type-value">{{ stats.typeDistribution.weapons }}</span>
         </div>
         @if (stats.typeDistribution.locations > 0) {
           <div class="type-item">
-            <span class="type-icon">🏛️</span>
-            <span class="type-label">Lieux</span>
+            <span class="type-icon"></span>
+            <span class="type-label">Locations</span>
             <span class="type-value">{{ stats.typeDistribution.locations }}</span>
           </div>
         }
@@ -69,11 +66,11 @@
 
     <!-- Phases de Jeu -->
     <div class="stats-section phases-section">
-      <h3>⏱️ Phases de Jeu</h3>
+      <h3>Game Phases</h3>
       <div class="phase-list">
         <div class="phase-item">
           <div class="phase-header">
-            <span class="phase-label">Début (0-3)</span>
+            <span class="phase-label">Early (0-3)</span>
             <span
               class="phase-value"
               [style.color]="getPhaseColor('early')"
@@ -89,13 +86,13 @@
             ></div>
           </div>
           @if (getPhaseWarning('early'); as warning) {
-            <span class="phase-warning">⚠️ {{ warning }}</span>
+            <span class="phase-warning">{{ warning }}</span>
           }
         </div>
 
         <div class="phase-item">
           <div class="phase-header">
-            <span class="phase-label">Milieu (4-6)</span>
+            <span class="phase-label">Mid (4-6)</span>
             <span
               class="phase-value"
               [style.color]="getPhaseColor('mid')"
@@ -114,7 +111,7 @@
 
         <div class="phase-item">
           <div class="phase-header">
-            <span class="phase-label">Fin (7+)</span>
+            <span class="phase-label">Late (7+)</span>
             <span
               class="phase-value"
               [style.color]="getPhaseColor('late')"
@@ -130,7 +127,7 @@
             ></div>
           </div>
           @if (getPhaseWarning('late'); as warning) {
-            <span class="phase-warning">⚠️ {{ warning }}</span>
+            <span class="phase-warning">{{ warning }}</span>
           }
         </div>
       </div>
@@ -138,7 +135,7 @@
 
     <!-- Coût Moyen -->
     <div class="stats-section average-section">
-      <h3>📈 Coût Moyen</h3>
+      <h3>Average Cost</h3>
       <div class="average-display">
         <span class="average-value">{{ stats.averageManaCost }}</span>
         <span class="average-label">mana</span>
@@ -147,8 +144,8 @@
   } @else {
     <!-- État vide -->
     <div class="empty-stats">
-      <p>Aucune statistique disponible</p>
-      <p class="empty-hint">Ajoutez des cartes au deck</p>
+      <p>No statistics available</p>
+      <p class="empty-hint">Add cards to the deck</p>
     </div>
   }
 </div>

@@ -35,13 +35,13 @@ export type HiddenAttribute = 'name' | 'cardClass' | 'cost' | 'attack' | 'health
  * Labels pour les attributs devinables
  */
 export const HIDDEN_ATTRIBUTE_LABELS: Record<HiddenAttribute, string> = {
-  name: 'Nom de la carte',
-  cardClass: 'Classe',
-  cost: 'Coût en mana',
-  attack: 'Attaque',
-  health: 'Points de vie',
-  rarity: 'Rareté',
-  set: 'Extension'
+  name: 'Card Name',
+  cardClass: 'Class',
+  cost: 'Mana Cost',
+  attack: 'Attack',
+  health: 'Health',
+  rarity: 'Rarity',
+  set: 'Set'
 };
 
 /**

@@ -9,12 +9,12 @@ export class QuizService {
   private previousCardId: string | null = null;
 
   /**
-   * Sélectionne une carte aléatoire parmi la liste
-   * Évite de répéter la même carte consécutivement
+   * Selects a random card from the list.
+   * Avoids repeating the same card consecutively.
    */
   selectRandomCard(cards: Card[]): Card {
     if (cards.length === 0) {
-      throw new Error('Aucune carte disponible');
+      throw new Error('No cards available');
     }
 
     if (cards.length === 1) {
@@ -32,14 +32,14 @@ export class QuizService {
   }
 
   /**
-   * Réinitialise l'historique de carte précédente
+   * Resets the previous card history.
    */
   resetPreviousCard(): void {
     this.previousCardId = null;
   }
 
   /**
-   * Crée une nouvelle question de quiz
+   * Creates a new quiz question.
    */
   createQuestion(card: Card, hiddenAttribute: HiddenAttribute = 'name'): QuizQuestion {
     return {
@@ -53,45 +53,45 @@ export class QuizService {
   }
 
   /**
-   * Retourne le label d'un attribut à deviner
+   * Returns the label of an attribute to guess.
    */
   getAttributeLabel(attribute: HiddenAttribute): string {
     return HIDDEN_ATTRIBUTE_LABELS[attribute];
   }
 
   /**
-   * Retourne le placeholder pour le champ de réponse selon l'attribut
+   * Returns the placeholder for the answer field according to the attribute.
    */
   getAnswerPlaceholder(attribute: HiddenAttribute): string {
     switch (attribute) {
       case 'name':
-        return 'Entrez le nom de la carte...';
+        return 'Enter card name...';
       case 'cardClass':
-        return 'Entrez la classe (Mage, Guerrier, Neutre...)';
+        return 'Enter class (Mage, Warrior, Neutral...)';
       case 'cost':
-        return 'Entrez le coût en mana (0-10+)';
+        return 'Enter mana cost (0-10+)';
       case 'attack':
-        return 'Entrez l\'attaque';
+        return 'Enter attack';
       case 'health':
-        return 'Entrez les points de vie';
+        return 'Enter health';
       case 'rarity':
-        return 'Entrez la rareté (Commune, Rare, Épique, Légendaire)';
+        return 'Enter rarity (Common, Rare, Epic, Legendary)';
       case 'set':
-        return 'Entrez l\'extension (ex: Les Titans, Forgés dans les Tarides...)';
+        return 'Enter set (e.g.: Titans, Forged in the Barrens...)';
       default:
-        return 'Entrez votre réponse...';
+        return 'Enter your answer...';
     }
   }
 
   /**
-   * Vérifie si la réponse de l'utilisateur est correcte
+   * Checks if the user's answer is correct.
    */
   checkAnswer(question: QuizQuestion, userAnswer: string): boolean {
     const correctValue = this.getAttributeValue(question.card, question.hiddenAttribute);
     const normalizedUserAnswer = this.normalizeString(userAnswer);
     const normalizedCorrectValue = this.normalizeString(correctValue);
 
-    // Pour les classes et raretés, accepter aussi les traductions
+    // For classes and rarities, also accept translations
     if (question.hiddenAttribute === 'cardClass') {
       const translatedClass = CardService.translateClass(question.card.cardClass);
       if (normalizedUserAnswer === this.normalizeString(translatedClass)) {
@@ -118,7 +118,7 @@ export class QuizService {
   }
 
   /**
-   * Récupère la valeur d'un attribut de la carte (traduite si nécessaire)
+   * Retrieves the value of a card attribute (translated if necessary).
    */
   getAttributeValue(card: Card, attribute: HiddenAttribute): string {
     switch (attribute) {
@@ -142,19 +142,19 @@ export class QuizService {
   }
 
   /**
-   * Normalise une chaîne pour la comparaison
-   * - Convertit en minuscules
-   * - Supprime les accents
-   * - Supprime les caractères spéciaux et espaces multiples
+   * Normalizes a string for comparison:
+   * - Converts to lowercase.
+   * - Removes accents.
+   * - Removes special characters and multiple spaces.
    */
   normalizeString(str: string): string {
     return str
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Supprime les accents
-      .replace(/['']/g, ' ')           // Remplace apostrophes par espaces
-      .replace(/[^a-z0-9\s]/g, '')     // Garde uniquement lettres, chiffres, espaces
-      .replace(/\s+/g, ' ')            // Normalise les espaces
+      .replace(/[\u0300-\u036f]/g, '') // Removes accents
+      .replace(/['']/g, ' ')           // Replaces apostrophes with spaces
+      .replace(/[^a-z0-9\s]/g, '')     // Keeps only letters, numbers, spaces
+      .replace(/\s+/g, ' ')            // Normalizes spaces
       .trim();
   }
 }

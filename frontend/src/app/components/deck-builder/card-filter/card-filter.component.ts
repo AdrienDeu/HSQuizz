@@ -51,11 +51,11 @@ export class CardFilterComponent implements OnInit, OnDestroy {
   readonly manaCosts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // 10 = 10+
 
   readonly rarities = [
-    { code: 'FREE', name: 'Gratuite' },
-    { code: 'COMMON', name: 'Commune' },
+    { code: 'FREE', name: 'Free' },
+    { code: 'COMMON', name: 'Common' },
     { code: 'RARE', name: 'Rare' },
-    { code: 'EPIC', name: 'Épique' },
-    { code: 'LEGENDARY', name: 'Légendaire' }
+    { code: 'EPIC', name: 'Epic' },
+    { code: 'LEGENDARY', name: 'Legendary' }
   ];
 
   readonly types = [

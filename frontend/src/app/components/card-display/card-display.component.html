@@ -1,4 +1,8 @@
-<div class="card-container" [class]="rarityClass">
+<!-- Commentaire Pédagogique : Le template est maintenant beaucoup plus simple.
+     Il n'appelle plus de fonctions ou de getters complexes (comme `translatedType`),
+     mais se lie directement aux propriétés pré-calculées de l'objet `card`
+     qui est de type `DisplayableCard`. -->
+<div class="card-container" [class]="card.rarityClass">
   <!-- En-tête avec nom -->
   <div class="card-header">
     <span class="card-name" [class.hidden]="isHidden('name')">
@@ -17,12 +21,12 @@
     <div class="card-info-row">
       <div class="info-item">
         <span class="label">Type</span>
-        <span class="value">{{ translatedType }}</span>
+        <span class="value">{{ card.translatedType }}</span>
       </div>
       <div class="info-item">
         <span class="label">Classe</span>
         <span class="value" [class.hidden]="isHidden('cardClass')">
-          {{ isHidden('cardClass') ? '???' : translatedClass }}
+          {{ isHidden('cardClass') ? '???' : card.translatedClass }}
         </span>
       </div>
     </div>
@@ -31,20 +35,20 @@
     <div class="card-info-row">
       <div class="info-item">
         <span class="label">Rareté</span>
-        <span class="value rarity-badge" [class]="rarityClass" [class.hidden]="isHidden('rarity')">
-          {{ isHidden('rarity') ? '???' : translatedRarity }}
+        <span class="value rarity-badge" [class]="card.rarityClass" [class.hidden]="isHidden('rarity')">
+          {{ isHidden('rarity') ? '???' : card.translatedRarity }}
         </span>
       </div>
-      @if (translatedRace) {
+      @if (card.translatedRace) {
         <div class="info-item">
           <span class="label">Race</span>
-          <span class="value">{{ translatedRace }}</span>
+          <span class="value">{{ card.translatedRace }}</span>
         </div>
       }
     </div>
 
     <!-- Stats pour serviteurs/armes -->
-    @if (isMinion || isWeapon) {
+    @if (card.isMinion || card.isWeapon) {
       <div class="card-stats">
         <div class="stat attack">
           <span class="stat-icon">⚔️</span>
@@ -52,7 +56,7 @@
             {{ getDisplayValue('attack', card.attack) }}
           </span>
         </div>
-        @if (isMinion) {
+        @if (card.isMinion) {
           <div class="stat health">
             <span class="stat-icon">❤️</span>
             <span class="stat-value" [class.hidden]="isHidden('health')">
@@ -60,7 +64,7 @@
             </span>
           </div>
         }
-        @if (isWeapon) {
+        @if (card.isWeapon) {
           <div class="stat durability">
             <span class="stat-icon">🛡️</span>
             <span class="stat-value">{{ card.durability ?? '-' }}</span>
@@ -70,17 +74,17 @@
     }
 
     <!-- Texte de la carte -->
-    @if (cleanText) {
+    @if (card.cleanText) {
       <div class="card-text">
         <span class="label">Effet</span>
-        <p class="effect-text">{{ cleanText }}</p>
+        <p class="effect-text">{{ card.cleanText }}</p>
       </div>
     }
 
     <!-- Extension -->
     <div class="card-set">
       <span class="label">Extension</span>
-      <span class="value">{{ translatedSet }}</span>
+      <span class="value">{{ card.translatedSet }}</span>
     </div>
   </div>
 </div>

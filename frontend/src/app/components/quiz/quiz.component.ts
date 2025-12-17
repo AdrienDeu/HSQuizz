@@ -1,146 +1,103 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CardDisplayComponent } from '../card-display/card-display.component';
+import { Observable } from 'rxjs';
+import { map, first } from 'rxjs/operators';
+import { CardDisplayComponent, DisplayableCard } from '../card-display/card-display.component';
 import { CardService } from '../../services/card.service';
 import { QuizService } from '../../services/quiz.service';
 import { Card, QuizQuestion, HiddenAttribute, QuizSettings, HIDDEN_ATTRIBUTE_LABELS, SET_TRANSLATIONS } from '../../models/card.model';
 
+// Modèle de Données pour l'Affichage
+export interface DisplayableQuizQuestion extends Omit<QuizQuestion, 'card'> {
+  displayableCard: DisplayableCard;
+}
+
+// Commentaire Pédagogique : Le composant "Smart".
+// - Gère la communication avec les services.
+// - Expose les flux de données (Observables) au template.
+// - Prépare/mappe les données pour les composants "Dumb" enfants.
+// - Ne contient AUCUNE logique métier ou d'état du quiz (score, question actuelle...).
 @Component({
   selector: 'app-quiz',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardDisplayComponent],
+  imports: [CommonModule, FormsModule, AsyncPipe, CardDisplayComponent],
   templateUrl: './quiz.component.html',
   styleUrl: './quiz.component.scss'
 })
 export class QuizComponent implements OnInit {
-  // Données des cartes
-  allCards: Card[] = [];
-  filteredCards: Card[] = [];
-  currentQuestion: QuizQuestion | null = null;
-  userAnswer: string = '';
-  loading: boolean = true;
-  reloadingCards: boolean = false;
-  error: string | null = null;
+
+  // --- Observables Publics pour le Template ---
+  public question$: Observable<DisplayableQuizQuestion | null>;
+  public score$: Observable<number>;
+  public questionNumber$: Observable<number>;
+  public quizIsOver$: Observable<boolean>;
+  public availableSets$: Observable<{ code: string; name: string }[]>;
   
-  // Configuration du quiz
-  quizStarted: boolean = false;
-  availableSets: { code: string; name: string }[] = [];
-  settings: QuizSettings = {
-    selectedSets: [],
-    hiddenAttribute: 'name'
-  };
-  includeNonCollectible: boolean = false;
-  
-  // Options pour les attributs
-  attributeOptions: { value: HiddenAttribute; label: string }[] = [
-    { value: 'name', label: HIDDEN_ATTRIBUTE_LABELS['name'] },
-    { value: 'cardClass', label: HIDDEN_ATTRIBUTE_LABELS['cardClass'] },
-    { value: 'cost', label: HIDDEN_ATTRIBUTE_LABELS['cost'] },
-    { value: 'attack', label: HIDDEN_ATTRIBUTE_LABELS['attack'] },
-    { value: 'health', label: HIDDEN_ATTRIBUTE_LABELS['health'] },
-    { value: 'rarity', label: HIDDEN_ATTRIBUTE_LABELS['rarity'] },
-    { value: 'set', label: HIDDEN_ATTRIBUTE_LABELS['set'] }
-  ];
-  
-  // Stats
-  totalAnswered: number = 0;
-  correctAnswers: number = 0;
+  // --- État Local (Uniquement pour le formulaire de configuration) ---
+  public settings: QuizSettings = { selectedSets: [], hiddenAttribute: 'name' };
+  public attributeOptions: { value: HiddenAttribute; label: string }[];
 
   constructor(
     private cardService: CardService,
     private quizService: QuizService
-  ) {}
+  ) {
+    // On connecte les observables des services aux propriétés publiques.
+    this.score$ = this.quizService.score$;
+    this.questionNumber$ = this.quizService.questionNumber$;
+    this.quizIsOver$ = this.quizService.quizIsOver$;
+    this.availableSets$ = this.cardService.getCards().pipe(
+      map(cards => this.cardService.getAvailableSets(cards))
+    );
+
+    // Commentaire Pédagogique : C'est ici que la magie opère.
+    // On s'abonne à la question brute du service, et on la transforme (map)
+    // en une question "d'affichage" avant de l'exposer au template.
+    this.question$ = this.quizService.question$.pipe(
+      map(q => q ? this.mapToDisplayable(q) : null)
+    );
+    
+    // Initialisation des options du formulaire (données statiques).
+    this.attributeOptions = (Object.keys(HIDDEN_ATTRIBUTE_LABELS) as HiddenAttribute[]).map(key => ({
+        value: key,
+        label: HIDDEN_ATTRIBUTE_LABELS[key]
+    }));
+  }
 
   ngOnInit(): void {
-    this.loadCards(true);
-  }
-
-  /**
-   * Charge les cartes depuis le service
-   */
-  loadCards(isInitialLoad: boolean = false): void {
-    // Si c'est un rechargement (pas le chargement initial), on utilise reloadingCards
-    if (!isInitialLoad && this.allCards.length > 0) {
-      this.reloadingCards = true;
-    } else {
-      this.loading = true;
-    }
-    this.error = null;
-
-    this.cardService.getCollectibleCards(this.includeNonCollectible).subscribe({
-      next: (cards) => {
-        this.allCards = cards;
-        this.loading = false;
-        this.reloadingCards = false;
-        if (isInitialLoad) {
-          this.loadAvailableSets();
-        }
-      },
-      error: (err) => {
-        this.error = 'Erreur lors du chargement des cartes. Veuillez rafraîchir la page.';
-        this.loading = false;
-        this.reloadingCards = false;
-        console.error('Error loading cards:', err);
+    // Pré-sélectionner toutes les extensions par défaut pour une meilleure UX.
+    this.availableSets$.pipe(first()).subscribe(sets => {
+      if (sets && sets.length > 0) {
+        this.settings.selectedSets = sets.map(s => s.code);
       }
     });
   }
 
-  /**
-   * Charge la liste des extensions disponibles
-   */
-  loadAvailableSets(): void {
-    this.cardService.getAvailableSets().subscribe({
-      next: (sets) => {
-        this.availableSets = sets;
-      }
+  // --- Actions de l'Utilisateur (Délégation) ---
+
+  public startQuiz(): void {
+    this.cardService.getCards(true).pipe(first()).subscribe(allCards => {
+      this.quizService.startQuiz(this.settings, allCards);
     });
   }
 
-  /**
-   * Démarre le quiz avec les paramètres actuels
-   */
-  startQuiz(): void {
-    this.applyFilters();
-    
-    if (this.filteredCards.length === 0) {
-      this.error = 'Aucune carte ne correspond aux filtres sélectionnés.';
-      return;
-    }
-    
-    this.quizStarted = true;
-    this.resetStats();
-    this.quizService.resetPreviousCard();
-    this.nextCard();
+  public submitAnswer(answer: string): void {
+    if (!answer?.trim()) return;
+    this.quizService.submitAnswer(answer);
+  }
+  
+  public restartQuiz(): void {
+    this.cardService.getCards(true).pipe(first()).subscribe(allCards => {
+      this.quizService.startQuiz(this.settings, allCards);
+    });
   }
 
-  /**
-   * Applique les filtres de configuration
-   */
-  applyFilters(): void {
-    let cards = this.allCards;
-    
-    // Filtre par extension
-    cards = this.cardService.filterCardsBySets(cards, this.settings.selectedSets);
-    
-    // Filtre par attribut (pour s'assurer que l'attribut existe)
-    cards = this.cardService.filterCardsByAttribute(cards, this.settings.hiddenAttribute);
-    
-    this.filteredCards = cards;
+  public backToSettings(): void {
+    this.quizService.backToSettings();
   }
 
-  /**
-   * Retourne à la configuration
-   */
-  backToSettings(): void {
-    this.quizStarted = false;
-    this.currentQuestion = null;
-    this.error = null;
-  }
-
-  /**
-   * Toggle la sélection d'une extension
-   */
+  // --- Fonctions d'Aide pour le Template (Formulaire) ---
+  
   toggleSet(setCode: string): void {
     const index = this.settings.selectedSets.indexOf(setCode);
     if (index === -1) {
@@ -150,148 +107,43 @@ export class QuizComponent implements OnInit {
     }
   }
 
-  /**
-   * Vérifie si une extension est sélectionnée
-   */
-  isSetSelected(setCode: string): boolean {
-    return this.settings.selectedSets.includes(setCode);
-  }
-
-  /**
-   * Sélectionne ou désélectionne toutes les extensions
-   */
-  toggleAllSets(): void {
-    if (this.settings.selectedSets.length === this.availableSets.length) {
+  toggleAllSets(allSets: { code: string; name: string }[] | null): void {
+    if (!allSets) return;
+    if (this.settings.selectedSets.length === allSets.length) {
       this.settings.selectedSets = [];
     } else {
-      this.settings.selectedSets = this.availableSets.map(s => s.code);
+      this.settings.selectedSets = allSets.map(s => s.code);
     }
   }
 
-  /**
-   * Passe à la carte suivante
-   */
-  nextCard(): void {
-    if (this.filteredCards.length === 0) return;
-    
-    const card = this.quizService.selectRandomCard(this.filteredCards);
-    this.currentQuestion = this.quizService.createQuestion(card, this.settings.hiddenAttribute);
-    this.userAnswer = '';
+  getCorrectAnswer(question: DisplayableQuizQuestion): string {
+    return this.quizService.getAttributeValue(question.displayableCard, question.hiddenAttribute);
   }
 
-  /**
-   * Soumet la réponse de l'utilisateur
-   */
-  submitAnswer(): void {
-    if (!this.currentQuestion || !this.userAnswer.trim()) return;
-    
-    const isCorrect = this.quizService.checkAnswer(this.currentQuestion, this.userAnswer);
-    this.currentQuestion.answered = true;
-    this.currentQuestion.correct = isCorrect;
-    this.currentQuestion.userAnswer = this.userAnswer;
-    
-    this.totalAnswered++;
-    if (isCorrect) {
-      this.correctAnswers++;
-    }
+  public getPlaceholder(question: DisplayableQuizQuestion | null): string {
+    if (!question) return 'Devinez...';
+    const label = this.attributeOptions.find(o => o.value === question.hiddenAttribute)?.label;
+    return 'Devinez : ' + (label || '');
   }
 
+  // --- Mapper Privé ---
   /**
-   * Révèle la réponse sans soumettre
+   * Transforme un objet Card brut en un objet DisplayableCard prêt à l'emploi.
    */
-  revealAnswer(): void {
-    if (!this.currentQuestion) return;
-    
-    this.currentQuestion.revealed = true;
-    this.currentQuestion.answered = true;
-    this.currentQuestion.correct = false;
-    this.totalAnswered++;
-  }
-
-  /**
-   * Réessayer (pour une réponse incorrecte)
-   */
-  retry(): void {
-    if (!this.currentQuestion) return;
-    
-    this.currentQuestion.answered = false;
-    this.currentQuestion.correct = null;
-    this.userAnswer = '';
-    this.totalAnswered--; // Annule le compteur
-  }
-
-  /**
-   * Réinitialise les statistiques
-   */
-  resetStats(): void {
-    this.totalAnswered = 0;
-    this.correctAnswers = 0;
-  }
-
-  /**
-   * Calcule le pourcentage de réussite
-   */
-  get successRate(): number {
-    if (this.totalAnswered === 0) return 0;
-    return Math.round((this.correctAnswers / this.totalAnswered) * 100);
-  }
-
-  /**
-   * Retourne le nombre de cartes après filtrage (preview)
-   */
-  get previewCardCount(): number {
-    let cards = this.allCards;
-    cards = this.cardService.filterCardsBySets(cards, this.settings.selectedSets);
-    cards = this.cardService.filterCardsByAttribute(cards, this.settings.hiddenAttribute);
-    return cards.length;
-  }
-
-  /**
-   * Retourne le label de l'attribut actuel
-   */
-  get currentAttributeLabel(): string {
-    return this.quizService.getAttributeLabel(this.settings.hiddenAttribute);
-  }
-
-  /**
-   * Retourne le placeholder pour le champ de réponse
-   */
-  get answerPlaceholder(): string {
-    return this.quizService.getAnswerPlaceholder(this.settings.hiddenAttribute);
-  }
-
-  /**
-   * Retourne les noms des extensions sélectionnées
-   */
-  get selectedSetsDisplay(): string {
-    if (this.settings.selectedSets.length === 0) {
-      return 'Toutes les extensions';
-    }
-    if (this.settings.selectedSets.length <= 2) {
-      return this.settings.selectedSets
-        .map(code => SET_TRANSLATIONS[code] || code)
-        .join(', ');
-    }
-    return `${this.settings.selectedSets.length} extensions`;
-  }
-
-  /**
-   * Retourne la réponse correcte pour la question actuelle
-   */
-  get correctAnswer(): string {
-    if (!this.currentQuestion) return '';
-    return this.quizService.getAttributeValue(
-      this.currentQuestion.card,
-      this.currentQuestion.hiddenAttribute
-    );
-  }
-
-  /**
-   * Gère la touche Entrée pour soumettre
-   */
-  onKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' && !this.currentQuestion?.answered) {
-      this.submitAnswer();
-    }
+  private mapToDisplayable(question: QuizQuestion): DisplayableQuizQuestion {
+    const card = question.card;
+    const displayableCard: DisplayableCard = {
+      ...card,
+      translatedType: CardService.translateType(card.type),
+      translatedClass: CardService.translateClass(card.cardClass),
+      translatedRarity: card.rarity ? CardService.translateRarity(card.rarity) : '-',
+      translatedRace: card.race ? CardService.translateRace(card.race) : '',
+      translatedSet: CardService.translateSet(card.set),
+      cleanText: CardService.cleanCardText(card.text),
+      rarityClass: card.rarity?.toLowerCase() ?? 'common',
+      isMinion: card.type === 'MINION',
+      isWeapon: card.type === 'WEAPON',
+    };
+    return { ...question, displayableCard };
   }
 }

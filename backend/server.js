@@ -21,21 +21,13 @@ const webClient = axios.create({
     }
 });
 
-// Cache simple
-let seasonsCache = { timestamp: 0, data: null };
-
 async function getLatestSeasonId(mode, region) {
-    const now = Date.now();
-    if (seasonsCache.data && (now - seasonsCache.timestamp < 3600000)) {
-        return findSeasonInMetadata(seasonsCache.data, mode, region);
-    }
     try {
-        console.log("🔄 Mise à jour du cache des saisons...");
+        console.log("🔄 Récupération des informations de saison...");
         const response = await webClient.get('https://hearthstone.blizzard.com/fr-fr/api/community/leaderboards');
-        seasonsCache = { timestamp: now, data: response.data };
         return findSeasonInMetadata(response.data, mode, region);
     } catch (e) {
-        console.error("⚠️ Erreur cache saisons.");
+        console.error("⚠️ Erreur lors de la récupération des saisons.");
         return null;
     }
 }
@@ -52,71 +44,94 @@ function findSeasonInMetadata(meta, mode, region) {
     return null;
 }
 
-// --- LA CORRECTION EST ICI ---
-// On écoute exactement l'URL demandée par votre message d'erreur
 app.get('/api/blizzard/leaderboardsData', async (req, res) => {
-
-    // Angular envoie les infos dans les paramètres (ex: ?leaderboardId=standard)
     const mode = req.query.leaderboardId || 'standard';
     const region = (req.query.region || 'EU').toUpperCase();
-    const page = req.query.page || 1;
+    // La "page" du frontend correspond à un bloc de 100 joueurs.
+    const frontendPage = parseInt(req.query.page || '1', 10);
 
-    console.log(`\n>>> REQUÊTE REÇUE : ${mode} (${region}) - Page ${page}`);
+    console.log(`\n▶️ [LEADERBOARD] Requête reçue pour ${mode} (${region}), bloc de page ${frontendPage}.`);
 
     try {
         const seasonId = await getLatestSeasonId(mode, region);
+        if (seasonId) {
+            console.log(`   - ID de saison trouvé: ${seasonId}`);
+        } else {
+            console.log(`   - ⚠️ Impossible de trouver un ID de saison, l'API pourrait échouer.`);
+        }
 
-        const params = {
-            region: region,
-            leaderboardId: mode,
-            page: page
+        // On va chercher 4 pages de 25 joueurs pour en avoir 100.
+        const pagesToFetch = [
+            (frontendPage - 1) * 4 + 1,
+            (frontendPage - 1) * 4 + 2,
+            (frontendPage - 1) * 4 + 3,
+            (frontendPage - 1) * 4 + 4,
+        ];
+        
+        console.log(`   - 📞 Préparation des appels parallèles pour les pages Blizzard: ${pagesToFetch.join(', ')}`);
+
+        // Créer un tableau de promesses pour les appels parallèles
+        const requests = pagesToFetch.map(page => {
+            const params = { region, leaderboardId: mode, page };
+            if (seasonId) params.seasonId = seasonId;
+            const targetUrl = `https://hearthstone.blizzard.com/fr-fr/api/community/leaderboardsData`;
+            return webClient.get(targetUrl, { params });
+        });
+
+        // Exécuter les requêtes en parallèle
+        const responses = await Promise.all(requests);
+
+        // Agréger et re-classer les résultats
+        let allRows = [];
+        let rankCounter = (frontendPage - 1) * 100;
+        for (const response of responses) {
+            const rows = response.data.leaderboard ? response.data.leaderboard.rows : [];
+            for (const row of rows) {
+                // On recalcule le rang pour qu'il soit continu
+                rankCounter++;
+                allRows.push({ ...row, rank: rankCounter });
+            }
+        }
+
+        console.log(`   - ✅ Succès ! ${allRows.length} joueurs reçus et re-classés au total.`);
+
+        // On doit re-créer l'objet réponse pour qu'il soit cohérent
+        const finalResponse = {
+            leaderboard: {
+                // On garde les métadonnées de la première réponse
+                ...(responses[0].data.leaderboard || {}),
+                rows: allRows
+            },
+            // On peut ajouter des métadonnées sur la pagination si besoin
+            pagination: {
+                frontendPage: frontendPage,
+                blizzardPages: pagesToFetch
+            }
         };
-        // On injecte la saison trouvée automatiquement
-        if (seasonId) params.seasonId = seasonId;
 
-        const response = await webClient.get('https://hearthstone.blizzard.com/fr-fr/api/community/leaderboardsData', { params });
-        const rows = response.data.leaderboard ? response.data.leaderboard.rows : [];
-
-        console.log(`✅ SUCCÈS : ${rows.length} joueurs envoyés au site.`);
-        res.json(response.data);
+        res.json(finalResponse);
 
     } catch (error) {
-        console.error("❌ ERREUR API:", error.message);
+        console.error("   - ❌ [LEADERBOARD] ERREUR lors des appels parallèles à l'API Blizzard.");
         if (error.response) {
+            console.error(`     - Status: ${error.response.status}`);
+            console.error(`     - Data: ${JSON.stringify(error.response.data)}`);
             res.status(error.response.status).json(error.response.data);
         } else {
-            res.status(500).json({ error: "Erreur interne serveur" });
+            console.error(`     - Message: ${error.message}`);
+            res.status(500).json({ error: "Erreur interne du serveur lors de la communication avec l'API Blizzard" });
         }
     }
 });
 
-// --- ENDPOINT POUR LES CARTES HEARTHSTONE ---
-// Cache pour les cartes (1 heure)
-let cardsCache = { timestamp: 0, data: null, includeNonCollectible: false };
-
 app.get('/api/hearthstone/cards', async (req, res) => {
-    const now = Date.now();
     const includeNonCollectible = req.query.includeNonCollectible === 'true';
 
-    // Si le cache est valide (moins d'1 heure) ET que le mode correspond, on l'utilise
-    if (cardsCache.data &&
-        (now - cardsCache.timestamp < 3600000) &&
-        cardsCache.includeNonCollectible === includeNonCollectible) {
-        console.log(`✅ Cartes servies depuis le cache (mode: ${includeNonCollectible ? 'toutes' : 'collectibles'})`);
-        res.setHeader('Content-Type', 'application/json');
-        return res.json(cardsCache.data);
-    }
-
-    if (cardsCache.data && cardsCache.includeNonCollectible !== includeNonCollectible) {
-        console.log(`🔄 Changement de mode détecté (${cardsCache.includeNonCollectible ? 'toutes' : 'collectibles'} -> ${includeNonCollectible ? 'toutes' : 'collectibles'}), rechargement...`);
-    }
-
     try {
-        console.log("🔄 Récupération des cartes depuis HearthstoneJSON...");
-        console.log("URL:", 'https://api.hearthstonejson.com/v1/latest/frFR/cards.json');
+        console.log(`🔄 Récupération des cartes depuis HearthstoneJSON (mode: ${includeNonCollectible ? 'toutes' : 'collectibles'})...`);
 
         const response = await axios.get('https://api.hearthstonejson.com/v1/latest/frFR/cards.json', {
-            timeout: 30000, // Augmenté à 30 secondes
+            timeout: 30000,
             headers: {
                 'Accept': 'application/json',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'
@@ -125,56 +140,26 @@ app.get('/api/hearthstone/cards', async (req, res) => {
             maxBodyLength: Infinity
         });
 
-        console.log(`📦 Réponse reçue - Status: ${response.status}`);
-        console.log(`📦 Type de données: ${typeof response.data}`);
-        console.log(`📦 Est un tableau: ${Array.isArray(response.data)}`);
-
         if (Array.isArray(response.data) && response.data.length > 0) {
-            console.log(`📦 Nombre de cartes total: ${response.data.length}`);
-
-            // Filtrer selon le paramètre includeNonCollectible
             let filteredCards;
             if (includeNonCollectible) {
-                // Inclure toutes les cartes qui ont un nom
-                filteredCards = response.data.filter(card =>
-                    card.name && card.name.trim().length > 0
-                );
-                console.log(`📦 Toutes les cartes (avec nom): ${filteredCards.length}`);
+                filteredCards = response.data.filter(card => card.name && card.name.trim().length > 0);
             } else {
-                // Ne garder que les cartes collectibles
-                filteredCards = response.data.filter(card =>
-                    card.collectible === true
-                );
-                console.log(`📦 Cartes collectibles: ${filteredCards.length}`);
+                filteredCards = response.data.filter(card => card.collectible === true);
             }
-
-            console.log(`📦 Exemple de carte:`, JSON.stringify(filteredCards[0], null, 2).substring(0, 200));
-
-            // Mise à jour du cache avec les cartes filtrées et le mode
-            cardsCache = { timestamp: now, data: filteredCards, includeNonCollectible };
-            console.log(`✅ ${filteredCards.length} cartes mises en cache (mode: ${includeNonCollectible ? 'toutes' : 'collectibles'})`);
-
-            // S'assurer que le Content-Type est correct
+            
+            console.log(`✅ ${filteredCards.length} cartes récupérées et filtrées.`);
             res.setHeader('Content-Type', 'application/json');
             res.json(filteredCards);
         } else {
-            console.error("❌ Les données reçues ne sont pas un tableau valide");
-            console.log("Données reçues:", JSON.stringify(response.data).substring(0, 500));
-            res.status(500).json({ error: "Format de données invalide" });
+            console.error("❌ Les données reçues de HearthstoneJSON ne sont pas un tableau valide.");
+            res.status(500).json({ error: "Format de données invalide depuis l'API de cartes" });
         }
 
     } catch (error) {
-        console.error("❌ ERREUR API CARTES:");
-        console.error("  Message:", error.message);
-        console.error("  Code:", error.code);
-        if (error.response) {
-            console.error("  Status:", error.response.status);
-            console.error("  Data:", JSON.stringify(error.response.data).substring(0, 200));
-            res.status(error.response.status).json({ error: "Erreur lors de la récupération des cartes", details: error.message });
-        } else {
-            res.status(500).json({ error: "Erreur interne serveur", details: error.message });
-        }
+        console.error("❌ ERREUR API CARTES:", error.message);
+        res.status(500).json({ error: "Erreur interne serveur lors de la récupération des cartes", details: error.message });
     }
 });
 
-app.listen(PORT, () => console.log(`🚀 Serveur PRET sur le port ${PORT}`));
+app.listen(PORT);

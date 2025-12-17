@@ -1,41 +1,100 @@
+<!-- Commentaire Pédagogique : C'est le template final. Il est entièrement réactif.
+     On utilise `@let` pour déballer tous nos observables une seule fois.
+     Ensuite, un grand `@if`/`@else` gère les 3 états principaux de l'application :
+     1. quizIsOver : Affichage des résultats.
+     2. question : Quiz en cours, on affiche la question.
+     3. else : Par défaut, on affiche l'écran de configuration.
+     Le template ne fait plus que "déclarer" comment l'interface doit être en fonction de l'état. -->
+@let question = question$ | async;
+@let score = score$ | async;
+@let questionNumber = questionNumber$ | async;
+@let quizIsOver = quizIsOver$ | async;
+@let allSets = availableSets$ | async;
+
 <div class="quiz-container">
   <!-- Header -->
   <header class="quiz-header">
-    <img src="logo.webp" alt="HSQuizz Logo" class="header-logo">
-    @if (!quizStarted) {
+    @if (!question && !quizIsOver) {
       <p class="subtitle">Configurez votre quiz Hearthstone !</p>
+    } @else if (question) {
+      <p class="subtitle">Question {{ questionNumber }} / 10</p>
     } @else {
-      <p class="subtitle">Devinez : {{ currentAttributeLabel }}</p>
+      <p class="subtitle">Quiz terminé !</p>
     }
   </header>
 
-  <!-- Loading state -->
-  @if (loading) {
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Chargement des cartes...</p>
+  @if (quizIsOver) {
+    <!-- 1. Écran des Résultats -->
+    <div class="results-panel">
+      <h2>🎉 Quiz Terminé ! 🎉</h2>
+      <p class="final-score">Votre score : <strong>{{ score }} / 10</strong></p>
+      <div class="action-buttons">
+        <button class="btn btn-primary" (click)="restartQuiz()">
+          Rejouer
+        </button>
+        <button class="btn btn-secondary" (click)="backToSettings()">
+          Modifier les paramètres
+        </button>
+      </div>
     </div>
-  }
 
-  <!-- Error state -->
-  @if (error && !quizStarted) {
-    <div class="error-message">
-      <p>{{ error }}</p>
-      <button class="btn btn-primary" (click)="loadCards()">Réessayer</button>
+  } @else if (question) {
+    <!-- 2. Écran du Quiz en Cours -->
+    <div class="quiz-in-progress">
+      <div class="stats-bar">
+        <div class="stat">
+          <span class="stat-label">Score</span>
+          <span class="stat-value">{{ score }}</span>
+        </div>
+      </div>
+
+      <div class="quiz-content">
+        <app-card-display
+          [card]="question.displayableCard"
+          [hiddenAttribute]="question.hiddenAttribute"
+          [revealed]="question.revealed">
+        </app-card-display>
+
+        <div class="answer-section">
+          @if (!question.answered) {
+            <!-- Formulaire de réponse -->
+            <div class="input-group">
+              <input #answerInput type="text" class="answer-input"
+                (keydown.enter)="submitAnswer(answerInput.value); answerInput.value = ''"
+                [placeholder]="getPlaceholder(question)" autofocus>
+              <button class="btn btn-primary" (click)="submitAnswer(answerInput.value); answerInput.value = ''"
+                [disabled]="!answerInput.value.trim()">
+                Valider
+              </button>
+            </div>
+          } @else {
+            <!-- Feedback après réponse -->
+            <div class="feedback" [class.correct]="question.correct" [class.incorrect]="!question.correct">
+              @if (question.correct) {
+                <div class="feedback-icon">✅</div>
+                <h2>Correct !</h2>
+              } @else {
+                <div class="feedback-icon">❌</div>
+                <h2>Incorrect</h2>
+              }
+              <p class="correct-answer">
+                Réponse : <strong>{{ getCorrectAnswer(question) }}</strong>
+              </p>
+            </div>
+            <!-- Le passage à la question suivante est automatique (géré par le service) -->
+          }
+        </div>
+      </div>
     </div>
-  }
 
-  <!-- Settings Panel -->
-  @if ((!loading || reloadingCards) && !quizStarted) {
-    <div class="settings-panel" [class.reloading]="reloadingCards">
-      <!-- Attribute selector -->
+  } @else {
+    <!-- 3. Écran de Configuration -->
+    <div class="settings-panel">
       <div class="settings-section">
         <h3>🎯 Que voulez-vous deviner ?</h3>
         <div class="attribute-options">
           @for (option of attributeOptions; track option.value) {
-            <button 
-              class="attribute-btn"
-              [class.selected]="settings.hiddenAttribute === option.value"
+            <button class="attribute-btn" [class.selected]="settings.hiddenAttribute === option.value"
               (click)="settings.hiddenAttribute = option.value">
               {{ option.label }}
             </button>
@@ -43,166 +102,32 @@
         </div>
       </div>
 
-      <!-- Set selector -->
-      <div class="settings-section">
-        <h3>📦 Extensions</h3>
-        <div class="sets-header">
-          <button class="btn btn-small" (click)="toggleAllSets()">
-            {{ settings.selectedSets.length === availableSets.length ? 'Tout désélectionner' : 'Tout sélectionner' }}
-          </button>
-          <span class="sets-count">
-            {{ settings.selectedSets.length === 0 ? 'Toutes' : settings.selectedSets.length + ' sélectionnée(s)' }}
-          </span>
-        </div>
-        <div class="sets-grid">
-          @for (set of availableSets; track set.code) {
-            <label class="set-checkbox">
-              <input
-                type="checkbox"
-                [checked]="isSetSelected(set.code)"
-                (change)="toggleSet(set.code)">
-              <span class="set-name">{{ set.name }}</span>
-            </label>
-          }
-        </div>
-      </div>
-
-      <!-- Collectible filter -->
-      <div class="settings-section">
-        <h3>🃏 Filtres de cartes</h3>
-        <label class="filter-checkbox" [class.loading]="reloadingCards">
-          <input
-            type="checkbox"
-            [(ngModel)]="includeNonCollectible"
-            (change)="loadCards()"
-            [disabled]="reloadingCards">
-          <span class="custom-checkbox"></span>
-          <div class="filter-label">
-            <span class="filter-label-main">
-              Inclure les éléments non-collectibles
-              @if (reloadingCards) {
-                <span class="loading-spinner-inline">⏳</span>
-              }
-            </span>
+      @if(allSets) {
+        <div class="settings-section">
+          <h3>📦 Extensions</h3>
+          <div class="sets-header">
+            <button class="btn btn-small" (click)="toggleAllSets(allSets)">
+              {{ settings.selectedSets.length === allSets.length ? 'Tout désélectionner' : 'Tout sélectionner' }}
+            </button>
+            <span class="sets-count">{{ settings.selectedSets.length }} / {{ allSets.length }}</span>
           </div>
-        </label>
-      </div>
+          <div class="sets-grid">
+            @for (set of allSets; track set.code) {
+              <label class="set-checkbox">
+                <input type="checkbox" [checked]="settings.selectedSets.includes(set.code)"
+                  (change)="toggleSet(set.code)">
+                <span class="set-name">{{ set.name }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      }
 
-      <!-- Preview and Start -->
       <div class="settings-section start-section">
-        <p class="preview-count">
-          @if (reloadingCards) {
-            <span class="loading-text">Chargement des cartes...</span>
-          } @else {
-            {{ previewCardCount }} cartes disponibles
-          }
-        </p>
-        @if (error) {
-          <p class="error-inline">{{ error }}</p>
-        }
-        <button 
-          class="btn btn-primary btn-large"
-          (click)="startQuiz()"
-          [disabled]="previewCardCount === 0">
+        <button class="btn btn-primary btn-large" (click)="startQuiz()">
           🚀 Démarrer le quiz
         </button>
       </div>
     </div>
   }
-
-  <!-- Quiz content -->
-  @if (!loading && quizStarted && currentQuestion) {
-    <!-- Stats -->
-    <div class="stats-bar">
-      <div class="stat">
-        <span class="stat-label">Score</span>
-        <span class="stat-value">{{ correctAnswers }}/{{ totalAnswered }}</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Réussite</span>
-        <span class="stat-value">{{ successRate }}%</span>
-      </div>
-      <button class="btn btn-small btn-settings" (click)="backToSettings()">
-        ⚙️ Paramètres
-      </button>
-    </div>
-
-    <!-- Current mode info -->
-    <div class="mode-info">
-      <span class="mode-badge">{{ currentAttributeLabel }}</span>
-      <span class="mode-badge">{{ selectedSetsDisplay }}</span>
-      <span class="mode-badge">{{ filteredCards.length }} cartes</span>
-    </div>
-
-    <div class="quiz-content">
-      <!-- Card display -->
-      <app-card-display
-        [card]="currentQuestion.card"
-        [hiddenAttribute]="currentQuestion.hiddenAttribute"
-        [revealed]="currentQuestion.revealed || currentQuestion.correct === true">
-      </app-card-display>
-
-      <!-- Answer section -->
-      <div class="answer-section">
-        @if (!currentQuestion.answered) {
-          <!-- Input form -->
-          <div class="input-group">
-            <input
-              type="text"
-              class="answer-input"
-              [(ngModel)]="userAnswer"
-              (keydown)="onKeyDown($event)"
-              [placeholder]="answerPlaceholder"
-              autofocus>
-            <button 
-              class="btn btn-primary"
-              (click)="submitAnswer()"
-              [disabled]="!userAnswer.trim()">
-              Valider
-            </button>
-          </div>
-          <button class="btn btn-secondary btn-reveal" (click)="revealAnswer()">
-            Je ne sais pas 😅
-          </button>
-        } @else {
-          <!-- Feedback -->
-          <div class="feedback" [class.correct]="currentQuestion.correct" [class.incorrect]="!currentQuestion.correct">
-            @if (currentQuestion.correct) {
-              <div class="feedback-icon">✅</div>
-              <h2>Correct !</h2>
-              <p class="correct-answer">{{ correctAnswer }}</p>
-            } @else {
-              <div class="feedback-icon">❌</div>
-              <h2>{{ currentQuestion.revealed ? 'Réponse révélée' : 'Incorrect' }}</h2>
-              @if (currentQuestion.userAnswer) {
-                <p class="user-answer">Votre réponse : {{ currentQuestion.userAnswer }}</p>
-              }
-              <p class="correct-answer">Réponse : <strong>{{ correctAnswer }}</strong></p>
-            }
-          </div>
-
-          <!-- Actions -->
-          <div class="action-buttons">
-            @if (!currentQuestion.correct && !currentQuestion.revealed) {
-              <button class="btn btn-secondary" (click)="retry()">
-                Réessayer
-              </button>
-            }
-            <button class="btn btn-primary" (click)="nextCard()">
-              Carte suivante →
-            </button>
-          </div>
-        }
-      </div>
-    </div>
-  }
-
-  <!-- Footer -->
-  <footer class="quiz-footer">
-    @if (quizStarted) {
-      <p>{{ filteredCards.length }} cartes dans cette sélection</p>
-    } @else {
-      <p>{{ allCards.length }} cartes au total</p>
-    }
-  </footer>
 </div>

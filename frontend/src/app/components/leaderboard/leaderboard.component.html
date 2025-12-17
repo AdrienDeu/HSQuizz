@@ -1,23 +1,37 @@
+<!-- Commentaire Pédagogique : Le template est maintenant "réactif". Il ne fait que refléter
+     l'état actuel des observables fournis par le composant. Le `@let` en haut nous permet
+     de "déballer" les observables (avec le pipe `| async`) une seule fois. C'est plus propre
+     et plus performant que de répéter `| async` partout dans le template. -->
+@let leaderboard = leaderboard$ | async;
+@let region = region$ | async;
+@let gameMode = gameMode$ | async;
+@let page = page$ | async;
+
 <div class="leaderboard-container">
   <!-- Header -->
   <div class="leaderboard-header">
-    <h1>🏆 Leaderboard</h1>
+    <h1>Leaderboard</h1>
     <p class="subtitle">Top des meilleurs joueurs Hearthstone</p>
   </div>
 
   <!-- Filtres -->
+  <!-- Commentaire Pédagogique : On utilise [ngModel] et (ngModelChange) au lieu de [(ngModel)].
+       Cela respecte le flux de données unidirectionnel (Règle d'Or n°1).
+       - [ngModel]="region" : La valeur de l'observable est "poussée" dans le select.
+       - (ngModelChange)="onRegionChange($event)" : L'événement de changement est "remonté" au composant. -->
   <div class="filters-section">
     <div class="filter-group">
       <label for="region-select">Région</label>
       <select 
         id="region-select" 
-        [(ngModel)]="selectedRegion" 
-        (change)="onRegionChange()"
+        [ngModel]="region"
+        (ngModelChange)="onRegionChange($event)"
         class="filter-select"
       >
-        <option *ngFor="let region of regions" [value]="region">
-          {{ regionLabels[region] }}
-        </option>
+        <!-- Règle d'Or n°4 : Utilisation de la nouvelle syntaxe `@for` -->
+        @for (r of regions; track r) {
+          <option [value]="r">{{ regionLabels[r] }}</option>
+        }
       </select>
     </div>
 
@@ -25,96 +39,87 @@
       <label for="gamemode-select">Mode de jeu</label>
       <select 
         id="gamemode-select" 
-        [(ngModel)]="selectedGameMode" 
-        (change)="onGameModeChange()"
+        [ngModel]="gameMode"
+        (ngModelChange)="onGameModeChange($event)"
         class="filter-select"
       >
-        <option *ngFor="let mode of gameModes" [value]="mode">
-          {{ gameModeLabels[mode] }}
-        </option>
+        @for (gm of gameModes; track gm) {
+          <option [value]="gm">{{ gameModeLabels[gm] }}</option>
+        }
       </select>
     </div>
   </div>
 
-  <!-- Loading initial -->
-  <div *ngIf="loading && leaderboardEntries.length === 0" class="loading">
-    <div class="spinner"></div>
-    <p>Chargement du leaderboard...</p>
-  </div>
+  <!-- Règle d'Or n°4 : Utilisation de la nouvelle syntaxe `@if`/`@else` -->
+  @if (leaderboard) {
+    <!-- Cas 1: Le leaderboard a été chargé et contient des entrées. -->
+    @if (leaderboard.length > 0) {
+      <div class="leaderboard-content">
+        <div class="table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th class="rank-col">Rang</th>
+                <th class="player-col">Joueur</th>
+                <!-- On affiche conditionnellement la colonne "Rating" -->
+                @if (gameMode === 'battlegrounds' || gameMode === 'battlegroundsduo') {
+                  <th class="rating-col">Rating</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of leaderboard; track entry.accountid) {
+                <tr [class]="getMedalClass(entry.rank)">
+                  <td class="rank-cell">
+                    @if (entry.rank <= 3) {
+                      <span class="medal">{{ getMedalEmoji(entry.rank) }}</span>
+                    }
+                    <span class="rank-number">{{ entry.rank }}</span>
+                  </td>
+                  <td class="player-cell">{{ getPlayerName(entry.accountid) }}</td>
+                  @if (gameMode === 'battlegrounds' || gameMode === 'battlegroundsduo') {
+                    <td class="rating-cell">{{ entry.rating || '-' }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
 
-  <!-- Error -->
-  <div *ngIf="error && !loading && leaderboardEntries.length === 0" class="error-message">
-    <p>{{ error }}</p>
-    <button class="btn btn-primary" (click)="loadLeaderboardPage(currentPage)">
-      Réessayer
-    </button>
-  </div>
-
-  <!-- Leaderboard Table -->
-  <div *ngIf="leaderboardEntries.length > 0 || (loading && leaderboardEntries.length > 0)" class="leaderboard-content">
-    <!-- Info en haut -->
-    <div class="pagination-info top">
-      <p>Joueurs {{ getDisplayedRange() }} </p>
-    </div>
-
-    <div class="table-container">
-      <!-- Loading overlay pour le tableau -->
-      <div *ngIf="loading" class="table-loading-overlay">
-        <div class="spinner"></div>
-        <p>Chargement...</p>
+        <!-- Pagination -->
+        <div class="pagination-section bottom">
+          <div class="pagination-controls">
+            <button
+              class="pagination-btn"
+              (click)="previousPage(page || 1)"
+              [disabled]="page === 1"
+              title="Page précédente"
+            >
+              ◀ Précédent
+            </button>
+            <span class="page-indicator">Page {{ page }}</span>
+            <button
+              class="pagination-btn"
+              (click)="nextPage(page || 1)"
+              [disabled]="page === 100 || leaderboard.length < 100"
+              title="Page suivante"
+            >
+              Suivant ▶
+            </button>
+          </div>
+        </div>
       </div>
-
-      <table class="leaderboard-table" [class.loading-table]="loading">
-        <thead>
-          <tr>
-            <th class="rank-col">Rang</th>
-            <th class="player-col">Joueur</th>
-            <th *ngIf="selectedGameMode === 'battlegrounds' || selectedGameMode === 'battlegroundsduo'" class="rating-col">Rating</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="let entry of leaderboardEntries"
-            [class]="getMedalClass(entry.rank)"
-          >
-            <td class="rank-cell">
-              <span class="medal" *ngIf="entry.rank <= 3">{{ getMedalEmoji(entry.rank) }}</span>
-              <span class="rank-number">{{ entry.rank }}</span>
-            </td>
-            <td class="player-cell">{{ entry.accountid }}</td>
-            <td *ngIf="selectedGameMode === 'battlegrounds' || selectedGameMode === 'battlegroundsduo'" class="rating-cell">
-              {{ entry.rating || '-' }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination complète en bas -->
-    <div class="pagination-section bottom">
-      <div class="pagination-controls">
-        <button
-          class="pagination-btn"
-          (click)="previousPage()"
-          [disabled]="currentPage === 1 || loading"
-          title="Page précédente"
-        >
-          ◀ Précédent
-        </button>
-
-
-
-        <button
-          class="pagination-btn"
-          (click)="nextPage()"
-          [disabled]="currentPage === totalPages || loading"
-          title="Page suivante"
-        >
-          Suivant ▶
-        </button>
+    } @else {
+      <!-- Cas 2: Le leaderboard a été chargé mais il est vide. -->
+      <div class="empty-state">
+        <p>Aucune donnée disponible pour cette sélection.</p>
       </div>
-
-
+    }
+  } @else {
+    <!-- Cas 3: Le leaderboard est null (état initial, avant le premier chargement). -->
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Chargement du leaderboard...</p>
     </div>
-  </div>
+  }
 </div>

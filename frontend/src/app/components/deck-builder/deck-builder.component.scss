@@ -213,14 +213,14 @@
 
 .deck-builder-layout {
   display: grid;
-  grid-template-columns: 300px 1fr 350px;
+  grid-template-columns: 250px 1fr 350px;
   gap: 1rem;
   width: 100%;
   box-sizing: border-box;
   align-items: start;
 
   @media (max-width: 1200px) {
-    grid-template-columns: 280px 1fr 300px;
+    grid-template-columns: 230px 1fr 300px;
   }
 
   @media (max-width: 968px) {

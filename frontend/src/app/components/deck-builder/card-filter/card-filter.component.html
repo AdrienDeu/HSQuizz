@@ -34,7 +34,7 @@
         [class.active]="isClassSelected(cls.code)"
         (click)="toggleClass(cls.code)"
         [title]="cls.name">
-        <span class="icon">{{ cls.icon }}</span>
+        <img [src]="cls.icon" [alt]="cls.name" class="class-icon">
         <span class="name">{{ cls.name }}</span>
       </button>
     </div>
@@ -83,11 +83,9 @@
           type="checkbox"
           [checked]="isTypeSelected(type.code)"
           (change)="toggleType(type.code)">
-        <span class="checkbox-label">
-          <span class="icon">{{ type.icon }}</span>
-          {{ type.name }}
-        </span>
-      </label>
+                  <span class="checkbox-label">
+                  {{ type.name }}
+                </span>      </label>
     </div>
   </div>
 
@@ -95,7 +93,7 @@
   <div class="filter-section mechanics-section">
     <h4 class="filter-label clickable" (click)="showMechanics = !showMechanics">
       <span>Mécaniques</span>
-      <span class="toggle-icon">{{ showMechanics ? '\u25bc' : '\u25b6' }}</span>
+      <span class="toggle-icon">{{ showMechanics ? '▼' : '►' }}</span>
     </h4>
     <div class="filter-list mechanics-list" *ngIf="showMechanics">
       <label

@@ -34,18 +34,18 @@ export class CardFilterComponent implements OnInit, OnDestroy {
 
   // Options disponibles
   readonly classes = [
-    { code: 'NEUTRAL', name: 'Neutre', icon: '⚪' },
-    { code: 'MAGE', name: 'Mage', icon: '🔮' },
-    { code: 'WARRIOR', name: 'Guerrier', icon: '⚔️' },
-    { code: 'PALADIN', name: 'Paladin', icon: '🛡️' },
-    { code: 'HUNTER', name: 'Chasseur', icon: '🏹' },
-    { code: 'ROGUE', name: 'Voleur', icon: '🗡️' },
-    { code: 'PRIEST', name: 'Prêtre', icon: '✨' },
-    { code: 'SHAMAN', name: 'Chaman', icon: '⚡' },
-    { code: 'WARLOCK', name: 'Démoniste', icon: '🔥' },
-    { code: 'DRUID', name: 'Druide', icon: '🌿' },
-    { code: 'DEMONHUNTER', name: 'Chasseur de démons', icon: '😈' },
-    { code: 'DEATHKNIGHT', name: 'Chevalier de la mort', icon: '💀' }
+    { code: 'NEUTRAL', name: 'Neutre', icon: 'assets/icons/hs-icons-master/SVG/Misc_BattleNet.svg' },
+    { code: 'MAGE', name: 'Mage', icon: 'assets/icons/hs-icons-master/SVG/Class_Mage.svg' },
+    { code: 'WARRIOR', name: 'Guerrier', icon: 'assets/icons/hs-icons-master/SVG/Class_Warrior.svg' },
+    { code: 'PALADIN', name: 'Paladin', icon: 'assets/icons/hs-icons-master/SVG/Class_Paladin.svg' },
+    { code: 'HUNTER', name: 'Chasseur', icon: 'assets/icons/hs-icons-master/SVG/Class_Hunter.svg' },
+    { code: 'ROGUE', name: 'Voleur', icon: 'assets/icons/hs-icons-master/SVG/Class_Rogue.svg' },
+    { code: 'PRIEST', name: 'Prêtre', icon: 'assets/icons/hs-icons-master/SVG/Class_Priest.svg' },
+    { code: 'SHAMAN', name: 'Chaman', icon: 'assets/icons/hs-icons-master/SVG/Class_Shaman.svg' },
+    { code: 'WARLOCK', name: 'Démoniste', icon: 'assets/icons/hs-icons-master/SVG/Class_Warlock.svg' },
+    { code: 'DRUID', name: 'Druide', icon: 'assets/icons/hs-icons-master/SVG/Class_Druid.svg' },
+    { code: 'DEMONHUNTER', name: 'Chasseur de démons', icon: 'assets/icons/hs-icons-master/SVG/Class_DemonHunter.svg' },
+    { code: 'DEATHKNIGHT', name: 'Chevalier de la mort', icon: 'assets/icons/hs-icons-master/SVG/Mode_Duels.svg' } // Using Mode_Duels as a placeholder for Death Knight
   ];
 
   readonly manaCosts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // 10 = 10+
@@ -59,10 +59,10 @@ export class CardFilterComponent implements OnInit, OnDestroy {
   ];
 
   readonly types = [
-    { code: 'MINION', name: 'Serviteur', icon: '⚔️' },
-    { code: 'SPELL', name: 'Sort', icon: '✨' },
-    { code: 'WEAPON', name: 'Arme', icon: '🗡️' },
-    { code: 'LOCATION', name: 'Lieu', icon: '🏛️' }
+    { code: 'MINION', name: 'Serviteur', icon: '' },
+    { code: 'SPELL', name: 'Sort', icon: '' },
+    { code: 'WEAPON', name: 'Arme', icon: '' },
+    { code: 'LOCATION', name: 'Lieu', icon: '' }
   ];
 
   readonly mechanics = MECHANICS.map(m => ({

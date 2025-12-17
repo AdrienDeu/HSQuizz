@@ -13,95 +13,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-  }
-}
-
-.card-cost-badge {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 40px;
-  height: 40px;
-  background: url('/assets/mana-crystal.png') no-repeat center center;
-  background-size: contain;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.4rem;
-  color: white;
-  text-shadow: 0 0 5px black, 0 0 5px black;
-  z-index: 2;
-}
-
-.card-name-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-  padding: 20px 10px 10px 10px;
-  text-align: center;
-}
-
-.card-name {
-  font-weight: 600;
-  font-size: 1rem;
-  color: white;
-  text-shadow: 0 1px 3px black;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.rarity-gem {
-  position: absolute;
-  bottom: 45px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 0 5px rgba(0,0,0,0.5);
-
-  &.common { background-color: #bababa; }
-  &.rare { background-color: #3b8dff; }
-  &.epic { background-color: #a650ff; }
-  &.legendary { background-color: #ff9a2c; }
-}
-
-.card-item.compact {
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-
-  .card-cost-badge {
-    width: 25px;
-    height: 25px;
-    font-size: 1rem;
-    top: 2px;
-    left: 2px;
-  }
-  
-  .card-name-bar {
-    padding: 10px 5px 5px 5px;
-  }
-  
-  .card-name {
-    font-size: 0.8rem;
-  }
-  
-  .rarity-gem {
-    bottom: 25px;
-    width: 8px;
-    height: 8px;
   }
 }

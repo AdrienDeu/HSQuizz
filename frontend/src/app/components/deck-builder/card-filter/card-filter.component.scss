@@ -171,18 +171,18 @@
 // ============ FILTER BUTTONS ============
 
 .filter-btn {
-  padding: 0.5rem;
+  padding: 0.2rem 0.4rem; /* Further reduced padding */
   background: rgba(0, 0, 0, 0.5);
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   color: white;
-  font-size: 0.85rem;
+  font-size: 0.75rem; /* Further reduced font size */
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
+  gap: 0.2rem; /* Reduced gap */
 
   &:hover {
     border-color: rgba(255, 153, 0, 0.6);
@@ -203,14 +203,10 @@
 
 .class-btn {
   flex-direction: column;
-  padding: 0.4rem;
-
-  .icon {
-    font-size: 1.2rem;
-  }
+  padding: 0.15rem; /* Further reduced padding */
 
   .name {
-    font-size: 0.7rem;
+    font-size: 0.55rem; /* Further reduced font size */
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
@@ -221,7 +217,7 @@
 
 .mana-btn {
   font-weight: bold;
-  min-height: 36px;
+  min-height: 30px; /* Reduced min-height */
 }
 
 // ============ CHECKBOXES ============
@@ -229,15 +225,15 @@
 .filter-list {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem; /* Reduced gap */
 }
 
 .filter-checkbox {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem; /* Reduced gap */
   cursor: pointer;
-  padding: 0.3rem;
+  padding: 0.2rem; /* Reduced padding */
   border-radius: 4px;
   transition: background 0.2s;
 
@@ -279,10 +275,10 @@
 
   .checkbox-label {
     color: white;
-    font-size: 0.85rem;
+    font-size: 0.8rem; /* Reduced font size */
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.2rem; /* Reduced gap */
 
     .icon {
       font-size: 1rem;
@@ -364,3 +360,16 @@
     font-size: 0.65rem;
   }
 }
+
+.class-icon {
+  width: 20px; /* Reduced size */
+  height: 20px; /* Reduced size */
+  filter: invert(1); // Makes black SVG icons white
+}
+
+.type-icon {
+  width: 16px;
+  height: 16px;
+  filter: invert(1); // Makes black SVG icons white
+}
+

@@ -3,14 +3,4 @@
   [class.compact]="compact"
   (click)="onClick()"
   [style.background-image]="'url(' + cardImageUrl + ')'">
-
-  <div class="card-cost-badge">{{ card.cost ?? 0 }}</div>
-  
-  <div class="card-name-bar">
-    <span class="card-name">{{ card.name }}</span>
-  </div>
-
-  @if (card.rarity) {
-    <div class="rarity-gem" [class]="rarityClass"></div>
-  }
 </div>

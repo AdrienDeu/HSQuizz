@@ -78,10 +78,6 @@
 
     <div class="table-container">
       <!-- Loading overlay for table -->
-      <div *ngIf="loading" class="table-loading-overlay">
-        <div class="spinner"></div>
-        <p>Loading...</p>
-      </div>
 
       <table class="leaderboard-table" [class.loading-table]="loading">
         <thead>

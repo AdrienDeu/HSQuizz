@@ -115,6 +115,8 @@
 .input-group {
   display: flex;
   gap: 0.75rem;
+  max-width: 400px; /* New: narrower width */
+  margin: 0 auto; /* New: center it */
 
   .answer-input {
     flex: 1;

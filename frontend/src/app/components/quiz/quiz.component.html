@@ -33,13 +33,28 @@
         <h3>What do you want to guess?</h3>
         <div class="attribute-options">
           @for (option of attributeOptions; track option.value) {
-            <button 
+            <button
               class="attribute-btn"
               [class.selected]="settings.hiddenAttribute === option.value"
               (click)="settings.hiddenAttribute = option.value">
               {{ option.label }}
             </button>
           }
+        </div>
+      </div>
+
+      <!-- Number of Questions -->
+      <div class="settings-section">
+        <h3>Number of Questions</h3>
+        <div class="input-group">
+          <input
+            type="number"
+            class="answer-input"
+            [(ngModel)]="settings.numberOfQuestions"
+            min="1"
+            max="100"
+            step="1"
+            >
         </div>
       </div>
 
@@ -100,10 +115,10 @@
         @if (error) {
           <p class="error-inline">{{ error }}</p>
         }
-        <button 
+        <button
           class="btn btn-primary btn-large"
           (click)="startQuiz()"
-          [disabled]="previewCardCount === 0">
+          [disabled]="previewCardCount === 0 || settings.numberOfQuestions <= 0">
           Start Quiz
         </button>
       </div>
@@ -111,9 +126,13 @@
   }
 
   <!-- Quiz content -->
-  @if (!loading && quizStarted && currentQuestion) {
+  @if (!loading && quizStarted && currentQuestion && !quizFinished) {
     <!-- Stats -->
     <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">Question</span>
+        <span class="stat-value">{{ currentQuestionNumber }} / {{ settings.numberOfQuestions }}</span>
+      </div>
       <div class="stat">
         <span class="stat-label">Score</span>
         <span class="stat-value">{{ correctAnswers }}/{{ totalAnswered }}</span>
@@ -154,7 +173,7 @@
               (keydown)="onKeyDown($event)"
               [placeholder]="answerPlaceholder"
               autofocus>
-            <button 
+            <button
               class="btn btn-primary"
               (click)="submitAnswer()"
               [disabled]="!userAnswer.trim()">
@@ -197,6 +216,26 @@
     </div>
   }
 
+  <!-- Quiz Finished State -->
+  @if (quizFinished) {
+    <div class="quiz-content quiz-finished-summary">
+      <div class="feedback correct">
+        <div class="feedback-icon"></div>
+        <h2>Quiz Completed!</h2>
+        <p class="correct-answer">You answered {{ correctAnswers }} out of {{ settings.numberOfQuestions }} questions correctly.</p>
+        <p class="correct-answer">Your success rate: <strong>{{ successRate }}%</strong></p>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-primary btn-large" (click)="backToSettings()">
+          Back to Settings
+        </button>
+        <button class="btn btn-secondary btn-large" (click)="startQuiz()">
+          Restart Quiz
+        </button>
+      </div>
+    </div>
+  }
+
   <!-- Footer -->
   <footer class="quiz-footer">
     @if (quizStarted) {
@@ -206,3 +245,4 @@
     }
   </footer>
 </div>
+

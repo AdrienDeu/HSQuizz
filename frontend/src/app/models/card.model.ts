@@ -50,6 +50,7 @@ export const HIDDEN_ATTRIBUTE_LABELS: Record<HiddenAttribute, string> = {
 export interface QuizSettings {
   selectedSets: string[];
   hiddenAttribute: HiddenAttribute;
+  numberOfQuestions: number; // New property for the number of questions in the quiz
 }
 
 /**

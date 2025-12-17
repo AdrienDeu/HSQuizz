@@ -28,7 +28,8 @@ export class QuizComponent implements OnInit {
   availableSets: { code: string; name: string }[] = [];
   settings: QuizSettings = {
     selectedSets: [],
-    hiddenAttribute: 'name'
+    hiddenAttribute: 'name',
+    numberOfQuestions: 10 // Default to 10 questions
   };
   includeNonCollectible: boolean = false;
   
@@ -46,6 +47,8 @@ export class QuizComponent implements OnInit {
   // Stats
   totalAnswered: number = 0;
   correctAnswers: number = 0;
+  currentQuestionNumber: number = 0; // Tracks the current question number
+  quizFinished: boolean = false; // Indicates if the quiz has finished
 
   constructor(
     private cardService: CardService,
@@ -109,6 +112,11 @@ export class QuizComponent implements OnInit {
       this.error = 'No cards match the selected filters.';
       return;
     }
+
+    if (this.settings.numberOfQuestions <= 0) {
+      this.error = 'Number of questions must be positive.';
+      return;
+    }
     
     this.quizStarted = true;
     this.resetStats();
@@ -138,6 +146,7 @@ export class QuizComponent implements OnInit {
     this.quizStarted = false;
     this.currentQuestion = null;
     this.error = null;
+    this.quizFinished = false; // Reset quiz finished state
   }
 
   /**
@@ -174,8 +183,14 @@ export class QuizComponent implements OnInit {
    * Passe à la carte suivante
    */
   nextCard(): void {
+    if (this.currentQuestionNumber >= this.settings.numberOfQuestions) {
+      this.quizFinished = true;
+      return;
+    }
+
     if (this.filteredCards.length === 0) return;
     
+    this.currentQuestionNumber++;
     const card = this.quizService.selectRandomCard(this.filteredCards);
     this.currentQuestion = this.quizService.createQuestion(card, this.settings.hiddenAttribute);
     this.userAnswer = '';
@@ -196,6 +211,10 @@ export class QuizComponent implements OnInit {
     if (isCorrect) {
       this.correctAnswers++;
     }
+
+    if (this.totalAnswered >= this.settings.numberOfQuestions) {
+      this.quizFinished = true;
+    }
   }
 
   /**
@@ -208,6 +227,10 @@ export class QuizComponent implements OnInit {
     this.currentQuestion.answered = true;
     this.currentQuestion.correct = false;
     this.totalAnswered++;
+
+    if (this.totalAnswered >= this.settings.numberOfQuestions) {
+      this.quizFinished = true;
+    }
   }
 
   /**
@@ -228,6 +251,8 @@ export class QuizComponent implements OnInit {
   resetStats(): void {
     this.totalAnswered = 0;
     this.correctAnswers = 0;
+    this.currentQuestionNumber = 0; // Reset current question number
+    this.quizFinished = false; // Reset quiz finished state
   }
 
   /**

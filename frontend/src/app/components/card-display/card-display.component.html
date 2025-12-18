@@ -1,9 +1,4 @@
-<!-- Commentaire Pédagogique : Le template est maintenant beaucoup plus simple.
-     Il n'appelle plus de fonctions ou de getters complexes (comme `translatedType`),
-     mais se lie directement aux propriétés pré-calculées de l'objet `card`
-     qui est de type `DisplayableCard`. -->
 <div class="card-container" [class]="card.rarityClass">
-  <!-- En-tête avec nom -->
   <div class="card-header">
     <span class="card-name" [class.hidden]="isHidden('name')">
       {{ getDisplayValue('name', card.name) }}
@@ -15,9 +10,7 @@
     }
   </div>
 
-  <!-- Corps de la carte -->
   <div class="card-body">
-    <!-- Info ligne 1: Type et Classe -->
     <div class="card-info-row">
       <div class="info-item">
         <span class="label">Type</span>
@@ -31,7 +24,6 @@
       </div>
     </div>
 
-    <!-- Info ligne 2: Rareté et Race -->
     <div class="card-info-row">
       <div class="info-item">
         <span class="label">Rareté</span>
@@ -47,7 +39,6 @@
       }
     </div>
 
-    <!-- Stats pour serviteurs/armes -->
     @if (card.isMinion || card.isWeapon) {
       <div class="card-stats">
         <div class="stat attack">
@@ -73,7 +64,6 @@
       </div>
     }
 
-    <!-- Texte de la carte -->
     @if (card.cleanText) {
       <div class="card-text">
         <span class="label">Effet</span>
@@ -81,7 +71,6 @@
       </div>
     }
 
-    <!-- Extension -->
     <div class="card-set">
       <span class="label">Extension</span>
       <span class="value">{{ card.translatedSet }}</span>

@@ -1,15 +1,9 @@
-/**
- * Interface représentant une entrée du leaderboard Hearthstone
- */
 export interface LeaderboardEntry {
   rank: number;
   accountid: string;
   rating?: number;
 }
 
-/**
- * Réponse de l'API leaderboard
- */
 export interface LeaderboardResponse {
   leaderboard: {
     rows: LeaderboardEntry[];
@@ -17,18 +11,12 @@ export interface LeaderboardResponse {
   seasonMetaData: Record<string, Record<string, GameModeMetaData>>;
 }
 
-/**
- * Métadonnées d'un mode de jeu
- */
 export interface GameModeMetaData {
   name: string;
   ratingId: number;
   seasons: SeasonInfo[];
 }
 
-/**
- * Information sur une saison
- */
 export interface SeasonInfo {
   season_id: number;
   key: { href: string };
@@ -40,36 +28,24 @@ export interface SeasonInfo {
   display_name?: Record<string, string>;
 }
 
-/**
- * Régions disponibles
- */
 export type LeaderboardRegion = 'EU' | 'US' | 'AP';
 
-/**
- * Modes de jeu disponibles
- */
-export type GameMode = 
-  | 'standard' 
-  | 'wild' 
-  | 'battlegrounds' 
+export type GameMode =
+  | 'standard'
+  | 'wild'
+  | 'battlegrounds'
   | 'battlegroundsduo'
-  | 'arena' 
-  | 'classic' 
-  | 'twist' 
+  | 'arena'
+  | 'classic'
+  | 'twist'
   | 'mercenaries';
 
-/**
- * Labels pour les régions
- */
 export const REGION_LABELS: Record<LeaderboardRegion, string> = {
   EU: 'Europe',
   US: 'Amériques',
   AP: 'Asie-Pacifique'
 };
 
-/**
- * Labels pour les modes de jeu
- */
 export const GAME_MODE_LABELS: Record<GameMode, string> = {
   standard: 'Standard',
   wild: 'Wild',

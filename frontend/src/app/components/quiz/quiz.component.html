@@ -5,7 +5,6 @@
 @let allSets = availableSets$ | async;
 
 <div class="quiz-container">
-  <!-- Header -->
   <header class="quiz-header">
     @if (!question && !quizIsOver) {
       <p class="subtitle">Configurez votre quiz Hearthstone !</p>
@@ -31,7 +30,6 @@
     </div>
 
   } @else if (question) {
-    <!-- 2. Écran du Quiz en Cours -->
     <div class="quiz-in-progress">
       <div class="stats-bar">
         <div class="stat">
@@ -52,7 +50,6 @@
 
         <div class="answer-section">
           @if (!question.answered) {
-            <!-- Formulaire de réponse -->
             <div class="input-group">
               <input #answerInput type="text" class="answer-input"
                 (keydown.enter)="submitAnswer(answerInput.value); answerInput.value = ''"
@@ -66,7 +63,6 @@
               </button>
             </div>
           } @else {
-            <!-- Feedback après réponse -->
             <div class="feedback" [class.correct]="question.correct" [class.incorrect]="!question.correct">
               @if (question.correct) {
                 <h2>Correct !</h2>
@@ -77,14 +73,12 @@
                 Réponse : <strong>{{ getCorrectAnswer(question) }}</strong>
               </p>
             </div>
-            <!-- Le passage à la question suivante est automatique (géré par le service) -->
           }
         </div>
       </div>
     </div>
 
   } @else {
-    <!-- 3. Écran de Configuration -->
     <div class="settings-panel">
       <div class="settings-section">
         <h3>Que voulez-vous deviner ?</h3>

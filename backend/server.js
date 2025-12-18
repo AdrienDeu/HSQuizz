@@ -48,9 +48,6 @@ app.get('/api/blizzard/leaderboardsData', async (req, res) => {
 
     try {
         const seasonId = await getLatestSeasonId(mode, region);
-        if (seasonId) {
-        } else {
-        }
 
         const pagesToFetch = [
             (frontendPage - 1) * 4 + 1,
@@ -58,7 +55,6 @@ app.get('/api/blizzard/leaderboardsData', async (req, res) => {
             (frontendPage - 1) * 4 + 3,
             (frontendPage - 1) * 4 + 4,
         ];
-        
 
         const requests = pagesToFetch.map(page => {
             const params = { region, leaderboardId: mode, page };
@@ -78,7 +74,6 @@ app.get('/api/blizzard/leaderboardsData', async (req, res) => {
                 allRows.push({ ...row, rank: rankCounter });
             }
         }
-
 
         const finalResponse = {
             leaderboard: {

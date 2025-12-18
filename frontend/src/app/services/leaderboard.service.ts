@@ -8,17 +8,14 @@ import { LeaderboardEntry, LeaderboardRegion, GameMode, LeaderboardResponse } fr
   providedIn: 'root'
 })
 export class LeaderboardService {
-  // URL de notre propre backend qui agit comme un proxy
   private readonly API_BASE_URL = '/api/blizzard/leaderboardsData';
 
-  // --- Gestion de l'état des filtres ---
   private readonly _region$ = new BehaviorSubject<LeaderboardRegion>('EU');
   private readonly _gameMode$ = new BehaviorSubject<GameMode>('standard');
   private readonly _page$ = new BehaviorSubject<number>(1);
   private readonly _loading$ = new BehaviorSubject<boolean>(false);
   private readonly _error$ = new BehaviorSubject<string | null>(null);
 
-  // --- Observables Publics ---
   public readonly leaderboard$: Observable<LeaderboardEntry[]>;
   public readonly region$: Observable<LeaderboardRegion> = this._region$.asObservable();
   public readonly gameMode$: Observable<GameMode> = this._gameMode$.asObservable();
@@ -27,13 +24,11 @@ export class LeaderboardService {
   public readonly error$: Observable<string | null> = this._error$.asObservable();
 
   constructor(private http: HttpClient) {
-    // Le pipeline réactif
     this.leaderboard$ = combineLatest([
       this._region$,
       this._gameMode$,
       this._page$
     ]).pipe(
-      // On utilise switchMap pour lancer un appel API à chaque changement de filtre
       switchMap(([region, gameMode, page]) => {
         this._loading$.next(true);
         this._error$.next(null);
@@ -42,26 +37,20 @@ export class LeaderboardService {
           .set('region', region)
           .set('leaderboardId', gameMode)
           .set('page', page.toString());
-        
+
         return this.http.get<LeaderboardResponse>(this.API_BASE_URL, { params }).pipe(
-          // En cas d'erreur, on la capture et on retourne un tableau vide
           catchError(err => {
-            console.error('Erreur API Leaderboard:', err);
             this._error$.next('Impossible de charger le classement.');
             return of({ leaderboard: { rows: [] } });
           }),
-          // Une fois l'appel terminé (succès ou erreur gérée), on arrête le chargement
           tap(() => this._loading$.next(false))
         );
       }),
-      // On extrait les 'rows' de la réponse
       map(response => response?.leaderboard?.rows ?? []),
-      // On s'assure qu'une valeur initiale est émise pour éviter les problèmes au démarrage
       startWith([])
     );
   }
 
-  // --- Méthodes de Modification des Filtres ---
   public setRegion(region: LeaderboardRegion): void {
     if (region !== this._region$.getValue()) {
       this._region$.next(region);
@@ -82,7 +71,6 @@ export class LeaderboardService {
     }
   }
 
-  // --- Données Statiques ---
   public getAvailableRegions(): LeaderboardRegion[] {
     return ['EU', 'US', 'AP'];
   }

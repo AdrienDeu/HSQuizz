@@ -1,34 +1,23 @@
-<!-- Commentaire Pédagogique : Le template est maintenant "réactif". Il ne fait que refléter
-     l'état actuel des observables fournis par le composant. Le `@let` en haut nous permet
-     de "déballer" les observables (avec le pipe `| async`) une seule fois. C'est plus propre
-     et plus performant que de répéter `| async` partout dans le template. -->
 @let leaderboard = leaderboard$ | async;
 @let region = region$ | async;
 @let gameMode = gameMode$ | async;
 @let page = page$ | async;
 
 <div class="leaderboard-container">
-  <!-- Header -->
   <div class="leaderboard-header">
     <h1>Leaderboard</h1>
     <p class="subtitle">Top des meilleurs joueurs Hearthstone</p>
   </div>
 
-  <!-- Filtres -->
-  <!-- Commentaire Pédagogique : On utilise [ngModel] et (ngModelChange) au lieu de [(ngModel)].
-       Cela respecte le flux de données unidirectionnel (Règle d'Or n°1).
-       - [ngModel]="region" : La valeur de l'observable est "poussée" dans le select.
-       - (ngModelChange)="onRegionChange($event)" : L'événement de changement est "remonté" au composant. -->
   <div class="filters-section">
     <div class="filter-group">
       <label for="region-select">Région</label>
-      <select 
-        id="region-select" 
+      <select
+        id="region-select"
         [ngModel]="region"
         (ngModelChange)="onRegionChange($event)"
         class="filter-select"
       >
-        <!-- Règle d'Or n°4 : Utilisation de la nouvelle syntaxe `@for` -->
         @for (r of regions; track r) {
           <option [value]="r">{{ regionLabels[r] }}</option>
         }
@@ -37,8 +26,8 @@
 
     <div class="filter-group">
       <label for="gamemode-select">Mode de jeu</label>
-      <select 
-        id="gamemode-select" 
+      <select
+        id="gamemode-select"
         [ngModel]="gameMode"
         (ngModelChange)="onGameModeChange($event)"
         class="filter-select"
@@ -50,9 +39,7 @@
     </div>
   </div>
 
-  <!-- Règle d'Or n°4 : Utilisation de la nouvelle syntaxe `@if`/`@else` -->
   @if (leaderboard) {
-    <!-- Cas 1: Le leaderboard a été chargé et contient des entrées. -->
     @if (leaderboard.length > 0) {
       <div class="leaderboard-content">
         <div class="table-container">
@@ -61,7 +48,6 @@
               <tr>
                 <th class="rank-col">Rang</th>
                 <th class="player-col">Joueur</th>
-                <!-- On affiche conditionnellement la colonne "Rating" -->
                 @if (gameMode === 'battlegrounds' || gameMode === 'battlegroundsduo') {
                   <th class="rating-col">Rating</th>
                 }
@@ -86,7 +72,6 @@
           </table>
         </div>
 
-        <!-- Pagination -->
         <div class="pagination-section bottom">
           <div class="pagination-controls">
             <button
@@ -110,13 +95,11 @@
         </div>
       </div>
     } @else {
-      <!-- Cas 2: Le leaderboard a été chargé mais il est vide. -->
       <div class="empty-state">
         <p>Aucune donnée disponible pour cette sélection.</p>
       </div>
     }
   } @else {
-    <!-- Cas 3: Le leaderboard est null (état initial, avant le premier chargement). -->
     <div class="loading">
       <div class="spinner"></div>
       <p>Chargement du leaderboard...</p>

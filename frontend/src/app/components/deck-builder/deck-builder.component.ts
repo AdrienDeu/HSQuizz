@@ -148,7 +148,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       sets: []
     });
 
-    this.showSuccess(`Classe changée : ${this.getClassName(this.selectedClass)}`);
+    this.showSuccess(`Class changed : ${this.getClassName(this.selectedClass)}`);
   }
 
   /**
@@ -156,16 +156,16 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    */
   onFormatChange(): void {
     this.deckBuilderService.updateDeckMetadata({ format: this.selectedFormat });
-    this.showSuccess(`Format changé : ${this.selectedFormat === 'standard' ? 'Standard' : 'Libre'}`);
+    this.showSuccess(`Format changed : ${this.selectedFormat === 'standard' ? 'Standard' : 'Wild'}`);
   }
 
   /**
    * Vide le deck actuel
    */
   clearDeck(): void {
-    if (confirm('Êtes-vous sûr de vouloir vider le deck ?')) {
+    if (confirm('Are you sure you want to clear the deck?')) {
       this.deckBuilderService.clearDeck();
-      this.showSuccess('Deck vidé');
+      this.showSuccess('Deck cleared');
     }
   }
 
@@ -174,7 +174,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    */
   newDeck(): void {
     if (this.currentStats && this.currentStats.totalCards > 0) {
-      if (!confirm('Créer un nouveau deck ? Les modifications non sauvegardées seront perdues.')) {
+      if (!confirm('Create a new deck? Unsaved changes will be lost.')) {
         return;
       }
     }
@@ -220,7 +220,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
         try {
           deckCode = this.deckCodeService.encodeDeck(this.currentDeck);
         } catch (error) {
-          console.warn('Impossible de générer le code deck:', error);
+          console.warn('Impossible to generate deck code:', error);
         }
       }
 
@@ -230,9 +230,9 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       };
 
       this.deckStorageService.saveDeck(savedDeck);
-      this.showSuccess(`Deck "${this.deckName}" sauvegardé ! (${totalCards}/30 cartes)`);
+      this.showSuccess(`Deck "${this.deckName}" saved! (${totalCards}/30 cards)`);
     } catch (error: any) {
-      this.showError('Erreur lors de la sauvegarde : ' + error.message);
+      this.showError('Error saving deck: ' + error.message);
     }
   }
 
@@ -246,7 +246,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
 
     const validation = this.deckBuilderService.validateDeck(this.currentDeck);
     if (!validation.valid) {
-      this.showError('Le deck doit contenir exactement 30 cartes pour être exporté');
+      this.showError('The deck must contain exactly 30 cards to be exported');
       return;
     }
 
@@ -254,7 +254,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       this.exportedCode = this.deckCodeService.encodeDeck(this.currentDeck);
       this.showExportModal = true;
     } catch (error: any) {
-      this.showError('Erreur lors de l\'export : ' + error.message);
+      this.showError('Error during export: ' + error.message);
     }
   }
 
@@ -265,10 +265,10 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
     if (!this.exportedCode) return;
 
     navigator.clipboard.writeText(this.exportedCode).then(() => {
-      this.showSuccess('Code copié dans le presse-papier !');
+      this.showSuccess('Code copied to clipboard!');
     }).catch(err => {
-      console.error('Erreur lors de la copie:', err);
-      this.showError('Impossible de copier le code');
+      console.error('Error copying to clipboard:', err);
+      this.showError('Unable to copy code');
     });
   }
 
@@ -285,41 +285,39 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    */
   importDeck(): void {
     if (!this.importCode.trim()) {
-      this.showError('Veuillez entrer un code de deck');
+      this.showError('Please enter a deck code');
       return;
     }
 
-    console.log('📥 Tentative d\'import du code:', this.importCode);
-
+    console.log('📥 Attempting to import code:', this.importCode);
     // Extraire le nom du deck si disponible
     const extractedName = this.extractDeckName(this.importCode);
 
     // Extraire le code deck du texte (peut contenir des commentaires et autres infos)
     const deckCode = this.extractDeckCode(this.importCode);
     if (!deckCode) {
-      this.showError('Aucun code de deck valide trouvé dans le texte');
+      this.showError('No valid deck code found in the text');
       return;
     }
 
-    console.log('✂️ Code deck extrait:', deckCode);
+    console.log('✂️ Extracted deck code:', deckCode);
     if (extractedName) {
-      console.log('📝 Nom du deck extrait:', extractedName);
+      console.log('📝 Extracted deck name:', extractedName);
     }
 
     try {
       const decoded = this.deckCodeService.decodeDeck(deckCode);
       if (!decoded) {
-        this.showError('Code de deck invalide - Impossible de décoder');
+        this.showError('Deck code could not be decodeda');
         return;
       }
 
-      console.log('✅ Deck décodé avec succès:', decoded);
-      console.log(`   Classe: ${decoded.heroClass}`);
+      console.log('✅ Deck successfully decoded:', decoded);
+      console.log(`   Class: ${decoded.heroClass}`);
       console.log(`   Format: ${decoded.format}`);
-      console.log(`   Single copy: ${decoded.singleCopyDbfIds.length} cartes`);
-      console.log(`   Double copy: ${decoded.doubleCopyDbfIds.length} cartes`);
-      console.log(`   N-copy: ${decoded.nCopyCards.length} cartes`);
-
+      console.log(`   Single copy: ${decoded.singleCopyDbfIds.length} cards`);
+      console.log(`   Double copy: ${decoded.doubleCopyDbfIds.length} cards`);
+      console.log(`   N-copy: ${decoded.nCopyCards.length} cards`);
       // Collecter tous les DBF IDs avec leurs quantités
       const allDbfIds: number[] = [];
       const cardQuantities = new Map<number, number>();
@@ -342,32 +340,32 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
         cardQuantities.set(dbfId, count);
       });
 
-      console.log(`🔍 Recherche de ${allDbfIds.length} cartes...`, allDbfIds);
+      console.log(`🔍 Searching for ${allDbfIds.length} cards...`, allDbfIds);
 
-      // Récupérer les cartes complètes depuis CardService
+      // Retrieve full cards from CardService
       this.cardService.getCardsByDbfIds(allDbfIds).subscribe({
         next: (cards) => {
-          console.log(`✅ Cartes trouvées: ${cards.length}/${allDbfIds.length}`);
+          console.log(`✅ Cards found: ${cards.length}/${allDbfIds.length}`);
 
           if (cards.length === 0) {
-            this.showError(`Aucune carte trouvée dans la base de données pour ce deck. DBF IDs: ${allDbfIds.join(', ')}`);
+            this.showError(`No cards found in the database for this deck. DBF IDs: ${allDbfIds.join(', ')}`);
             return;
           }
 
           if (cards.length < allDbfIds.length) {
             const foundIds = new Set(cards.map(c => c.dbfId));
             const missingIds = allDbfIds.filter(id => !foundIds.has(id));
-            console.warn(`⚠️ Cartes manquantes (${missingIds.length}):`, missingIds);
+            console.warn(`⚠️ Missing cards (${missingIds.length}):`, missingIds);
           }
 
-          // Construire le deck avec les cartes et leurs quantités
+          // Build the deck with cards and their quantities
           const deckCards: any[] = cards.map(card => ({
             card,
             quantity: cardQuantities.get(card.dbfId) || 1
           }));
 
           // Utiliser le nom extrait ou générer un nom par défaut
-          const deckName = extractedName || `Deck importé - ${this.getClassName(decoded.heroClass)}`;
+          const deckName = extractedName || `Imported Deck - ${this.getClassName(decoded.heroClass)}`;
 
           // Créer le nouveau deck
           const importedDeck: Deck = {
@@ -383,8 +381,8 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
           // Charger le deck importé
           this.deckBuilderService.loadDeck(importedDeck);
 
-          console.log(`🔄 Deck chargé - Classe: ${importedDeck.heroClass}, Format: ${importedDeck.format}`);
-          console.log(`🔄 Variables composant après loadDeck - selectedClass: ${this.selectedClass}, selectedFormat: ${this.selectedFormat}`);
+          console.log(`🔄 Deck loaded - Class: ${importedDeck.heroClass}, Format: ${importedDeck.format}`);
+          console.log(`🔄 Component variables after loadDeck - selectedClass: ${this.selectedClass}, selectedFormat: ${this.selectedFormat}`);
 
           // La subscription dans ngOnInit va mettre à jour automatiquement selectedClass et selectedFormat
           // Pas besoin de les mettre à jour manuellement ici

@@ -79,7 +79,7 @@
             <button
               class="pagination-btn"
               (click)="previousPage(page || 1)"
-              [disabled]="page === 1"
+              [disabled]="page === 1 || loading"
               title="Previous page"
             >
               ◀ Previous
@@ -88,7 +88,7 @@
             <button
               class="pagination-btn"
               (click)="nextPage(page || 1)"
-              [disabled]="page === 100 || leaderboard.length < 100"
+              [disabled]="page === 100 || (leaderboard && leaderboard.length < 100) || loading"
               title="Next page"
             >
               Next ▶

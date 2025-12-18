@@ -17,7 +17,7 @@
         <span class="value">{{ card.translatedType }}</span>
       </div>
       <div class="info-item">
-        <span class="label">Classe</span>
+        <span class="label">Class</span>
         <span class="value" [class.hidden]="isHidden('cardClass')">
           {{ isHidden('cardClass') ? '???' : card.translatedClass }}
         </span>
@@ -26,7 +26,7 @@
 
     <div class="card-info-row">
       <div class="info-item">
-        <span class="label">Rareté</span>
+        <span class="label">Rarity</span>
         <span class="value rarity-badge" [class]="card.rarityClass" [class.hidden]="isHidden('rarity')">
           {{ isHidden('rarity') ? '???' : card.translatedRarity }}
         </span>
@@ -66,13 +66,13 @@
 
     @if (card.cleanText) {
       <div class="card-text">
-        <span class="label">Effet</span>
+        <span class="label">Effect</span>
         <p class="effect-text">{{ card.cleanText }}</p>
       </div>
     }
 
     <div class="card-set">
-      <span class="label">Extension</span>
+      <span class="label">Set</span>
       <span class="value">{{ card.translatedSet }}</span>
     </div>
   </div>

@@ -11,7 +11,7 @@
 
   <div class="filters-section">
     <div class="filter-group">
-      <label for="region-select">Région</label>
+      <label for="region-select">Region</label>
       <select
         id="region-select"
         [ngModel]="region"
@@ -19,13 +19,13 @@
         class="filter-select"
       >
         @for (r of regions; track r) {
-          <option [value]="r">{{ regionLabels[r] }}</option>
+          <option [value]="r">{{ r }}</option>
         }
       </select>
     </div>
 
     <div class="filter-group">
-      <label for="gamemode-select">Mode de jeu</label>
+      <label for="gamemode-select">Game Mode</label>
       <select
         id="gamemode-select"
         [ngModel]="gameMode"
@@ -33,7 +33,7 @@
         class="filter-select"
       >
         @for (gm of gameModes; track gm) {
-          <option [value]="gm">{{ gameModeLabels[gm] }}</option>
+          <option [value]="gm">{{ gm }}</option>
         }
       </select>
     </div>

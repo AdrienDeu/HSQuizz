@@ -3,12 +3,10 @@ import { CommonModule, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { LeaderboardService } from '../../services/leaderboard.service';
-import { 
-  LeaderboardEntry, 
-  LeaderboardRegion, 
-  GameMode,
-  REGION_LABELS,
-  GAME_MODE_LABELS
+import {
+  LeaderboardEntry,
+  LeaderboardRegion,
+  GameMode
 } from '../../models/leaderboard.model';
 
 @Component({
@@ -26,9 +24,6 @@ export class LeaderboardComponent {
 
   public readonly regions: LeaderboardRegion[];
   public readonly gameModes: GameMode[];
-  
-  public readonly regionLabels = REGION_LABELS;
-  public readonly gameModeLabels = GAME_MODE_LABELS;
 
   constructor(private leaderboardService: LeaderboardService) {
     this.leaderboard$ = this.leaderboardService.leaderboard$;

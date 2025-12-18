@@ -9,7 +9,6 @@ import { CardService } from './card.service';
 })
 export class QuizService {
 
-  // --- État Privé ---
   private readonly _question$ = new BehaviorSubject<QuizQuestion | null>(null);
   private readonly _score$ = new BehaviorSubject<number>(0);
   private readonly _questionNumber$ = new BehaviorSubject<number>(0);
@@ -19,7 +18,6 @@ export class QuizService {
   private settings: QuizSettings = { selectedSets: [], hiddenAttribute: 'name' };
   private readonly TOTAL_QUESTIONS = 10;
 
-  // --- Observables Publics ---
   public readonly question$: Observable<QuizQuestion | null> = this._question$.asObservable();
   public readonly score$: Observable<number> = this._score$.asObservable();
   public readonly questionNumber$: Observable<number> = this._questionNumber$.asObservable();
@@ -30,19 +28,15 @@ export class QuizService {
   public startQuiz(settings: QuizSettings, allCards: Card[]): void {
     this.settings = settings;
 
-    // 1. Filtrer la liste de cartes complète avec les paramètres du quiz
     let filteredCards = this.cardService.filterCardsBySets(allCards, settings.selectedSets);
     filteredCards = this.cardService.filterCardsByAttribute(filteredCards, settings.hiddenAttribute);
 
-    // 2. Préparer le deck pour le quiz
     this._quizDeck = this.shuffleArray([...filteredCards]).slice(0, this.TOTAL_QUESTIONS);
 
-    // 3. Réinitialiser l'état du quiz
     this._score$.next(0);
     this._questionNumber$.next(0);
     this._quizIsOver$.next(false);
     
-    // 4. Lancer la première question
     this.nextQuestion();
   }
 
@@ -74,9 +68,9 @@ export class QuizService {
 
     const revealedQuestion: QuizQuestion = {
       ...currentQuestion,
-      userAnswer: 'Je ne sais pas', // Indiquer que la question a été passée
+      userAnswer: 'I don\'t know',
       answered: true,
-      correct: false, // Compter comme incorrect
+      correct: false,
       revealed: true
     };
     this._question$.next(revealedQuestion);
@@ -124,31 +118,19 @@ export class QuizService {
     const correctValue = this.getAttributeValue(question.card, question.hiddenAttribute);
     const normalizedUserAnswer = this.normalizeString(userAnswer);
     const normalizedCorrectValue = this.normalizeString(correctValue);
-    
-    if (question.hiddenAttribute === 'cardClass') {
-      const translatedClass = CardService.translateClass(question.card.cardClass);
-      if (normalizedUserAnswer === this.normalizeString(translatedClass)) return true;
-    }
-    if (question.hiddenAttribute === 'rarity' && question.card.rarity) {
-      const translatedRarity = CardService.translateRarity(question.card.rarity);
-      if (normalizedUserAnswer === this.normalizeString(translatedRarity)) return true;
-    }
-    if (question.hiddenAttribute === 'set') {
-      const setCode = question.card.set;
-      if (normalizedUserAnswer === this.normalizeString(setCode)) return true;
-    }
+
     return normalizedUserAnswer === normalizedCorrectValue;
   }
 
   public getAttributeValue(card: Card, attribute: HiddenAttribute): string {
     switch (attribute) {
       case 'name': return card.name;
-      case 'cardClass': return CardService.translateClass(card.cardClass);
+      case 'cardClass': return card.cardClass;
       case 'cost': return card.cost?.toString() ?? '0';
       case 'attack': return card.attack?.toString() ?? '0';
       case 'health': return card.health?.toString() ?? '0';
-      case 'rarity': return CardService.translateRarity(card.rarity ?? '');
-      case 'set': return CardService.translateSet(card.set);
+      case 'rarity': return card.rarity ?? '';
+      case 'set': return card.set;
       default: return '';
     }
   }

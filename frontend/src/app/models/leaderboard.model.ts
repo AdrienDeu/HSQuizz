@@ -39,20 +39,3 @@ export type GameMode =
   | 'classic'
   | 'twist'
   | 'mercenaries';
-
-export const REGION_LABELS: Record<LeaderboardRegion, string> = {
-  EU: 'Europe',
-  US: 'Amériques',
-  AP: 'Asie-Pacifique'
-};
-
-export const GAME_MODE_LABELS: Record<GameMode, string> = {
-  standard: 'Standard',
-  wild: 'Wild',
-  battlegrounds: 'Battlegrounds',
-  battlegroundsduo: 'Battlegrounds Duo',
-  arena: 'Arène',
-  classic: 'Classique',
-  twist: 'Twist',
-  mercenaries: 'Mercenaires'
-};

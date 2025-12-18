@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, shareReplay, catchError } from 'rxjs/operators';
-import { Card, HiddenAttribute, SET_TRANSLATIONS } from '../models/card.model';
+import { catchError } from 'rxjs/operators';
+import { Card, HiddenAttribute } from '../models/card.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,8 +24,8 @@ export class CardService {
   public getAvailableSets(cards: Card[]): { code: string; name: string }[] {
     const sets = new Set<string>(cards.map(card => card.set));
     return Array.from(sets)
-      .map(code => ({ code, name: SET_TRANSLATIONS[code] || code }))
-      .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+      .map(code => ({ code, name: code }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   public filterCardsBySets(cards: Card[], selectedSets: string[]): Card[] {
@@ -46,30 +46,6 @@ export class CardService {
       default:
         return cards;
     }
-  }
-
-  static translateType(type: string): string {
-    const translations: Record<string, string> = { 'MINION': 'Serviteur', 'SPELL': 'Sort', 'WEAPON': 'Arme', 'HERO': 'Héros', 'LOCATION': 'Lieu' };
-    return translations[type] || type;
-  }
-
-  static translateClass(cardClass: string): string {
-    const translations: Record<string, string> = { 'NEUTRAL': 'Neutre', 'MAGE': 'Mage', 'WARRIOR': 'Guerrier', 'PALADIN': 'Paladin', 'HUNTER': 'Chasseur', 'ROGUE': 'Voleur', 'PRIEST': 'Prêtre', 'SHAMAN': 'Chaman', 'WARLOCK': 'Démoniste', 'DRUID': 'Druide', 'DEMONHUNTER': 'Chasseur de démons', 'DEATHKNIGHT': 'Chevalier de la mort' };
-    return translations[cardClass] || cardClass;
-  }
-
-  static translateRarity(rarity: string): string {
-    const translations: Record<string, string> = { 'FREE': 'Gratuit', 'COMMON': 'Commune', 'RARE': 'Rare', 'EPIC': 'Épique', 'LEGENDARY': 'Légendaire' };
-    return translations[rarity] || rarity;
-  }
-
-  static translateSet(set: string): string {
-    return SET_TRANSLATIONS[set] || set;
-  }
-
-  static translateRace(race: string): string {
-    const translations: Record<string, string> = { 'BEAST': 'Bête', 'DRAGON': 'Dragon', 'MURLOC': 'Murloc', 'DEMON': 'Démon', 'MECH': 'Méca', 'PIRATE': 'Pirate', 'TOTEM': 'Totem', 'ELEMENTAL': 'Élémentaire', 'UNDEAD': 'Mort-vivant', 'NAGA': 'Naga', 'QUILBOAR': 'Sanglier' };
-    return translations[race] || race;
   }
 
   static cleanCardText(text: string | undefined): string {

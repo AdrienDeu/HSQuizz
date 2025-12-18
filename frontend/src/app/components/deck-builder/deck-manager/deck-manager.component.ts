@@ -126,6 +126,15 @@ export class DeckManagerComponent implements OnInit, OnDestroy {
    */
   loadDeck(deck: SavedDeck): void {
     this.deckBuilderService.loadDeck(deck);
+    this.deckBuilderService.updateFilters({
+      heroClass: [deck.heroClass, 'NEUTRAL'],
+      manaCosts: [],
+      rarities: [],
+      types: [],
+      mechanics: [],
+      searchQuery: '',
+      sets: []
+    });
     this.closeManager.emit();
   }
 

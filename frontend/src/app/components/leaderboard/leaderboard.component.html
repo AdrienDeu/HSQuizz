@@ -2,11 +2,12 @@
 @let region = region$ | async;
 @let gameMode = gameMode$ | async;
 @let page = page$ | async;
+@let loading = loading$ | async;
 
 <div class="leaderboard-container">
   <div class="leaderboard-header">
     <h1>Leaderboard</h1>
-    <p class="subtitle">Top des meilleurs joueurs Hearthstone</p>
+    <p class="subtitle">Top Hearthstone Players</p>
   </div>
 
   <div class="filters-section">
@@ -39,15 +40,19 @@
     </div>
   </div>
 
-  @if (leaderboard) {
-    @if (leaderboard.length > 0) {
-      <div class="leaderboard-content">
-        <div class="table-container">
-          <table class="leaderboard-table">
+  @if (loading && leaderboard && leaderboard.length === 0) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading leaderboard...</p>
+    </div>
+  } @else if (leaderboard && leaderboard.length > 0) {
+    <div class="leaderboard-content">
+      <div class="table-container">
+        <table class="leaderboard-table" [class.table-loading-state]="loading">
             <thead>
               <tr>
-                <th class="rank-col">Rang</th>
-                <th class="player-col">Joueur</th>
+                <th class="rank-col">Rank</th>
+                <th class="player-col">Player</th>
                 @if (gameMode === 'battlegrounds' || gameMode === 'battlegroundsduo') {
                   <th class="rating-col">Rating</th>
                 }
@@ -57,9 +62,6 @@
               @for (entry of leaderboard; track entry.accountid) {
                 <tr [class]="getMedalClass(entry.rank)">
                   <td class="rank-cell">
-                    @if (entry.rank <= 3) {
-                      <span class="medal">{{ getMedalEmoji(entry.rank) }}</span>
-                    }
                     <span class="rank-number">{{ entry.rank }}</span>
                   </td>
                   <td class="player-cell">{{ getPlayerName(entry.accountid) }}</td>
@@ -78,31 +80,25 @@
               class="pagination-btn"
               (click)="previousPage(page || 1)"
               [disabled]="page === 1"
-              title="Page précédente"
+              title="Previous page"
             >
-              ◀ Précédent
+              ◀ Previous
             </button>
             <span class="page-indicator">Page {{ page }}</span>
             <button
               class="pagination-btn"
               (click)="nextPage(page || 1)"
               [disabled]="page === 100 || leaderboard.length < 100"
-              title="Page suivante"
+              title="Next page"
             >
-              Suivant ▶
+              Next ▶
             </button>
           </div>
         </div>
       </div>
-    } @else {
-      <div class="empty-state">
-        <p>Aucune donnée disponible pour cette sélection.</p>
-      </div>
-    }
   } @else {
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Chargement du leaderboard...</p>
+    <div class="empty-state">
+      <p>No data available for this selection.</p>
     </div>
   }
 </div>

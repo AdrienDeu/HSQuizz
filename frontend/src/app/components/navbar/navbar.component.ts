@@ -11,8 +11,8 @@ import { RouterLink } from '@angular/router';
 })
 export class NavbarComponent {
   readonly email = 'deu.adrien@gmail.com';
-  readonly suggestionsSubject = 'Suggestion HSQuizz';
-  
+  readonly suggestionsSubject = 'HSQuizz Suggestion';
+
   get mailtoLink(): string {
     return `mailto:${this.email}?subject=${encodeURIComponent(this.suggestionsSubject)}`;
   }

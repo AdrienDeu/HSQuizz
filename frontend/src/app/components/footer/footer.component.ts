@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './footer.component.scss'
 })
 export class FooterComponent {
-  readonly authorName = 'Adrien Deü';
+  readonly authorName = 'Adrien Deu';
   readonly linkedinUrl = 'https://linkedin.com/in/adrien-deü';
   readonly githubUrl = 'https://github.com/AdrienDeu';
   readonly currentYear = new Date().getFullYear();

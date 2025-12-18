@@ -7,24 +7,24 @@
 <div class="quiz-container">
   <header class="quiz-header">
     @if (!question && !quizIsOver) {
-      <p class="subtitle">Configurez votre quiz Hearthstone !</p>
+      <p class="subtitle">Configure your Hearthstone quiz!</p>
     } @else if (question) {
       <p class="subtitle">Question {{ questionNumber }} / 10</p>
     } @else {
-      <p class="subtitle">Quiz terminé !</p>
+      <p class="subtitle">Quiz completed!</p>
     }
   </header>
 
   @if (quizIsOver) {
     <div class="results-panel">
-      <h2>Quiz Terminé !</h2>
-      <p class="final-score">Votre score : <strong>{{ score }} / 10</strong></p>
+      <h2>Quiz Completed!</h2>
+      <p class="final-score">Your score: <strong>{{ score }} / 10</strong></p>
       <div class="action-buttons">
         <button class="btn btn-primary" (click)="backToSettings()">
-          Nouveau Quiz
+          New Quiz
         </button>
         <button class="btn btn-secondary" (click)="restartQuiz()">
-          Rejouer
+          Play Again
         </button>
       </div>
     </div>
@@ -37,7 +37,7 @@
           <span class="stat-value">{{ score }}</span>
         </div>
         <button class="btn btn-secondary btn-small" (click)="backToSettings()">
-          Recommencer
+          Restart
         </button>
       </div>
 
@@ -54,23 +54,25 @@
               <input #answerInput type="text" class="answer-input"
                 (keydown.enter)="submitAnswer(answerInput.value); answerInput.value = ''"
                 [placeholder]="getPlaceholder(question)" autofocus>
-              <button class="btn btn-primary" (click)="submitAnswer(answerInput.value); answerInput.value = ''"
-                [disabled]="!answerInput.value.trim()">
-                Valider
-              </button>
-              <button class="btn btn-secondary" (click)="skipQuestion()">
-                Je ne sais pas
-              </button>
+              <div class="button-group">
+                <button class="btn btn-primary" (click)="submitAnswer(answerInput.value); answerInput.value = ''"
+                  [disabled]="!answerInput.value.trim()">
+                  Submit
+                </button>
+                <button class="btn btn-secondary" (click)="skipQuestion()">
+                  I don't know
+                </button>
+              </div>
             </div>
           } @else {
             <div class="feedback" [class.correct]="question.correct" [class.incorrect]="!question.correct">
               @if (question.correct) {
-                <h2>Correct !</h2>
+                <h2>Correct!</h2>
               } @else {
                 <h2>Incorrect</h2>
               }
               <p class="correct-answer">
-                Réponse : <strong>{{ getCorrectAnswer(question) }}</strong>
+                Answer: <strong>{{ getCorrectAnswer(question) }}</strong>
               </p>
             </div>
           }
@@ -81,7 +83,7 @@
   } @else {
     <div class="settings-panel">
       <div class="settings-section">
-        <h3>Que voulez-vous deviner ?</h3>
+        <h3>What do you want to guess?</h3>
         <div class="attribute-options">
           @for (option of attributeOptions; track option.value) {
             <button class="attribute-btn" [class.selected]="settings.hiddenAttribute === option.value"
@@ -94,10 +96,10 @@
 
       @if(allSets) {
         <div class="settings-section">
-          <h3>Extensions</h3>
+          <h3>Card Sets</h3>
           <div class="sets-header">
             <button class="btn btn-small" (click)="toggleAllSets(allSets)">
-              {{ settings.selectedSets.length === allSets.length ? 'Tout désélectionner' : 'Tout sélectionner' }}
+              {{ settings.selectedSets.length === allSets.length ? 'Deselect All' : 'Select All' }}
             </button>
             <span class="sets-count">{{ settings.selectedSets.length }} / {{ allSets.length }}</span>
           </div>
@@ -115,7 +117,7 @@
 
       <div class="settings-section start-section">
         <button class="btn btn-primary btn-large" (click)="startQuiz()">
-          🚀 Démarrer le quiz
+          Start Quiz
         </button>
       </div>
     </div>

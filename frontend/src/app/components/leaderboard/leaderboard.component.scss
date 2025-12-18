@@ -12,7 +12,6 @@
   }
 }
 
-// Header
 .leaderboard-header {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -39,7 +38,6 @@
   }
 }
 
-// Filters
 .filters-section {
   display: flex;
   flex-direction: column;
@@ -98,28 +96,43 @@
   }
 }
 
-// Loading
 .loading {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 3rem;
-  
+  gap: 1.5rem;
+  padding: 4rem;
+  min-height: 400px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+
   p {
-    color: #a89070;
+    color: #f4e4bc;
+    font-size: 1.1rem;
+    font-weight: 600;
+    animation: pulse-text 1.5s ease-in-out infinite;
   }
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(139, 115, 85, 0.3);
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(139, 115, 85, 0.2);
   border-top-color: #ff9900;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 20px rgba(255, 153, 0, 0.3);
+}
+
+@keyframes pulse-text {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes spin {
@@ -128,7 +141,6 @@
   }
 }
 
-// Error
 .error-message {
   text-align: center;
   padding: 2rem;
@@ -139,7 +151,6 @@
   }
 }
 
-// Buttons
 .btn {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
@@ -172,7 +183,6 @@
   }
 }
 
-// Leaderboard Content
 .leaderboard-content {
   flex: 1;
   display: flex;
@@ -188,7 +198,6 @@
   overflow-y: auto;
   position: relative;
 
-  // Custom scrollbar
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -205,6 +214,13 @@
       background: #a89070;
     }
   }
+}
+
+.table-loading-state {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  cursor: wait;
 }
 
 .table-loading-overlay {
@@ -270,8 +286,7 @@
       &:not(:last-child) {
         border-bottom: 1px solid rgba(139, 115, 85, 0.2);
       }
-      
-      // Medal rows
+
       &.gold {
         background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent);
         
@@ -309,7 +324,7 @@
 }
 
 .player-col {
-  flex: 1; // Takes remaining space
+  flex: 1;
 }
 
 .rating-col {
@@ -342,7 +357,6 @@
   font-family: monospace;
 }
 
-// Pagination
 .pagination-section {
   display: flex;
   flex-direction: column;
@@ -487,7 +501,6 @@
     cursor: not-allowed;
   }
 
-  // Remove spinner arrows
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -497,7 +510,6 @@
   -moz-appearance: textfield;
 }
 
-// Responsive
 @media (max-width: 480px) {
   .leaderboard-table {
     thead th,

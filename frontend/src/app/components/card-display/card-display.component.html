@@ -42,14 +42,14 @@
     @if (card.isMinion || card.isWeapon) {
       <div class="card-stats">
         <div class="stat attack">
-          <span class="stat-icon">⚔️</span>
+          <span class="stat-label">ATK</span>
           <span class="stat-value" [class.hidden]="isHidden('attack')">
             {{ getDisplayValue('attack', card.attack) }}
           </span>
         </div>
         @if (card.isMinion) {
           <div class="stat health">
-            <span class="stat-icon">❤️</span>
+            <span class="stat-label">HP</span>
             <span class="stat-value" [class.hidden]="isHidden('health')">
               {{ getDisplayValue('health', card.health) }}
             </span>
@@ -57,7 +57,7 @@
         }
         @if (card.isWeapon) {
           <div class="stat durability">
-            <span class="stat-icon">🛡️</span>
+            <span class="stat-label">DUR</span>
             <span class="stat-value">{{ card.durability ?? '-' }}</span>
           </div>
         }

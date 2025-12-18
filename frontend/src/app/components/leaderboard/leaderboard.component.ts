@@ -21,6 +21,7 @@ export class LeaderboardComponent {
   public readonly region$: Observable<LeaderboardRegion>;
   public readonly gameMode$: Observable<GameMode>;
   public readonly page$: Observable<number>;
+  public readonly loading$: Observable<boolean>;
 
   public readonly regions: LeaderboardRegion[];
   public readonly gameModes: GameMode[];
@@ -30,6 +31,7 @@ export class LeaderboardComponent {
     this.region$ = this.leaderboardService.region$;
     this.gameMode$ = this.leaderboardService.gameMode$;
     this.page$ = this.leaderboardService.page$;
+    this.loading$ = this.leaderboardService.loading$;
 
     this.regions = this.leaderboardService.getAvailableRegions();
     this.gameModes = this.leaderboardService.getAvailableGameModes();
@@ -57,13 +59,6 @@ export class LeaderboardComponent {
     if (rank === 1) return 'gold';
     if (rank === 2) return 'silver';
     if (rank === 3) return 'bronze';
-    return '';
-  }
-
-  public getMedalEmoji(rank: number): string {
-    if (rank === 1) return '🥇';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
     return '';
   }
 

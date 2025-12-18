@@ -22,7 +22,6 @@
   }
 }
 
-// Header
 .quiz-header {
   text-align: center;
   margin-bottom: 1rem;
@@ -57,7 +56,6 @@
   }
 }
 
-// Loading
 .loading {
   flex: 1;
   display: flex;
@@ -86,7 +84,6 @@
   }
 }
 
-// Error
 .error-message {
   text-align: center;
   padding: 2rem;
@@ -97,7 +94,6 @@
   }
 }
 
-// Quiz content
 .quiz-content {
   flex: 1;
   display: flex;
@@ -105,7 +101,6 @@
   gap: 1.5rem;
 }
 
-// Answer section
 .answer-section {
   display: flex;
   flex-direction: column;
@@ -114,13 +109,14 @@
 
 .input-group {
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
   max-width: 500px;
   margin: 0 auto;
   width: 100%;
 
   .answer-input {
-    flex: 1;
+    width: 100%;
     padding: 0.9rem 1.2rem;
     font-size: 1.05rem;
     border: 2px solid #8b7355;
@@ -148,7 +144,13 @@
   }
 }
 
-// Buttons
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
 .btn {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
@@ -221,7 +223,6 @@
   padding: 0.5rem 1rem;
 }
 
-// Feedback
 .feedback {
   text-align: center;
   padding: 1.5rem;
@@ -277,7 +278,6 @@
   }
 }
 
-// Action buttons
 .action-buttons {
   display: flex;
   justify-content: center;
@@ -285,7 +285,6 @@
   flex-wrap: wrap;
 }
 
-// Settings Panel
 .settings-panel {
   flex: 1;
   display: flex;
@@ -317,7 +316,6 @@
   }
 }
 
-// Attribute options
 .attribute-options {
   display: flex;
   flex-wrap: wrap;
@@ -370,7 +368,6 @@
   }
 }
 
-// Sets selector
 .sets-header {
   display: flex;
   justify-content: space-between;
@@ -485,7 +482,6 @@
   }
 }
 
-// Custom styled checkbox for filters
 .filter-checkbox {
   display: flex;
   align-items: center;
@@ -504,13 +500,11 @@
     transform: translateX(3px);
   }
 
-  // Hide default checkbox
   input[type="checkbox"] {
     position: absolute;
     opacity: 0;
     cursor: pointer;
 
-    // Custom checkbox styles
     & + .custom-checkbox {
       position: relative;
       width: 28px;
@@ -521,7 +515,6 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
 
-      // Checkmark
       &::after {
         content: "";
         position: absolute;
@@ -537,7 +530,6 @@
       }
     }
 
-    // When checked
     &:checked + .custom-checkbox {
       background: linear-gradient(145deg, #ff9900, #cc7700);
       border-color: #ff9900;
@@ -554,7 +546,6 @@
     }
   }
 
-  // Label text
   .filter-label {
     color: #f4e4bc;
     font-size: 0.95rem;
@@ -575,7 +566,6 @@
     }
   }
 
-  // Loading state
   &.loading {
     opacity: 0.6;
     pointer-events: none;
@@ -594,7 +584,6 @@
   }
 }
 
-// Loading spinner inline
 .loading-spinner-inline {
   display: inline-block;
   margin-left: 0.5rem;
@@ -610,13 +599,11 @@
   }
 }
 
-// Loading text
 .loading-text {
   color: #ff9900;
   font-style: italic;
 }
 
-// Start section
 .start-section {
   text-align: center;
   position: relative;
@@ -676,7 +663,6 @@
   margin-left: auto;
 }
 
-// Mode info badges
 .mode-info {
   display: flex;
   justify-content: center;
@@ -701,7 +687,6 @@
   }
 }
 
-// Stats bar updates
 .stats-bar {
   display: flex;
   justify-content: space-between;
@@ -760,7 +745,6 @@
   }
 }
 
-// Footer
 .quiz-footer {
   text-align: center;
   padding: 1rem 0;
@@ -773,15 +757,14 @@
   }
 }
 
-// Responsive
 @media (max-width: 480px) {
   .quiz-header h1 {
     font-size: 2rem;
   }
-  
-  .input-group {
+
+  .button-group {
     flex-direction: column;
-    
+
     .btn {
       width: 100%;
     }

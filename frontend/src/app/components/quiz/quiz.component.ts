@@ -86,7 +86,6 @@ export class QuizComponent implements OnInit {
           this.loading = false;
         }
         this.reloadingCards = false;
-        console.error('Error loading cards:', err);
       }
     });
   }

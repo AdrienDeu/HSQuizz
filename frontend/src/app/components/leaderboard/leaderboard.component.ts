@@ -94,7 +94,6 @@ export class LeaderboardComponent implements OnInit {
       error: (err) => {
         this.error = 'Erreur lors du chargement du leaderboard. Veuillez réessayer.';
         this.loading = false;
-        console.error('Error loading leaderboard:', err);
       }
     });
   }

@@ -25,7 +25,6 @@ export class CardService {
   getCollectibleCards(includeNonCollectible: boolean = false): Observable<Card[]> {
     // Si le paramètre change par rapport au dernier appel, on invalide le cache
     if (this.cards$ && this.lastIncludeNonCollectible !== includeNonCollectible) {
-      console.log(`🔄 Changement de filtre détecté (${this.lastIncludeNonCollectible} -> ${includeNonCollectible}), invalidation du cache...`);
       this.cards$ = null;
     }
 
@@ -37,14 +36,9 @@ export class CardService {
         ? `${this.API_URL}?includeNonCollectible=true`
         : this.API_URL;
 
-      console.log(`📡 Requête API: ${url}`);
-
       this.cards$ = this.http.get<Card[]>(url).pipe(
-        tap((cards) => console.log(`✅ ${cards.length} cartes chargées depuis l'API`)),
         catchError(error => {
-          console.warn('⚠️ Erreur API, utilisation du fichier backup:', error.message);
           return this.http.get<Card[]>(this.BACKUP_URL).pipe(
-            tap(() => console.log('✅ Cartes chargées depuis le fichier backup')),
             map(cards => includeNonCollectible ? cards : this.filterCollectibleCards(cards))
           );
         }),
@@ -115,16 +109,12 @@ export class CardService {
   getCardsByDbfIds(dbfIds: number[]): Observable<Card[]> {
     return this.getCollectibleCards(true).pipe(
       map(allCards => {
-        console.log(`🔍 Recherche dans ${allCards.length} cartes disponibles`);
-
         const cardMap = new Map<number, Card>();
         allCards.forEach(card => {
           if (card.dbfId) {
             cardMap.set(card.dbfId, card);
           }
         });
-
-        console.log(`📊 Index créé avec ${cardMap.size} cartes uniques`);
 
         const foundCards: Card[] = [];
         const missingIds: number[] = [];
@@ -137,12 +127,6 @@ export class CardService {
             missingIds.push(dbfId);
           }
         });
-
-        console.log(`✅ Trouvées: ${foundCards.length}, ❌ Manquantes: ${missingIds.length}`);
-
-        if (missingIds.length > 0) {
-          console.warn(`⚠️ Cartes non trouvées pour DBF IDs:`, missingIds);
-        }
 
         return foundCards;
       })

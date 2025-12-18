@@ -117,7 +117,6 @@ export class DeckCodeService {
       // 1. Décoder de base64
       const bytes = Array.from(this.base64Decode(deckCode));
       let offset = 0;
-      console.log(`🔍 Décodage: ${bytes.length} bytes total`);
 
       // 2. Lire header (format officiel Hearthstone)
       if (bytes.length < 2) {
@@ -126,26 +125,18 @@ export class DeckCodeService {
 
       // Byte 1: Reserved (0x00)
       const reservedByte = bytes[offset++];
-      console.log(`   Reserved byte: ${reservedByte}`);
 
       // Byte 2: Version (1)
       const version = bytes[offset++];
-      console.log(`   Version: ${version}`);
-
-      if (version !== this.VERSION && version !== 0) {
-        console.warn(`Version non supportée: ${version}`);
-      }
 
       // 3. Lire format
       const formatResult = VarintUtil.decode(bytes, offset);
       offset += formatResult.bytesRead;
       const format = formatResult.value === this.FORMAT_STANDARD ? 'standard' : 'wild';
-      console.log(`   Format: ${formatResult.value} (${format}), offset: ${offset}`);
 
       // 4. Lire nombre de héros
       const numHeroesResult = VarintUtil.decode(bytes, offset);
       offset += numHeroesResult.bytesRead;
-      console.log(`   Nombre de héros: ${numHeroesResult.value}, offset: ${offset}`);
 
       // 5. Lire TOUS les hero DBF IDs (important!)
       // Pour les decks avec Maestra (multi-héros), on préfère le héros non-NEUTRAL
@@ -162,13 +153,11 @@ export class DeckCodeService {
           // Si c'est le premier héros, on l'utilise par défaut
           heroClass = currentHeroClass;
         }
-        console.log(`   Hero ${i + 1} DBF ID: ${heroDbfIdResult.value} (${currentHeroClass}), offset: ${offset}`);
       }
 
       // 6. Lire cartes single copy
       const singleCountResult = VarintUtil.decode(bytes, offset);
       offset += singleCountResult.bytesRead;
-      console.log(`   Single copy count: ${singleCountResult.value}, offset: ${offset}`);
       const singleCopyDbfIds: number[] = [];
 
       for (let i = 0; i < singleCountResult.value; i++) {
@@ -176,7 +165,6 @@ export class DeckCodeService {
         offset += dbfIdResult.bytesRead;
         singleCopyDbfIds.push(dbfIdResult.value);
       }
-      console.log(`   Single copy cards: ${singleCopyDbfIds.length} cartes lues, offset: ${offset}`);
 
       // 7. Lire cartes double copy
       const doubleCountResult = VarintUtil.decode(bytes, offset);
@@ -211,7 +199,6 @@ export class DeckCodeService {
       };
 
     } catch (error) {
-      console.error('Erreur lors du décodage du deck code:', error);
       return null;
     }
   }
@@ -241,7 +228,6 @@ export class DeckCodeService {
   private getHeroDbfId(heroClass: string): number {
     const dbfId = HERO_DBF_IDS[heroClass];
     if (!dbfId) {
-      console.warn(`Classe inconnue: ${heroClass}, utilisation de MAGE par défaut`);
       return HERO_DBF_IDS['MAGE'];
     }
     return dbfId;
@@ -253,7 +239,6 @@ export class DeckCodeService {
   private getClassFromHeroDbfId(dbfId: number): string {
     const heroClass = DBF_ID_TO_CLASS[dbfId];
     if (!heroClass) {
-      console.warn(`DBF ID inconnu: ${dbfId}, utilisation de MAGE par défaut`);
       return 'MAGE';
     }
     return heroClass;

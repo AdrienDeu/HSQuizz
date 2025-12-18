@@ -68,7 +68,6 @@ export class LeaderboardService {
     return forkJoin(pageRequests).pipe(
       map(results => results.flat()),
       catchError(error => {
-        console.error('Erreur lors du chargement de la page:', error);
         return of([]);
       })
     );
@@ -107,7 +106,6 @@ export class LeaderboardService {
         return allEntries.slice(0, limit);
       }),
       catchError(error => {
-        console.error('Erreur lors du chargement du leaderboard:', error);
         return of([]);
       })
     );

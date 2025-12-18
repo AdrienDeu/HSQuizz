@@ -34,9 +34,7 @@ export class DeckStorageService {
     try {
       const json = JSON.stringify(data);
       localStorage.setItem(this.STORAGE_KEY, json);
-      console.log(`💾 ${decks.length} decks sauvegardés (${this.getStorageSize()} bytes)`);
     } catch (error: any) {
-      console.error('❌ Erreur lors de la sauvegarde des decks:', error);
       this.handleStorageError(error);
       throw error;
     }
@@ -51,7 +49,6 @@ export class DeckStorageService {
     try {
       const json = localStorage.getItem(this.STORAGE_KEY);
       if (!json) {
-        console.log('ℹ️ Aucun deck sauvegardé');
         return [];
       }
 
@@ -59,7 +56,6 @@ export class DeckStorageService {
 
       // Migration de version si nécessaire
       if (data.version !== this.STORAGE_VERSION) {
-        console.log(`🔄 Migration de la version ${data.version} vers ${this.STORAGE_VERSION}`);
         return this.migrateDecks(data);
       }
 
@@ -70,10 +66,8 @@ export class DeckStorageService {
         updatedAt: new Date(deck.updatedAt)
       }));
 
-      console.log(`✅ ${decks.length} decks chargés`);
       return decks;
     } catch (error) {
-      console.error('❌ Erreur lors du chargement des decks:', error);
       return [];
     }
   }
@@ -90,14 +84,12 @@ export class DeckStorageService {
     if (index >= 0) {
       // Mise à jour d'un deck existant
       decks[index] = deck;
-      console.log(`✏️ Deck "${deck.name}" mis à jour`);
     } else {
       // Ajout d'un nouveau deck
       if (decks.length >= this.MAX_DECKS) {
         throw new Error(`Limite de ${this.MAX_DECKS} decks atteinte. Supprimez des decks pour en ajouter de nouveaux.`);
       }
       decks.push(deck);
-      console.log(`➕ Deck "${deck.name}" ajouté`);
     }
 
     this.saveDecks(decks);
@@ -113,12 +105,10 @@ export class DeckStorageService {
     const filtered = decks.filter(d => d.id !== deckId);
 
     if (filtered.length === decks.length) {
-      console.warn(`⚠️ Deck ${deckId} non trouvé`);
       return;
     }
 
     this.saveDecks(filtered);
-    console.log(`🗑️ Deck supprimé`);
   }
 
   /**
@@ -144,7 +134,6 @@ export class DeckStorageService {
     const index = decks.findIndex(d => d.id === deckId);
 
     if (index < 0) {
-      console.warn(`⚠️ Deck ${deckId} non trouvé pour mise à jour`);
       return;
     }
 
@@ -155,7 +144,6 @@ export class DeckStorageService {
     };
 
     this.saveDecks(decks);
-    console.log(`✏️ Deck mis à jour`);
   }
 
   /**
@@ -163,7 +151,6 @@ export class DeckStorageService {
    */
   clearAllDecks(): void {
     localStorage.removeItem(this.STORAGE_KEY);
-    console.log('🗑️ Tous les decks supprimés');
   }
 
   /**
@@ -213,15 +200,10 @@ export class DeckStorageService {
    */
   private handleStorageError(error: any): void {
     if (error.name === 'QuotaExceededError') {
-      console.error('💥 Quota LocalStorage dépassé!');
-      console.log('💡 Suggestion: Supprimez des decks anciens pour libérer de l\'espace');
-
       // Optionnel: Supprimer automatiquement les decks les plus anciens
       // this.cleanupOldDecks();
     } else if (error.name === 'SecurityError') {
-      console.error('🔒 Accès au LocalStorage bloqué (mode privé ou restrictions)');
     } else {
-      console.error('❌ Erreur de stockage:', error.message);
     }
   }
 
@@ -231,12 +213,10 @@ export class DeckStorageService {
   private migrateDecks(data: any): SavedDeck[] {
     // Pour l'instant, pas de migration nécessaire (version 1.0)
     // Dans le futur, ajouter la logique de migration ici
-    console.log('⚠️ Migration non implémentée, tentative de chargement direct');
 
     try {
       return data.decks || [];
     } catch {
-      console.error('❌ Échec de la migration, retour tableau vide');
       return [];
     }
   }
@@ -260,8 +240,6 @@ export class DeckStorageService {
     // Garder seulement les N plus récents
     const kept = decks.slice(0, keepCount);
     this.saveDecks(kept);
-
-    console.log(`🧹 ${decks.length - keepCount} decks anciens supprimés`);
   }
 
   /**
@@ -301,9 +279,7 @@ export class DeckStorageService {
       });
 
       this.saveDecks(decks);
-      console.log(`📥 ${importedDecks.length} decks importés`);
     } catch (error) {
-      console.error('❌ Erreur lors de l\'import:', error);
       throw new Error('Échec de l\'import des decks. Vérifiez le format JSON.');
     }
   }

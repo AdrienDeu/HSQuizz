@@ -84,15 +84,12 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('🎴 Deck Builder initialisé');
-
     // S'abonner au deck actuel
     this.deck$.pipe(takeUntil(this.destroy$)).subscribe(deck => {
       this.currentDeck = deck;
       this.deckName = deck.name;
       this.selectedClass = deck.heroClass;
       this.selectedFormat = deck.format;
-      console.log(`📡 Deck mis à jour via subscription - Classe: ${deck.heroClass}, Format: ${deck.format}`);
     });
 
     // S'abonner aux statistiques
@@ -220,7 +217,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
         try {
           deckCode = this.deckCodeService.encodeDeck(this.currentDeck);
         } catch (error) {
-          console.warn('Impossible to generate deck code:', error);
         }
       }
 
@@ -267,7 +263,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
     navigator.clipboard.writeText(this.exportedCode).then(() => {
       this.showSuccess('Code copied to clipboard!');
     }).catch(err => {
-      console.error('Error copying to clipboard:', err);
       this.showError('Unable to copy code');
     });
   }
@@ -289,7 +284,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('📥 Attempting to import code:', this.importCode);
     // Extraire le nom du deck si disponible
     const extractedName = this.extractDeckName(this.importCode);
 
@@ -300,11 +294,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('✂️ Extracted deck code:', deckCode);
-    if (extractedName) {
-      console.log('📝 Extracted deck name:', extractedName);
-    }
-
     try {
       const decoded = this.deckCodeService.decodeDeck(deckCode);
       if (!decoded) {
@@ -312,12 +301,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
         return;
       }
 
-      console.log('✅ Deck successfully decoded:', decoded);
-      console.log(`   Class: ${decoded.heroClass}`);
-      console.log(`   Format: ${decoded.format}`);
-      console.log(`   Single copy: ${decoded.singleCopyDbfIds.length} cards`);
-      console.log(`   Double copy: ${decoded.doubleCopyDbfIds.length} cards`);
-      console.log(`   N-copy: ${decoded.nCopyCards.length} cards`);
       // Collecter tous les DBF IDs avec leurs quantités
       const allDbfIds: number[] = [];
       const cardQuantities = new Map<number, number>();
@@ -340,13 +323,9 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
         cardQuantities.set(dbfId, count);
       });
 
-      console.log(`🔍 Searching for ${allDbfIds.length} cards...`, allDbfIds);
-
       // Retrieve full cards from CardService
       this.cardService.getCardsByDbfIds(allDbfIds).subscribe({
         next: (cards) => {
-          console.log(`✅ Cards found: ${cards.length}/${allDbfIds.length}`);
-
           if (cards.length === 0) {
             this.showError(`No cards found in the database for this deck. DBF IDs: ${allDbfIds.join(', ')}`);
             return;
@@ -355,7 +334,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
           if (cards.length < allDbfIds.length) {
             const foundIds = new Set(cards.map(c => c.dbfId));
             const missingIds = allDbfIds.filter(id => !foundIds.has(id));
-            console.warn(`⚠️ Missing cards (${missingIds.length}):`, missingIds);
           }
 
           // Build the deck with cards and their quantities
@@ -380,9 +358,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
 
           // Charger le deck importé
           this.deckBuilderService.loadDeck(importedDeck);
-
-          console.log(`🔄 Deck loaded - Class: ${importedDeck.heroClass}, Format: ${importedDeck.format}`);
-          console.log(`🔄 Component variables after loadDeck - selectedClass: ${this.selectedClass}, selectedFormat: ${this.selectedFormat}`);
 
           // La subscription dans ngOnInit va mettre à jour automatiquement selectedClass et selectedFormat
           // Pas besoin de les mettre à jour manuellement ici
@@ -410,13 +385,11 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
           this.showImportModal = false;
         },
         error: (err) => {
-          console.error('❌ Erreur lors de la récupération des cartes:', err);
           this.showError('Erreur lors de la récupération des cartes: ' + err.message);
         }
       });
 
     } catch (error: any) {
-      console.error('❌ Erreur lors de l\'import:', error);
       this.showError('Erreur lors de l\'import : ' + error.message);
     }
   }
@@ -461,7 +434,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       if (trimmedLine.startsWith('###')) {
         const name = trimmedLine.substring(3).trim();
         if (name.length > 0) {
-          console.log(`📝 Nom du deck trouvé: "${name}"`);
           return name;
         }
       }

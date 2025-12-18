@@ -90,10 +90,8 @@ export class DeckBuilderService {
         const filtered = this.applyFiltersToCards(allCards, filters);
         this.availableCardsSubject.next(filtered);
         this.loadingSubject.next(false);
-        console.log(`📚 ${filtered.length} cartes chargées (Format: ${deck.format})`);
       },
       error: (err) => {
-        console.error('Erreur lors du chargement des cartes:', err);
         this.loadingSubject.next(false);
       }
     });
@@ -153,7 +151,6 @@ export class DeckBuilderService {
     const validation = this.canAddCard(card, currentDeck);
 
     if (!validation.valid) {
-      console.warn('❌ Impossible d\'ajouter la carte:', validation.reason);
       return false;
     }
 
@@ -181,7 +178,6 @@ export class DeckBuilderService {
     };
 
     this.deckSubject.next(updatedDeck);
-    console.log(`✅ Carte "${card.name}" ajoutée au deck`);
     return true;
   }
 
@@ -196,7 +192,6 @@ export class DeckBuilderService {
     const existingIndex = currentDeck.cards.findIndex(dc => dc.card.id === cardId);
 
     if (existingIndex < 0) {
-      console.warn('⚠️ Carte non trouvée dans le deck');
       return;
     }
 
@@ -222,7 +217,6 @@ export class DeckBuilderService {
     };
 
     this.deckSubject.next(updatedDeck);
-    console.log(`🗑️ Carte "${existing.card.name}" retirée du deck`);
   }
 
   /**
@@ -236,7 +230,6 @@ export class DeckBuilderService {
       updatedAt: new Date()
     };
     this.deckSubject.next(clearedDeck);
-    console.log('🧹 Deck vidé');
   }
 
   /**
@@ -247,7 +240,6 @@ export class DeckBuilderService {
       ...deck,
       updatedAt: new Date()
     });
-    console.log(`📂 Deck "${deck.name}" chargé`);
   }
 
   /**
@@ -451,7 +443,6 @@ export class DeckBuilderService {
       ...filters
     };
     this.filtersSubject.next(updatedFilters);
-    console.log('🔍 Filtres mis à jour', updatedFilters);
   }
 
   /**
@@ -459,7 +450,6 @@ export class DeckBuilderService {
    */
   clearFilters(): void {
     this.filtersSubject.next(this.getDefaultFilters());
-    console.log('🧹 Filtres réinitialisés');
   }
 
   /**
@@ -472,9 +462,6 @@ export class DeckBuilderService {
     const currentDeck = this.deckSubject.value;
     if (currentDeck.format === 'standard') {
       filtered = filtered.filter(card => STANDARD_SETS.includes(card.set));
-      console.log(`🎯 Mode Standard: ${filtered.length} cartes disponibles`);
-    } else {
-      console.log(`🌟 Mode Wild: ${filtered.length} cartes disponibles`);
     }
 
     // Filtre par classe

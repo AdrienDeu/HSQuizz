@@ -30,17 +30,14 @@ export class CardCollectionComponent implements OnInit, OnChanges {
   totalPages = 0;
 
   constructor(private deckBuilderService: DeckBuilderService) {
-    console.log('🔧 CardCollectionComponent constructor, service injecté:', !!this.deckBuilderService);
   }
 
   ngOnInit(): void {
-    console.log('📚 Collection de cartes initialisée avec', this.cards.length, 'cartes');
     this.updatePagination();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['cards'] && !changes['cards'].firstChange) {
-      console.log('🔄 Cartes changées, reset pagination');
       this.currentPage = 0;
       this.updatePagination();
     }
@@ -61,7 +58,6 @@ export class CardCollectionComponent implements OnInit, OnChanges {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     this.displayedCards = this.cards.slice(startIndex, endIndex);
-    console.log(`📄 Page ${this.currentPage + 1}/${this.totalPages} - ${this.displayedCards.length} cartes affichées`);
   }
 
   /**
@@ -112,19 +108,11 @@ export class CardCollectionComponent implements OnInit, OnChanges {
    * Gère le clic sur une carte (ajout au deck)
    */
   onCardClick(card: Card): void {
-    console.log('🖱️ Clic sur la carte:', card.name);
-
     if (!this.deckBuilderService) {
-      console.error('❌ Service DeckBuilder non disponible!');
       return;
     }
 
-    const success = this.deckBuilderService.addCardToDeck(card);
-    if (success) {
-      console.log('✨ Carte ajoutée avec succès au deck!');
-    } else {
-      console.warn('❌ Impossible d\'ajouter la carte au deck');
-    }
+    this.deckBuilderService.addCardToDeck(card);
   }
 
   /**

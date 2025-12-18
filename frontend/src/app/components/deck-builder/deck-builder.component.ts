@@ -145,7 +145,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       sets: []
     });
 
-    this.showSuccess(`Class changed : ${this.getClassName(this.selectedClass)}`);
+    this.showSuccess(`Class changed: ${this.getClassName(this.selectedClass)}`);
   }
 
   /**
@@ -160,10 +160,8 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    * Vide le deck actuel
    */
   clearDeck(): void {
-    if (confirm('Are you sure you want to clear the deck?')) {
-      this.deckBuilderService.clearDeck();
-      this.showSuccess('Deck cleared');
-    }
+    this.deckBuilderService.clearDeck();
+    this.showSuccess('Deck cleared');
   }
 
   /**
@@ -171,9 +169,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    */
   newDeck(): void {
     if (this.currentStats && this.currentStats.totalCards > 0) {
-      if (!confirm('Create a new deck? Unsaved changes will be lost.')) {
-        return;
-      }
+      // Allow creating a new deck without confirmation
     }
 
     this.deckBuilderService.loadDeck({
@@ -297,7 +293,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
     try {
       const decoded = this.deckCodeService.decodeDeck(deckCode);
       if (!decoded) {
-        this.showError('Deck code could not be decodeda');
+        this.showError('Invalid deck code');
         return;
       }
 
@@ -476,7 +472,8 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
    * Récupère le nom traduit d'une classe
    */
   getClassName(classCode: string): string {
-    return classCode;
+    const classInfo = this.classes.find(c => c.code === classCode);
+    return classInfo ? classInfo.name : classCode;
   }
 
   /**

@@ -140,19 +140,23 @@ export class DeckCodeService {
 
       // 5. Lire TOUS les hero DBF IDs (important!)
       // Pour les decks avec Maestra (multi-héros), on préfère le héros non-NEUTRAL
-      let heroClass = 'NEUTRAL'; // Défaut
+      let heroClass: string | undefined = undefined; // Défaut
       for (let i = 0; i < numHeroesResult.value; i++) {
         const heroDbfIdResult = VarintUtil.decode(bytes, offset);
         offset += heroDbfIdResult.bytesRead;
         const currentHeroClass = this.getClassFromHeroDbfId(heroDbfIdResult.value);
 
-        // Préférer un héros avec une vraie classe plutôt que NEUTRAL
-        if (currentHeroClass !== 'NEUTRAL') {
+        if (currentHeroClass && currentHeroClass !== 'NEUTRAL') {
           heroClass = currentHeroClass;
-        } else if (i === 0) {
-          // Si c'est le premier héros, on l'utilise par défaut
+          break;
+        }
+        if (!heroClass && currentHeroClass) {
           heroClass = currentHeroClass;
         }
+      }
+
+      if (!heroClass) {
+        throw new Error('Could not determine hero class from deck code');
       }
 
       // 6. Lire cartes single copy
@@ -236,12 +240,8 @@ export class DeckCodeService {
   /**
    * Récupère la classe à partir du DBF ID du héros
    */
-  private getClassFromHeroDbfId(dbfId: number): string {
-    const heroClass = DBF_ID_TO_CLASS[dbfId];
-    if (!heroClass) {
-      return 'MAGE';
-    }
-    return heroClass;
+  private getClassFromHeroDbfId(dbfId: number): string | undefined {
+    return DBF_ID_TO_CLASS[dbfId];
   }
 
   /**

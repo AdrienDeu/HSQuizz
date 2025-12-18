@@ -355,8 +355,10 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
           // Charger le deck importé
           this.deckBuilderService.loadDeck(importedDeck);
 
-          // La subscription dans ngOnInit va mettre à jour automatiquement selectedClass et selectedFormat
-          // Pas besoin de les mettre à jour manuellement ici
+          // Mettre à jour manuellement les propriétés du composant pour assurer la réactivité de l'UI
+          this.deckName = importedDeck.name;
+          this.selectedClass = importedDeck.heroClass;
+          this.selectedFormat = importedDeck.format;
 
           // Appliquer les filtres pour la classe importée
           this.deckBuilderService.updateFilters({

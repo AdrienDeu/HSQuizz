@@ -125,6 +125,8 @@ export class DeckManagerComponent implements OnInit, OnDestroy {
    * Charge un deck dans le builder
    */
   loadDeck(deck: SavedDeck): void {
+    this.deckBuilderService.loadDeck(deck);
+    this.closeManager.emit();
   }
 
   /**

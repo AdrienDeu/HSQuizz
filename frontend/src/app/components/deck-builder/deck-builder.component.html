@@ -193,6 +193,27 @@
           }
         </div>
       </div>
+
+      <!-- Dust Statistics -->
+      <div class="dust-stats-section">
+        <div class="section-header">
+          <h2>Dust Statistics</h2>
+        </div>
+        <div class="dust-stats-content">
+          @if (dustInfo.totalDust > 0) {
+            <p><strong>Total Dust:</strong> {{ dustInfo.totalDust }}</p>
+            <p><strong>Breakdown:</strong></p>
+            <ul>
+              @for (rarity of Object.keys(dustInfo.rarityBreakdown); track rarity) {
+                <li>{{ rarity }}: {{ dustInfo.rarityBreakdown[rarity] }}</li>
+              }
+            </ul>
+            <app-dust-chart [dustStats]="dustInfo"></app-dust-chart>
+          } @else {
+            <p class="placeholder-text">No dust statistics available</p>
+          }
+        </div>
+      </div>
     </aside>
   </div>
 

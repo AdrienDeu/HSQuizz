@@ -7,11 +7,14 @@ import { DeckBuilderService } from '../../services/deck-builder.service';
 import { DeckCodeService } from '../../services/deck-code.service';
 import { DeckStorageService } from '../../services/deck-storage.service';
 import { CardService } from '../../services/card.service';
+import { DustCalculatorService, DustStats } from '../../services/dust-calculator.service';
 import { Deck, DeckStatistics, SavedDeck } from '../../models/deck.model';
+import { Card } from '../../models/card.model';
 import { CardCollectionComponent } from './card-collection/card-collection.component';
 import { DeckStatsComponent } from './deck-stats/deck-stats.component';
 import { CardFilterComponent } from './card-filter/card-filter.component';
 import { DeckManagerComponent } from './deck-manager/deck-manager.component';
+import { DustChartComponent } from './dust-chart/dust-chart.component'; // Add this line
 
 @Component({
   selector: 'app-deck-builder',
@@ -22,7 +25,8 @@ import { DeckManagerComponent } from './deck-manager/deck-manager.component';
     CardCollectionComponent,
     DeckStatsComponent,
     CardFilterComponent,
-    DeckManagerComponent
+    DeckManagerComponent,
+    DustChartComponent
   ],
   templateUrl: './deck-builder.component.html',
   styleUrl: './deck-builder.component.scss'
@@ -53,6 +57,10 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
   importCode: string = '';
   errorMessage: string = '';
   successMessage: string = '';
+  public dustInfo: DustStats = { totalDust: 0, rarityBreakdown: {} }; // New property
+
+  // Make global Object accessible in template
+  public Object: ObjectConstructor = Object;
 
   // Options de classes (sans Neutre)
   readonly classes = [
@@ -73,7 +81,8 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
     deckBuilderService: DeckBuilderService,
     private deckCodeService: DeckCodeService,
     private deckStorageService: DeckStorageService,
-    private cardService: CardService
+    private cardService: CardService,
+    private dustCalculatorService: DustCalculatorService // Inject DustCalculatorService
   ) {
     this.deckBuilderService = deckBuilderService;
     // Initialiser les observables après l'injection
@@ -90,6 +99,13 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
       this.deckName = deck.name;
       this.selectedClass = deck.heroClass;
       this.selectedFormat = deck.format;
+
+      // Calculate dust info whenever the deck changes
+      const allCardsInDeck = deck.cards.flatMap(deckCard =>
+        Array(deckCard.quantity).fill(deckCard.card)
+      );
+      this.dustInfo = this.dustCalculatorService.calculateDustCost(allCardsInDeck);
+      console.log('Dust Info:', this.dustInfo);
     });
 
     // S'abonner aux statistiques
@@ -321,19 +337,19 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
 
       // Retrieve full cards from CardService
       this.cardService.getCardsByDbfIds(allDbfIds).subscribe({
-        next: (cards) => {
+        next: (cards: Card[]) => {
           if (cards.length === 0) {
             this.showError(`No cards found in the database for this deck. DBF IDs: ${allDbfIds.join(', ')}`);
             return;
           }
 
           if (cards.length < allDbfIds.length) {
-            const foundIds = new Set(cards.map(c => c.dbfId));
+            const foundIds = new Set(cards.map((c: Card) => c.dbfId));
             const missingIds = allDbfIds.filter(id => !foundIds.has(id));
           }
 
           // Build the deck with cards and their quantities
-          const deckCards: any[] = cards.map(card => ({
+          const deckCards: { card: Card; quantity: number }[] = cards.map((card: Card) => ({
             card,
             quantity: cardQuantities.get(card.dbfId) || 1
           }));
@@ -382,7 +398,7 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
 
           this.showImportModal = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           this.showError('Erreur lors de la récupération des cartes: ' + err.message);
         }
       });

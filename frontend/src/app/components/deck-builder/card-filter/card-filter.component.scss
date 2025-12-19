@@ -255,17 +255,21 @@
     &:checked {
       background: #ff9900;
       border-color: #ff9900;
-
-      &::after {
-        content: '\u2713';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: black;
-        font-weight: bold;
-        font-size: 14px;
-      }
+      position: relative;
+    }
+    &:checked::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 14px;
+      height: 14px;
+      transform: translate(-50%, -50%);
+      background-image: url('data:image/svg+xml;utf8,<svg fill="black" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M6.173 13.924a.75.75 0 0 1-1.06 0l-3.53-3.53a.75.75 0 1 1 1.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.47 7.47z"/></svg>');
+      background-size: 14px 14px;
+      background-repeat: no-repeat;
+      background-position: center;
+      pointer-events: none;
     }
 
     &:hover {

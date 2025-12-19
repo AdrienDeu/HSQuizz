@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Import CommonModule
-import { Chart, ChartConfiguration, ChartData, ChartType, ArcElement, Tooltip, Legend, CategoryScale } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartType, ArcElement, Tooltip, Legend, CategoryScale, PieController } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { DustStats } from '../../../services/dust-calculator.service';
 
@@ -34,11 +34,19 @@ export class DustChartComponent implements OnChanges {
       }
     }
   };
+  private static RARITY_COLORS: { [key: string]: string } = {
+    'LEGENDARY': '#ff8000',
+    'EPIC': '#a335ee',
+    'RARE': '#0070dd',
+    'COMMON': '#ffffff',
+    'FREE': '#9d9d9d'
+  };
+
   public pieChartData: ChartData<'pie', number[], string | string[]> = {
     labels: [],
     datasets: [{
       data: [],
-      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+      backgroundColor: []
     }]
   };
   public pieChartType: ChartType = 'pie';
@@ -62,16 +70,19 @@ export class DustChartComponent implements OnChanges {
 
     const labels: string[] = [];
     const data: number[] = [];
+    const bgColors: string[] = [];
 
     for (const rarity in this.dustStats.rarityBreakdown) {
       if (this.dustStats.rarityBreakdown.hasOwnProperty(rarity)) {
         labels.push(rarity);
         data.push(this.dustStats.rarityBreakdown[rarity]);
+        bgColors.push(DustChartComponent.RARITY_COLORS[rarity.toUpperCase()] || '#cccccc');
       }
     }
 
     this.pieChartData.labels = labels;
     this.pieChartData.datasets[0].data = data;
+    this.pieChartData.datasets[0].backgroundColor = bgColors;
 
     this.chart?.update();
   }

@@ -4,7 +4,7 @@ import { DustChartComponent } from './dust-chart.component';
 
 describe('DustChartComponent', () => {
   let component: DustChartComponent;
-  let fixture: ComponentFixture<DustChart>;
+  let fixture: ComponentFixture<DustChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

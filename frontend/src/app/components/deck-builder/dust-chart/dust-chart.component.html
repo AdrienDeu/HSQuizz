@@ -1,0 +1,14 @@
+<div class="dust-chart-container">
+  <div *ngIf="dustStats && dustStats.totalDust > 0" class="chart-wrapper">
+    <p>Total Dust: {{ dustStats.totalDust }}</p>
+
+    <canvas baseChart
+            [data]="pieChartData"
+            [options]="pieChartOptions"
+            [type]="pieChartType">
+    </canvas>
+  </div>
+  <div *ngIf="!dustStats || dustStats.totalDust === 0" class="no-data-message">
+    <p>No dust data available for this deck.</p>
+  </div>
+</div>

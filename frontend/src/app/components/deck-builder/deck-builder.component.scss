@@ -282,7 +282,7 @@
 
   .deck-stats-content {
     background: rgba(0, 0, 0, 0.3);
-    padding: 0;
+    padding: 1rem; // Add padding here
     border-radius: 0 0 8px 8px;
     min-height: 200px;
   }
@@ -424,6 +424,28 @@
         color: #666;
         font-size: 0.85rem;
         text-align: center;
+      }
+    }
+  }
+
+  .dust-stats-section {
+    .dust-stats-content {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 0 0 8px 8px;
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0;
+        li {
+          color: #ccc;
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+      }
+      .placeholder-text {
+        color: #999;
+        margin: 0;
       }
     }
   }

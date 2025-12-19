@@ -1,0 +1,24 @@
+.dust-chart-container {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.chart-wrapper {
+  margin-top: 1rem;
+  max-width: 400px; /* Adjust as needed */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.no-data-message {
+  color: #666;
+  font-style: italic;
+  margin-top: 1rem;
+}

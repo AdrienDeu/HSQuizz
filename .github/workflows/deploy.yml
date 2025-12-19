@@ -20,11 +20,12 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
+        command_timeout: 30m # ⚠️ IMPORTANT : Laisse 30min au serveur pour build (évite les coupures)
         script: |
           set -e
           
-          # --- CORRECTIF GIT (AJOUTÉ ICI) ---
-          # On autorise Git à utiliser ce dossier même s'il appartient à www-data
+          # --- CONFIGURATION GIT ---
+          # Évite l'erreur "dubious ownership" si l'utilisateur est différent
           git config --global --add safe.directory /var/www/HSQuizz
 
           echo "🚀 DÉBUT DU DÉPLOIEMENT..."
@@ -32,18 +33,20 @@ jobs:
           # --- 1. MISE A JOUR DU CODE ---
           cd /var/www/HSQuizz
           echo "📥 Récupération du code depuis GitHub..."
+          
+          # Nettoyage des changements locaux pour éviter les conflits
           git checkout main
           git fetch --all
-          
-          # ⚠️ ATTENTION : Cela va écraser votre server.js du serveur !
-          # Assurez-vous d'avoir mis le bon server.js sur votre GitHub avant !
           git reset --hard origin/main
 
           # --- 2. FRONTEND (Angular) ---
           echo "🅰️  Mise à jour du Frontend..."
           cd frontend
+          
           echo "📦 Installation des dépendances Frontend..."
-          npm ci
+          # Utilisation de install au lieu de ci + legacy-peer-deps pour gérer vos conflits de versions
+          npm install --legacy-peer-deps
+          
           echo "🏗️  Build de l'application Angular..."
           npm run build -- --configuration production
 
@@ -52,9 +55,13 @@ jobs:
           cd ../backend
           
           echo "📦 Installation des dépendances Backend..."
-          npm install --production
+          npm install --production --legacy-peer-deps
 
-          echo "🔄 Redémarrage du serveur Node.js..."
-          pm2 restart hs-backend
+          echo "🔄 Gestion du processus PM2..."
+          # Redémarre si existe, sinon le démarre. Nom du process : 'hs-backend'
+          pm2 reload hs-backend || pm2 start server.js --name hs-backend
+
+          echo "💾 Sauvegarde de la liste PM2..."
+          pm2 save
 
           echo "✅ DÉPLOIEMENT TERMINÉ AVEC SUCCÈS ! 🎉"

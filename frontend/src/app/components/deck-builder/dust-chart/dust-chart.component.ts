@@ -46,7 +46,7 @@ export class DustChartComponent implements OnChanges {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
   constructor() {
-    Chart.register(ArcElement, Tooltip, Legend, CategoryScale);
+    Chart.register(ArcElement, Tooltip, Legend, CategoryScale, PieController);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -105,7 +105,6 @@ export class DeckBuilderComponent implements OnInit, OnDestroy {
         Array(deckCard.quantity).fill(deckCard.card)
       );
       this.dustInfo = this.dustCalculatorService.calculateDustCost(allCardsInDeck);
-      console.log('Dust Info:', this.dustInfo);
     });
 
     // S'abonner aux statistiques

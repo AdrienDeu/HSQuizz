@@ -37,11 +37,8 @@ export class CardService {
         : this.API_URL;
 
       this.cards$ = this.http.get<Card[]>(url).pipe(
-        map(cards => this.deduplicateCards(cards)),
         catchError(error => {
-          return this.http.get<Card[]>(this.BACKUP_URL).pipe(
-            map(cards => this.deduplicateCards(cards))
-          );
+          return this.http.get<Card[]>(this.BACKUP_URL);
         }),
         map(cards => includeNonCollectible ? cards : this.filterCollectibleCards(cards)),
         shareReplay(1)
@@ -147,34 +144,7 @@ export class CardService {
     );
   }
 
-  /**
-   * Déduplique un tableau de cartes Hearthstone selon les règles suivantes :
-   * - Unicité basée sur dbfId
-   * - Priorité à la carte collectible
-   * - Si plusieurs collectibles, priorité au set le plus récent (ordre alphabétique comme fallback)
-   */
-  private deduplicateCards(cards: Card[]): Card[] {
-    const cardMap = new Map<string, Card>();
-    for (const card of cards) {
-      if (!card.name) continue;
-      const key = card.name.trim().toLowerCase();
-      const existing = cardMap.get(key);
-      if (!existing) {
-        cardMap.set(key, card);
-      } else {
-        // 1. Priorité à la carte collectible
-        if (card.collectible && !existing.collectible) {
-          cardMap.set(key, card);
-        } else if (card.collectible === existing.collectible) {
-          // 2. Si les deux sont collectibles ou non, garder celle du set le plus "récent" (ordre alphabétique)
-          if (card.set > existing.set) {
-            cardMap.set(key, card);
-          }
-        }
-      }
-    }
-    return Array.from(cardMap.values());
-  }
+
 
   /**
    * Traduit le type de carte en français

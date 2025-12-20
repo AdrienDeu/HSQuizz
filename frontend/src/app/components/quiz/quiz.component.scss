@@ -1,3 +1,69 @@
+// Quiz header main (style proche leaderboard)
+.quiz-header-main {
+  text-align: center;
+  margin-bottom: 1.2rem;
+  h1 {
+    font-family: 'Cinzel', 'Georgia', serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #f4e4bc;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 8px #7a5c1b, 0 1px 0 #fffbe6;
+  }
+  .subtitle {
+    color: #a89070;
+    margin: 0.5rem 0 0 0;
+    font-size: 1.1rem;
+  }
+}
+// Quiz loading title (style proche leaderboard)
+.quiz-loading-title {
+  text-align: center;
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #f4e4bc;
+  margin: 0 0 1rem 0;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 8px #7a5c1b, 0 1px 0 #fffbe6;
+}
+// Quiz title (enhanced style)
+.quiz-title {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #f7e7b0;
+  text-shadow: 0 2px 8px #7a5c1b, 0 1px 0 #fffbe6;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #ffe082 30%, #fffbe6 60%, #d1b97a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  animation: quizTitleGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes quizTitleGlow {
+  0% {
+    text-shadow: 0 2px 8px #7a5c1b, 0 1px 0 #fffbe6;
+  }
+  100% {
+    text-shadow: 0 4px 16px #ffe082, 0 2px 4px #bfa14a;
+  }
+}
+
+.quiz-title-text {
+  display: inline-block;
+}
+
+.hs-highlight {
+  color: #ffb300;
+  font-weight: 900;
+  text-shadow: 0 2px 8px #bfa14a, 0 1px 0 #fffbe6;
+  letter-spacing: 1.5px;
+}
 // Loading overlay
 
 .quiz-loading-overlay {

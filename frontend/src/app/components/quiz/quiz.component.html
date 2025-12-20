@@ -2,7 +2,10 @@
   <!-- Header -->
   <header class="quiz-header">
     @if (!quizStarted) {
-      <p class="subtitle">Configure your Hearthstone Quiz!</p>
+      <div class="quiz-header-main">
+        <h1>Hearthstone Quiz</h1>
+        <p class="subtitle">Configure your quiz</p>
+      </div>
     } @else {
       <p class="subtitle">Guess : {{ currentAttributeLabel }}</p>
     }
@@ -11,7 +14,7 @@
     <!-- Loading state -->
     @if (loading) {
       <div class="loading">
-        <div class="spinner"></div>
+        <h1 class="quiz-loading-title">Hearthstone Quiz</h1>
         <p>Loading cards...</p>
       </div>
     }

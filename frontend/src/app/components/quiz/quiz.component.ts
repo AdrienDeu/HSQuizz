@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Renderer2, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardDisplayComponent } from '../card-display/card-display.component';
@@ -13,7 +13,9 @@ import { Card, QuizQuestion, HiddenAttribute, QuizSettings, HIDDEN_ATTRIBUTE_LAB
   templateUrl: './quiz.component.html',
   styleUrl: './quiz.component.scss'
 })
-export class QuizComponent implements OnInit {
+export class QuizComponent implements OnInit, OnDestroy {
+  @ViewChild('multiselect') multiselect!: ElementRef;
+
   // Données des cartes
   allCards: Card[] = [];
   filteredCards: Card[] = [];
@@ -32,6 +34,11 @@ export class QuizComponent implements OnInit {
     numberOfQuestions: 10 // Default to 10 questions
   };
   includeNonCollectible: boolean = false;
+
+  // Set selection dropdown
+  setsDropdownOpen = false;
+  searchText = '';
+  filteredSets: { code: string; name: string }[] = [];
   
   // Options pour les attributs
   attributeOptions: { value: HiddenAttribute; label: string }[] = [
@@ -50,42 +57,53 @@ export class QuizComponent implements OnInit {
   currentQuestionNumber: number = 0; // Tracks the current question number
   quizFinished: boolean = false; // Indicates if the quiz has finished
 
+  private globalClickListener: (() => void) | null = null;
+
   constructor(
     private cardService: CardService,
-    private quizService: QuizService
+    private quizService: QuizService,
+    private renderer: Renderer2,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.loading = true; // Set global loading for initial load
     this.loadCards(true);
+  }
+
+  ngOnDestroy(): void {
+    if (this.globalClickListener) {
+      this.globalClickListener();
+    }
   }
 
   /**
    * Charge les cartes depuis le service
    */
   loadCards(isInitialLoad: boolean = false): void {
-    if (!isInitialLoad) {
-      this.reloadingCards = true; // Use localized loading for subsequent reloads
-    }
     this.error = null;
+    if (isInitialLoad) {
+      this.loading = true;
+    } else {
+      this.reloadingCards = true;
+    }
 
     this.cardService.getCollectibleCards(this.includeNonCollectible).subscribe({
       next: (cards) => {
         this.allCards = cards;
-        if (isInitialLoad) { // Only set global loading to false if it was an initial load
-          this.loading = false;
-        }
-        this.reloadingCards = false;
         if (isInitialLoad) {
+          this.loading = false;
           this.loadAvailableSets();
+        } else {
+          this.reloadingCards = false;
         }
       },
       error: (err) => {
         this.error = 'Error loading cards. Please refresh the page.';
-        if (isInitialLoad) { // Only set global loading to false if it was an initial load
+        if (isInitialLoad) {
           this.loading = false;
+        } else {
+          this.reloadingCards = false;
         }
-        this.reloadingCards = false;
       }
     });
   }
@@ -97,6 +115,7 @@ export class QuizComponent implements OnInit {
     this.cardService.getAvailableSets().subscribe({
       next: (sets) => {
         this.availableSets = sets;
+        this.filteredSets = sets;
       }
     });
   }
@@ -146,6 +165,14 @@ export class QuizComponent implements OnInit {
     this.currentQuestion = null;
     this.error = null;
     this.quizFinished = false; // Reset quiz finished state
+    // Ferme le dropdown si ouvert
+    if (this.setsDropdownOpen) {
+      this.setsDropdownOpen = false;
+      if (this.globalClickListener) {
+        this.globalClickListener();
+        this.globalClickListener = null;
+      }
+    }
   }
 
   /**
@@ -176,6 +203,52 @@ export class QuizComponent implements OnInit {
     } else {
       this.settings.selectedSets = this.availableSets.map(s => s.code);
     }
+  }
+
+  /**
+   * Toggle the sets dropdown
+   */
+  toggleSetsDropdown(): void {
+    // If already open, close and remove the listener
+    if (this.setsDropdownOpen) {
+      this.setsDropdownOpen = false;
+      if (this.globalClickListener) {
+        this.globalClickListener(); // Unbind the listener
+        this.globalClickListener = null;
+      }
+      return;
+    }
+
+    // Else, open and add the listener
+    this.setsDropdownOpen = true;
+    // Use setTimeout to ensure the listener is added after the current event cycle
+    // This prevents the click that opens the dropdown from immediately closing it
+    setTimeout(() => {
+      this.globalClickListener = this.renderer.listen('document', 'click', (event: MouseEvent) => {
+        // If the click is outside the multiselect component, close the dropdown
+        if (this.multiselect && !this.multiselect.nativeElement.contains(event.target)) {
+          this.setsDropdownOpen = false;
+          if (this.globalClickListener) {
+            this.globalClickListener(); // Unbind the listener
+            this.globalClickListener = null;
+          }
+          this.cdRef.detectChanges(); // Manually trigger change detection
+        }
+      });
+    });
+  }
+
+  /**
+   * Filter sets based on search text
+   */
+  filterSets(): void {
+    if (!this.searchText) {
+      this.filteredSets = this.availableSets;
+      return;
+    }
+    this.filteredSets = this.availableSets.filter(set =>
+      set.name.toLowerCase().includes(this.searchText.toLowerCase())
+    );
   }
 
   /**

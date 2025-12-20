@@ -6,17 +6,17 @@
     } @else {
       <p class="subtitle">Guess : {{ currentAttributeLabel }}</p>
     }
-  </header>
-
-  <!-- Loading state -->
-  @if (loading) {
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Loading cards...</p>
-    </div>
-  }
-
-  <!-- Error state -->
+    </header>
+  
+    <!-- Loading state -->
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading cards...</p>
+      </div>
+    }
+  
+    <!-- Error state -->
   @if (error && !quizStarted) {
     <div class="error-message">
       <p>{{ error }}</p>
@@ -44,47 +44,59 @@
 
       <!-- Set selector -->
       <div class="settings-section">
-        <h3>Sets</h3>
-        <div class="sets-header">
-          <button class="btn btn-small" (click)="toggleAllSets()">
-            {{ settings.selectedSets.length === availableSets.length ? 'Deselect All' : 'Select All' }}
-          </button>
-          <span class="sets-count">
-            {{ settings.selectedSets.length === 0 ? 'All' : settings.selectedSets.length + ' selected' }}
-          </span>
+        <h3>Options</h3>
+        <div class="multiselect-sets" #multiselect>
+            <button class="multiselect-sets-toggle" (click)="toggleSetsDropdown()">
+                {{ settings.selectedSets.length === 0 ? 'All Sets' : settings.selectedSets.length + ' sets selected' }}
+                <span class="multiselect-sets-arrow"></span>
+            </button>
+            @if (setsDropdownOpen) {
+                <div class="multiselect-sets-panel">
+                <div class="multiselect-sets-header">
+                    <input
+                    type="text"
+                    class="multiselect-sets-search"
+                    placeholder="Search sets..."
+                    [(ngModel)]="searchText"
+                    (ngModelChange)="filterSets()">
+                    <button class="btn btn-small" (click)="toggleAllSets()">
+                    {{ settings.selectedSets.length === availableSets.length ? 'Deselect All' : 'Select All' }}
+                    </button>
+                </div>
+                <div class="multiselect-sets-list">
+                    @for (set of filteredSets; track set.code) {
+                    <label class="set-checkbox">
+                        <input
+                          type="checkbox"
+                          [checked]="isSetSelected(set.code)"
+                          (change)="toggleSet(set.code)"
+                        >
+                        <span class="custom-checkbox"></span>
+                        <span class="set-name">{{ set.name }}</span>
+                    </label>
+                    }
+                </div>
+                <div class="card-filters">
+                    <label class="filter-checkbox" [class.loading]="reloadingCards">
+                        <input
+                        type="checkbox"
+                        [(ngModel)]="includeNonCollectible"
+                        (change)="loadCards()"
+                        [disabled]="reloadingCards">
+                        <span class="custom-checkbox"></span>
+                        <div class="filter-label">
+                        <span class="filter-label-main">
+                            Include uncollectible items
+                            @if (reloadingCards) {
+                            <span class="loading-spinner-inline">⏳</span>
+                            }
+                        </span>
+                        </div>
+                    </label>
+                </div>
+                </div>
+            }
         </div>
-        <div class="sets-grid">
-          @for (set of availableSets; track set.code) {
-            <label class="set-checkbox">
-              <input
-                type="checkbox"
-                [checked]="isSetSelected(set.code)"
-                (change)="toggleSet(set.code)">
-              <span class="set-name">{{ set.name }}</span>
-            </label>
-          }
-        </div>
-      </div>
-
-      <!-- Collectible filter -->
-      <div class="settings-section">
-        <h3>🃏 Card Filters</h3>
-        <label class="filter-checkbox" [class.loading]="reloadingCards">
-          <input
-            type="checkbox"
-            [(ngModel)]="includeNonCollectible"
-            (change)="loadCards()"
-            [disabled]="reloadingCards">
-          <span class="custom-checkbox"></span>
-          <div class="filter-label">
-            <span class="filter-label-main">
-              Include uncollectible items
-              @if (reloadingCards) {
-                <span class="loading-spinner-inline">⏳</span>
-              }
-            </span>
-          </div>
-        </label>
       </div>
 
       <!-- Preview and Start -->
